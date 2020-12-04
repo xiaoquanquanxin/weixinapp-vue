@@ -1,8 +1,8 @@
 <template>
     <div>
-        已缴
+        组件
 
-
+        <div></div>
     </div>
 </template>
 

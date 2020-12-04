@@ -7,7 +7,7 @@
             <router-link to="">预缴费用</router-link>
         </div>
         <div class="payment right-button">
-            <router-link to="PaymentList/paid-in">缴费记录</router-link>
+            <router-link to="PaymentList/paid-out">缴费记录</router-link>
         </div>
     </div>
 </template>

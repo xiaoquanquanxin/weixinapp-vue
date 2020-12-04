@@ -3,10 +3,10 @@
         <div class="banner"></div>
         <div class="nav">
             <div>
-                <router-link to="/PaymentList/paid-in" active-class="active" exact>未缴账单</router-link>
+                <router-link to="/PaymentList/paid-out" active-class="active" exact>未缴账单</router-link>
             </div>
             <div>
-                <router-link to="/PaymentList/paid-out" active-class="active">未缴账单</router-link>
+                <router-link to="/PaymentList/paid-in" active-class="active">已缴账单</router-link>
             </div>
         </div>
         <router-view></router-view>
