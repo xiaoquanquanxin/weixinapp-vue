@@ -1,0 +1,68 @@
+body,html{
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background: #f9f9f9;
+}
+p {
+    margin-bottom: 0;
+}
+
+
+li {
+    list-style-type: none;
+}
+
+ul {
+    padding-left: 0;
+    margin-bottom: 0;
+}
+
+
+hr {
+    border-top: none;
+    margin: 0;
+}
+
+/*横向滚动条的行高*/
+.ant-menu-horizontal {
+    line-height: 40px;
+}
+
+/*!*滚动条*!*/
+/**::-webkit-scrollbar {*/
+/*    !*display: none;*!*/
+/*    visibility: hidden;*/
+/*}*/
+
+/*下拉的后缀*/
+.caret-down svg {
+    transform: scale(1.3);
+    color: #b5b5b5;
+}
+
+
+/*表头*/
+.ant-table th {
+    white-space: nowrap !important;
+}
+
+/*表格*/
+.ant-table td {
+    /*white-space: nowrap !important;*/
+}
+
+/*滚动*/
+.ant-table-fixed-header > .ant-table-content > .ant-table-scroll > .ant-table-body {
+    overflow: auto !important;
+}
+
+/*表格的空隙*/
+.ant-table-thead > tr > th, .ant-table-tbody > tr > td {
+    /*padding-left: 0;*/
+    /*padding-right: 0;*/
+}
+a{
+    text-decoration: none;
+}
