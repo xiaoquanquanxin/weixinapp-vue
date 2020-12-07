@@ -42,11 +42,13 @@
     },
     methods: {
       choose() {
+
         this.$nextTick(() => {
           new IosSelect(1,
             [this.paidOut],
             {
               container: '.select-box',
+              title:'选择费项',
               itemHeight: 50,
               itemShowCount: 3,
               showAnimate: true,

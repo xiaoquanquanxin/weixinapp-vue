@@ -1,7 +1,6 @@
 import Page404 from '@/views/Page404.vue'
 import Login from "@/views/Login.vue";
 import PayIndex from "@/views/payment/PayIndex.vue";
-import Payment from "@/views/payment/Payment.vue";
 import PaymentList from "@/views/payment/PaymentList.vue";
 //	同步路由
 export const syncRoutesList = [
@@ -25,12 +24,7 @@ export const syncRoutesList = [
         component: PayIndex,
 
     },
-    {
-        path: '/Payment',
-        name: 'Payment',
-        component: Payment,
 
-    },
     {
         path: '/PaymentList',
         name: 'PaymentList',

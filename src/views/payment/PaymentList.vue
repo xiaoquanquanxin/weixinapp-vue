@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-        <div class="banner"></div>
+        <div class="banner" @click="aaa"></div>
         <div class="nav">
             <div>
                 <router-link to="/PaymentList/paid-out" active-class="active" exact>未缴账单</router-link>
@@ -14,8 +14,15 @@
 </template>
 
 <script>
+
   export default {
-    name: "PaymentList"
+    name: "PaymentList",
+    methods:{
+      aaa(){
+        this.$showToast.show('hello2020!')
+        // this.$showToast.hide()
+      }
+    }
   }
 </script>
 

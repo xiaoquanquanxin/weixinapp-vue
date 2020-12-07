@@ -1,13 +1,13 @@
 <template>
     <div class="">
         <div class="payment right-button">
-            <router-link to="Payment">物业缴费</router-link>
+            <div @click="goPage('PaymentList/paid-out')">物业缴费</div>
         </div>
         <div class="payment right-button">
-            <router-link to="">预缴费用</router-link>
+            <div @click="goPage('PaymentList/paid-out')">预缴费用</div>
         </div>
         <div class="payment right-button">
-            <router-link to="PaymentList/paid-out">缴费记录</router-link>
+            <router-link to="/">缴费记录</router-link>
         </div>
     </div>
 </template>
@@ -16,25 +16,33 @@
 
   export default {
     computed: {
-      count(){
+      count() {
         return this.$store.state.test.count
       }
     },
-    data(){
+    data() {
       return {};
     },
     methods: {
-      //  xxx
       ...mapActions('test', [
         'setCountAdd',
         'setCountReduce',
       ]),
+      goPage(url) {
+        // this.$axios({
+        //   url: "aaa",
+        //   method: 'get',
+        // }).then(()=>{
+        //   this.$router.push({path: url})
+        // })
+        this.$router.push({path: url})
+      }
     }
   };
 </script>
 <style scoped lang="less">
     // 列表组件布局 用react的话 直接把下面注释就可以
-    .payment{
+    .payment {
         height: 0.5rem;
         line-height: 0.5rem;
         border-top: 1px solid #eeeeee;
@@ -42,9 +50,8 @@
         padding: 0 0.26rem;
         box-sizing: border-box;
         margin-bottom: 0.1rem;
-        a{
-            font-size: .12rem;
-            display: block;
+        font-size: .12rem;
+        div {
             width: 100%;
             height: 100%;
         }
