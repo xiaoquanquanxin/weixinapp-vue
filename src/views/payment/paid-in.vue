@@ -1,7 +1,6 @@
 <template>
     <div class="paid-box">
-        已缴
-        <payment class="paid-box" :paidData="paidIn"></payment>
+        <payment class="paid-box" :paidData="paidInList"></payment>
     </div>
 </template>
 
@@ -12,49 +11,41 @@
     name: "paid-in",
     data() {
       return {
-        paidIn: [
-          {
-            'year': '2016', 'data': [
-              {'id': '10001', 'value': '工商银行'},
-            ]
-          },
-          {
-            'year': '2017', 'data': [
-              {'id': '10002', 'value': '建设银行'},
-            ]
-          },
-          {
-            'year': '2018', 'data': [
-              {'id': '10002', 'value': '建设银行'},
-            ]
-          },
-          {
-            'year': '2019', 'data': [
-              {'id': '10002', 'value': '建设银行'},
-            ]
-          },
-          {
-            'year': '2020', 'data': [
-              {'id': '10002', 'value': '建设银行'},
-            ]
-          },
-          {
-            'year': '2021', 'data': [
-              {'id': '10002', 'value': '建设银行'},
-            ]
-          },
-          {
-            'year': '2022', 'data': [
-              {'id': '10002', 'value': '建设银行'},
-            ]
-          },
-          {
-            'year': '2023', 'data': [
-              {'id': '10002', 'value': '建设银行'},
-            ]
-          },
-        ]
+        paidInList: []
       }
+    },
+    created() {
+      // 获取费用项目列表
+      this.paidInList = [
+        {
+          "billMonth": "2019-9",
+          "billDetails": [
+            {
+              "paid": "4801",
+              "paidName": "住宅物业管理费",
+              "paidStatus": "0",
+              "isMeter": "1",
+              "paidTotal": 183,
+              "isFrozen": "0",
+              "billIds": "789612"
+            }
+          ]
+        },
+        {
+          "billMonth": "2019-10",
+          "billDetails": [
+            {
+              "paid": "4801",
+              "paidName": "住宅物业管理费",
+              "paidStatus": "0",
+              "isMeter": "1",
+              "paidTotal": 183,
+              "isFrozen": "1",
+              "billIds": "799458"
+            }
+          ]
+        },
+      ]
     },
     components: {
       payment

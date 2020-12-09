@@ -2,9 +2,15 @@
     <div class="form-item">
         <ul>
             <li v-for="item in paidData" :key="item.index">
-                <div class="year">{{item.year}}</div>
-                <div v-for="items in item.data" :key="items.id" >
-                    <input v-if="paidName === 'paidOut'" type="checkbox" :id="items.id"><label :for="items.id">{{items.value}}</label>
+                <div class="year">{{item.billMonth}}</div>
+                <div v-for="items in item.billDetails" :key="items.billIds" class="paid-cont"
+                     @click="choosepaid(items.billIds)">
+                    <div>
+                        <span v-if="paidName === 'paidOut'" :class="['checkbox',{'isChecked':items.checked}]"></span>{{items.paidName}}
+                    </div>
+                    <div>
+                        ￥410.00
+                    </div>
                 </div>
             </li>
         </ul>
@@ -13,18 +19,37 @@
 
 <script>
 
+  import {mapActions} from "vuex";
 
   export default {
     name: "payment",
     data() {
       return {
-
+        paidList: this.$store.state.paidOut.paidOutList
       }
     },
-    props:['paidData','paidName'],
+    props: ['paidData', 'paidName', 'isAllChecked'],
+    computed: {
+      allChecked() {
+        return this.$store.state.paidOut.allChecked
+      }
+    },
     methods: {
-
-
+      ...mapActions('paidOut', [
+        //  保存病人信息，这是为了给组件用，而不是页面，所以要store
+        'setAllChecked',
+      ]),
+      choosepaid(id) {
+        this.paidData.map((item) => {
+          if (item.billDetails[0].billIds == id) {
+            this.$set(item.billDetails[0], 'checked', !item.billDetails[0].checked)
+          }
+        })
+        let isCheck = this.paidData.every((item)=>{
+          return item.billDetails[0].checked
+        })
+        this.setAllChecked(isCheck)
+      }
     }
   }
 </script>
@@ -33,15 +58,39 @@
     .form-item {
         font-size: 0.16rem;
     }
-    li{
+
+    li {
         border-bottom: 1px solid #eeeeee;
-        padding-left: 0.13rem;
-        div{
+        padding-left: 0.1rem;
+
+        div {
             line-height: 0.4rem;
         }
     }
-    .year{
+
+    .year {
         border-bottom: 1px solid #eeeeee;
     }
 
+    .paid-cont {
+        display: flex;
+        justify-content: space-between;
+        padding-right: 0.1rem;
+    }
+
+    .checkbox {
+        display: inline-block;
+        width: 0.14rem;
+        height: 0.14rem;
+        border: 0.01rem solid #979797;
+        border-radius: 100%;
+        margin-right: 0.1rem;
+    }
+    .isChecked {
+        background-image: url("~@/assets/images/checked.png");
+        background-size: cover;
+        width: 0.16rem;
+        height: 0.16rem;
+        border: none;
+    }
 </style>
