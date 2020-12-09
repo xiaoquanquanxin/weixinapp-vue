@@ -3,13 +3,16 @@
         <ul>
             <li v-for="item in paidData" :key="item.index">
                 <div class="year">{{item.year}}</div>
-                <div v-for="items in item.data" :key="items.id" >{{items.value}}</div>
+                <div v-for="items in item.data" :key="items.id" >
+                    <input v-if="paidName === 'paidOut'" type="checkbox" :id="items.id"><label :for="items.id">{{items.value}}</label>
+                </div>
             </li>
         </ul>
     </div>
 </template>
 
 <script>
+
 
   export default {
     name: "payment",
@@ -18,7 +21,7 @@
 
       }
     },
-    props:['paidData'],
+    props:['paidData','paidName'],
     methods: {
 
 

@@ -5,12 +5,12 @@
                 <!--                <input type="hidden" name="bank_id" id="bankId" value="">-->
 
                 <div class="screening">
-                    <div>{{bill}}</div>
+                    <div>{{billName}}</div>
                     <div id="showBank" @click="choose">费项筛选</div>
                 </div>
-                <payment class="context" :paidData="paidOut"></payment>
+                <payment class="context" :paidData="paidOut" :paidName="'paidOut'"></payment>
             </div>
-            <div class="freeze">您有账单被冻结，请支付或取消后再缴费>></div>
+            <div class="freeze" v-if="isFreeze">您有账单被冻结，请支付或取消后再缴费>></div>
             <div class="box-footer"></div>
         </div>
         <ios-select ref="mychild" @func="setRoom" :paidData="paidOut"></ios-select>
@@ -31,7 +31,8 @@
     },
     data() {
       return {
-        paidOut: [
+        isFreeze:false, // 冻结状态
+        paidOut: [      // 费项列表
           {
             'year': '2016', 'data': [
               {'id': '10001', 'value': '工商银行'},
@@ -44,36 +45,36 @@
           },
           {
             'year': '2018', 'data': [
-              {'id': '10002', 'value': '建设银行'},
+              {'id': '10003', 'value': '建设银行'},
             ]
           },
           {
             'year': '2019', 'data': [
-              {'id': '10002', 'value': '建设银行'},
+              {'id': '10004', 'value': '建设银行'},
             ]
           },
           {
             'year': '2020', 'data': [
-              {'id': '10002', 'value': '建设银行'},
+              {'id': '10005', 'value': '建设银行'},
             ]
           },
           {
             'year': '2021', 'data': [
-              {'id': '10002', 'value': '建设银行'},
+              {'id': '10006', 'value': '建设银行'},
             ]
           },
           {
             'year': '2022', 'data': [
-              {'id': '10002', 'value': '建设银行'},
+              {'id': '10007', 'value': '建设银行'},
             ]
           },
           {
             'year': '2023', 'data': [
-              {'id': '10002', 'value': '建设银行'},
+              {'id': '10008', 'value': '建设银行'},
             ]
           },
         ],
-        bill: ""
+        billName: ""  // 费项名称
       }
     },
     methods: {
