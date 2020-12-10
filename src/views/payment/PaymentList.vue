@@ -1,14 +1,19 @@
 <template>
     <div class="container">
         <div class="banner">
-            <p @click="choose">{{roomName}}</p>
+            <p>¥1265.00</p>
+            <span>未缴总金额</span>
+            <div @click="choose">
+                房间：{{roomName}}
+                <!--                <img src="~@/assets/images/right.png">-->
+            </div>
         </div>
         <div class="nav">
             <div>
-                <router-link to="/PaymentList/paid-out" active-class="active" exact>未缴账单</router-link>
+                <router-link to="/PaymentList/Paid-out" active-class="active" exact>未缴账单</router-link>
             </div>
             <div>
-                <router-link to="/PaymentList/paid-in" active-class="active">已缴账单</router-link>
+                <router-link to="/PaymentList/Paid-in" active-class="active">已缴账单</router-link>
             </div>
         </div>
         <router-view class="content"></router-view>
@@ -27,20 +32,20 @@
     data() {
       return {
         room: [
-          {'id': '10001', 'value': '实地-遵义蔷薇国际'},
-          {'id': '10002', 'value': '中山-遵义蔷薇国际'},
-          {'id': '10003', 'value': '广州-遵义蔷薇国际'},
-          {'id': '10004', 'value': '北京-遵义蔷薇国际'},
-          {'id': '10005', 'value': '天津-遵义蔷薇国际'},
+          {'id': '10001', 'value': '实地 - 遵义蔷薇国际 - D3地块(7、8地块及周边地块还有啥来着)'},
+          {'id': '10002', 'value': '中山 - 遵义蔷薇国际 - D3地块(7、8地块及周边地块还有啥来着'},
+          {'id': '10003', 'value': '广州 - 遵义蔷薇国际 - D3地块(7、8地块及周边地块还有啥来着'},
+          {'id': '10004', 'value': '北京 - 遵义蔷薇国际 - D3地块(7、8地块及周边地块还有啥来着'},
+          {'id': '10005', 'value': '天津 - 遵义蔷薇国际 - D3地块(7、8地块及周边地块还有啥来着'},
         ],
-        roomName:"实地-遵义蔷薇国际"
+        roomName: "实地-遵义蔷薇国际"
       }
     },
     methods: {
       setRoom(value) {
         console.log(value)
         this.roomName = value.value
-        this.$showToast.show('hello2020!',2000)
+        this.$showToast.show('hello2020!', 2000)
         // this.$showToast.hide()
       },
       choose() {
@@ -59,15 +64,57 @@
     }
 
     .banner {
-        height: 1.2rem;
-        background: #b5b5b5;
+        height: 1.29rem;
+        background-image: url("~@/assets/images/banner.png");
+        background-size: cover;
         flex: none;
+        text-align: center;
+        p {
+            margin: 0;
+            padding-top: 0.19rem;
+            font-size: 0.26rem;
+            /*font-weight: bold;*/
+            color: #FFFFFF;
+            line-height: 0.37rem;
+            /*text-align: center;*/
+        }
+
+        span {
+            font-size: 0.12rem;
+            font-weight: 400;
+            color: #FFFFFF;
+            line-height: 0.17rem;
+            opacity: 0.75;
+        }
+
+        div {
+            width: 92%;
+            height: 0.3rem;
+            color: #ffffff;
+            margin: 0 auto;
+            text-align: left;
+            padding: 0.06rem 0.1rem;
+            padding-right: 0.35rem;
+            box-sizing: border-box;
+            background-color: rgba(0, 0, 0, 0.14);
+            background-image: url("~@/assets/images/right.png");
+            background-size: 0.07rem 0.11rem;
+            background-repeat: no-repeat;
+            background-position: center right 0.1rem;
+            font-size: 0.13rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            margin-top: 0.08rem;
+            opacity: 0.75;
+        }
     }
 
     .nav {
         display: flex;
         height: 0.4rem;
         background: #ffffff;
+
         div {
             height: 0.39rem;
             line-height: 0.4rem;

@@ -2,6 +2,8 @@ import Page404 from '@/views/Page404.vue'
 import Login from "@/views/Login.vue";
 import PayIndex from "@/views/payment/PayIndex.vue";
 import PaymentList from "@/views/payment/PaymentList.vue";
+import ConfirmPayment from "@/views/payment/ConfirmPayment.vue";
+import PaySuccess from "@/views/PaySuccess.vue";
 //	同步路由
 export const syncRoutesList = [
     {
@@ -25,21 +27,35 @@ export const syncRoutesList = [
 
     },
 
+
     {
         path: '/PaymentList',
         name: 'PaymentList',
         component: PaymentList,
         children: [
             {
-                path: 'paid-in',
-                name: 'paid-in',
-                component: () => import(/* webpackChunkName: "inventory" */ '@/views/payment/paid-in'),
+                path: 'Paid-in',
+                name: 'Paid-in',
+                component: () => import(/* webpackChunkName: "inventory" */ '@/views/payment/Paid-in'),
             },
             {
-                path: 'paid-out',
-                name: 'paid-out',
-                component: () => import(/* webpackChunkName: "purchaseOrder" */ '@/views/payment/paid-out'),
+                path: 'Paid-out',
+                name: 'Paid-out',
+                component: () => import(/* webpackChunkName: "purchaseOrder" */ '@/views/payment/Paid-out'),
             }]
+
+    },
+
+    {
+        path: '/ConfirmPayment',
+        name: 'ConfirmPayment',
+        component: ConfirmPayment,
+
+    },
+    {
+        path: '/PaySuccess',
+        name: 'PaySuccess',
+        component: PaySuccess,
 
     },
 ];

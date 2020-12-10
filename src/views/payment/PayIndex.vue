@@ -1,10 +1,10 @@
 <template>
     <div class="">
         <div class="payment right-button">
-            <div @click="goPage('PaymentList/paid-out')">物业缴费</div>
+            <div @click="goPage('PaymentList/Paid-out')">物业缴费</div>
         </div>
         <div class="payment right-button">
-            <div @click="goPage('PaymentList/paid-out')">预缴费用</div>
+            <div @click="goPage('PaymentList/Paid-out')">预缴费用</div>
         </div>
         <div class="payment right-button">
             <router-link to="/">缴费记录</router-link>

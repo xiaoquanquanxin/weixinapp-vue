@@ -38,7 +38,7 @@ axios.interceptors.response.use(
           localStorage.clear();
           window.location.href = '/login';
       }
-      return Promise.reject(new Error(res.message || 'Error'));
+      return Promise.reject(new Error(res.msg || 'Error'));
   },
   (error) => {
       return Promise.reject(error);

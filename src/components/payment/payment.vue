@@ -9,7 +9,7 @@
                         <span v-if="paidName === 'paidOut'" :class="['checkbox',{'isChecked':items.checked}]"></span>{{items.paidName}}
                     </div>
                     <div>
-                        ￥410.00
+                        ￥{{items.paidTotal}}
                     </div>
                 </div>
             </li>
@@ -19,13 +19,14 @@
 
 <script>
 
-  import {mapActions} from "vuex";
+  // import {mapActions} from "vuex";
 
   export default {
     name: "payment",
     data() {
       return {
-        paidList: this.$store.state.paidOut.paidOutList
+        // paidList: this.$store.state.paidOut.paidOutList,
+        // billdsList:[]
       }
     },
     props: ['paidData', 'paidName', 'isAllChecked'],
@@ -34,21 +35,31 @@
         return this.$store.state.paidOut.allChecked
       }
     },
+    created() {
+    },
     methods: {
-      ...mapActions('paidOut', [
-        //  保存病人信息，这是为了给组件用，而不是页面，所以要store
-        'setAllChecked',
-      ]),
+      // ...mapActions('paidOut', [
+      //   //  保存病人信息，这是为了给组件用，而不是页面，所以要store
+      //   'setAllChecked',
+      // ]),
       choosepaid(id) {
-        this.paidData.map((item) => {
-          if (item.billDetails[0].billIds == id) {
-            this.$set(item.billDetails[0], 'checked', !item.billDetails[0].checked)
-          }
-        })
-        let isCheck = this.paidData.every((item)=>{
-          return item.billDetails[0].checked
-        })
-        this.setAllChecked(isCheck)
+        // console.log(id)
+        // this.paidData.map((item,index) => {
+        //   if (item.billDetails[0].billIds == id) {
+        //     if(item.billDetails[0].checked){
+        //       this.billdsList.splice(index,1)
+        //     }else{
+        //       this.billdsList.push(item.billDetails[0])
+        //     }
+        //     this.$set(item.billDetails[0], 'checked', !item.billDetails[0].checked)
+        //   }
+        // })
+        // let isCheck = this.paidData.every((item)=>{
+        //   return item.billDetails[0].checked
+        // })
+        this.$emit('func',id)
+        // console.log(this.billdsList)
+        // this.setAllChecked(isCheck)
       }
     }
   }

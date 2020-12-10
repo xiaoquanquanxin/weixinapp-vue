@@ -2,13 +2,11 @@
     <div class="paid-box">
         <div class="form-item item-line">
             <div class="box">
-                <!--                <input type="hidden" name="bank_id" id="bankId" value="">-->
-
                 <div class="screening">
                     <div>{{billName}}</div>
                     <div id="showBank" @click="choose">费项筛选</div>
                 </div>
-                <payment class="context" :paidData="paidOutList" :paidName="'paidOut'"></payment>
+                <payment class="context" :paidData="paidOutList" :paidName="'paidOut'" @func="billdsCheck"></payment>
             </div>
             <div class="freeze" v-if="isFreeze">您有账单被冻结，请支付或取消后再缴费>></div>
             <div :class="['box-footer',{'box-shadow':!isFreeze}]">
@@ -19,9 +17,9 @@
                             <span :class="['checkbox',{'isChecked':allChecked}]"></span>
                             全选:
                         </label>
-                        <b>¥1265.00</b>
+                        <b>¥ {{totleMoney}}</b>
                     </div>
-                    <div class="payment">立即缴费</div>
+                    <div class="payment" @click="goConfirmPayment">立即缴费</div>
                 </div>
             </div>
         </div>
@@ -34,7 +32,8 @@
 
   import payment from "../../components/payment/payment";
   import iosSelect from "../../components/iosSelect";
-  import {mapActions} from "vuex";
+  // import {mapActions} from "vuex";
+  import $ from 'jquery'
 
   export default {
     name: "paid-in",
@@ -44,68 +43,106 @@
     },
     data() {
       return {
+        billName: "全部费用",  // 费项名称
         isFreeze: false, // 冻结状态
-        paidOutList: [],
-        billName: ""  // 费项名称
+        allChecked: true, //是否全选
+        billIDsList: [], // 选中的费项列表
+        paidOutList: [], // 费项列表
+        totleMoney: 0
       }
     },
     created() {
       // 获取费用项目列表
-      this.paidOutList = [
-        {
-          "billMonth": "2019-9",
-          "billDetails": [
-            {
-              "paid": "4801",
-              "paidName": "住宅物业管理费",
-              "paidStatus": "0",
-              "isMeter": "1",
-              "paidTotal": 183,
-              "isFrozen": "0",
-              "billIds": "789612"
-            }
-          ]
-        },
-        {
-          "billMonth": "2019-10",
-          "billDetails": [
-            {
-              "paid": "4801",
-              "paidName": "住宅物业管理费",
-              "paidStatus": "0",
-              "isMeter": "1",
-              "paidTotal": 183,
-              "isFrozen": "1",
-              "billIds": "799458"
-            }
-          ]
-        },
-      ]
+      let data = {
+        roomIDs: '4a7477c8-7a28-46ce-bfc9-678e6dd71aaa',
+        userID: '575cd6b8b1c54389936cf47fe8347a40'
+      };
+
+      $.ajax({
+        crossDomain: true,//兼容ie8,9
+        type: "post",
+        url: '/bpi/getUnpaidBill.do',
+        contentType: "application/x-www-form-urlencoded",
+        data: {'json': JSON.stringify(data)},
+      }).then((res) => {
+        // resolve(data)
+        // eslint-disable-next-line no-debugger
+
+        this.paidOutList = res.data.content
+
+        this.paidOutList.map((item) => {
+          // 拿到选中费项列表
+          this.billIDsList.push(item.billDetails[0].billIds);
+          // 默认选中所有费项
+          this.$set(item.billDetails[0], 'checked', true)
+          // 默认选中所有费项
+          this.totleMoney += item.billDetails[0].paidTotal
+        })
+        // this.allChecked = true;
+      })
+
     },
     computed: {
-      allChecked() {
-        return this.$store.state.paidOut.allChecked
-      }
+      // allChecked() {
+      //   return this.$store.state.paidOut.allChecked
+      // }
     },
     methods: {
-      ...mapActions('paidOut', [
-        //  保存病人信息，这是为了给组件用，而不是页面，所以要store
-        'setAllChecked',
-      ]),
+      // ...mapActions('paidOut', [
+      //   'setAllChecked',
+      // ]),
+      // iosSelect 激活组件
       choose() {
         this.$refs.mychild.choose()
       },
+      // 选择房间
       setRoom(value) {
-        console.log(value)
-        this.bill = value.value
+        this.billName = value.value
         this.$showToast.show('hello2020!', 2000)
         // this.$showToast.hide()
       },
+      //  全选按钮点击事件
       allCheck() {
         this.paidOutList.map((item) => {
           this.$set(item.billDetails[0], 'checked', !this.allChecked)
         })
-        this.setAllChecked(!this.allChecked) // 更改全选按钮状态
+        // this.setAllChecked(!this.allChecked) // 更改全选按钮状态
+        this.isCheckedAll()
+      },
+      // 立即缴费
+      goConfirmPayment() {
+        let query = {
+          userID: "575cd6b8b1c54389936cf47fe8347a40",
+          totleMoney: this.totleMoney,
+          billIDsList: this.billIDsList
+        }
+        this.$router.push({path: '/ConfirmPayment', query})
+      },
+      // 单费项点击事件
+      billdsCheck(id) {
+        this.paidOutList.map((item) => {
+          if (item.billDetails[0].billIds == id) {
+            // 遍历费项列表 找到选中费项 控制选中状态
+            this.$set(item.billDetails[0], 'checked', !item.billDetails[0].checked)
+            // 根据选中费项checked属性 添加/删除 选中费项列表内容
+            if (!item.billDetails[0].checked) {
+              if (this.billIDsList.indexOf(item.billDetails[0].billIds) != '-1') {
+                this.billdsList.splice(this.billIDsList.indexOf(item.billDetails[0].billIds), 1)
+              }
+              this.totleMoney -= item.billDetails[0].paidTotal
+            } else {
+              this.billIDsList.push(item.billDetails[0].billIds)
+              this.totleMoney += item.billDetails[0].paidTotal
+            }
+          }
+        })
+        this.isCheckedAll()
+      },
+      isCheckedAll() {
+        // 控制全选按钮
+        this.allChecked = this.paidOutList.every((item) => {
+          return item.billDetails[0].checked
+        })
       }
     }
   }
@@ -141,6 +178,13 @@
         height: 0.4rem;
         line-height: 0.4rem;
         padding: 0 0.13rem;
+        color: #909090;
+        font-size: 0.12rem;
+
+        #showBank {
+            font-size: 0.13rem;
+            color: #000000;
+        }
     }
 
     .box-footer {
@@ -207,6 +251,12 @@
             height: 100%;
             display: flex;
             align-items: center;
+
+            label {
+                display: flex;
+                align-items: center;
+                height: 100%;
+            }
         }
     }
 

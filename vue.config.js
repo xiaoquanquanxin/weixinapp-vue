@@ -2,10 +2,13 @@
 module.exports = {
     devServer: {
         proxy: {
-            '/api': {
-                target: 'http://容丽姐ip:端口/',
+            '/bpi': {
+                target: 'http://192.168.100.208:8090/',
                 changeOrigin: true,
+                pathRewrite: {
+                    '^/bpi': ''
+                }
             },
         }
-    }
+    },
 };
