@@ -6,33 +6,37 @@
         </div>
         <div class="payment-box">
             <div class="payment-list">
-                <div >
+                <div>
                     <p class="paymen-name">订单号码</p>
                     <p class="payment-money">2312412531234</p>
                 </div>
-                <div >
+                <div>
                     <p class="paymen-name">下单时间</p>
                     <p class="payment-money">2020-09-09 18:00</p>
                 </div>
-                <div >
+                <div>
                     <p class="paymen-name">支付方式</p>
                     <p class="payment-money">在线支付</p>
                 </div>
             </div>
         </div>
-        <div class="goIndex"><router-link to="/">返回首页</router-link></div>
-        <div class="goOrderDetail">查看订单</div>
+        <div class="goIndex">
+            <router-link to="/">返回首页</router-link>
+        </div>
+        <div class="goOrderDetail">
+            <router-link to="/OrderDetail">查看订单</router-link>
+        </div>
     </div>
 </template>
 
 <script>
   export default {
-    name: "PaySuccess"
+    name: "PaySuccess",
   }
 </script>
 
 <style scoped lang="less">
-    .pay{
+    .pay {
         width: 100%;
         height: 1.27rem;
         background: #FFFFFF;
@@ -41,11 +45,13 @@
         align-items: center;
         flex-direction: column;
         justify-content: center;
-        img{
+
+        img {
             width: 0.45rem;
             height: 0.45rem;
         }
-        p{
+
+        p {
             font-size: 0.18rem;
             color: #000000;
             line-height: 0.25rem;
@@ -62,6 +68,7 @@
             box-sizing: border-box;
             background: #ffffff;
             border-bottom: 0.01rem solid #ECECEC;
+
             div {
                 display: flex;
                 justify-content: space-between;
@@ -79,7 +86,8 @@
             }
         }
     }
-    .goIndex{
+
+    .goIndex {
         width: 2.4rem;
         height: 0.44rem;
         line-height: 0.44rem;
@@ -89,14 +97,16 @@
         margin-top: 0.36rem;
         font-size: 0.15rem;
         text-align: center;
-        a{
+
+        a {
             display: block;
             width: 100%;
             height: 100%;
             color: #ffffff;
         }
     }
-    .goOrderDetail{
+
+    .goOrderDetail {
         width: 2.4rem;
         height: 0.44rem;
         line-height: 0.44rem;
@@ -104,8 +114,14 @@
         border: 0.01rem solid #04639D;
         margin: 0 auto;
         margin-top: 0.2rem;
-        color: #04639D;
         text-align: center;
         font-size: 0.15rem;
+
+        a {
+            display: block;
+            width: 100%;
+            height: 100%;
+            color: #04639D;
+        }
     }
 </style>
