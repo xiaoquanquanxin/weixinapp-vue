@@ -3,7 +3,7 @@
         <div class="banner">
             <p>¥1265.00</p>
             <span>未缴总金额</span>
-            <div @click="choose">
+            <div class="world" @click="choose">
                 房间：{{roomName}}
                 <!--                <img src="~@/assets/images/right.png">-->
             </div>
