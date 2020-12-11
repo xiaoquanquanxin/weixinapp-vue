@@ -102,9 +102,7 @@
             background-repeat: no-repeat;
             background-position: center right 0.1rem;
             font-size: 0.13rem;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+
             margin-top: 0.08rem;
             opacity: 0.75;
         }

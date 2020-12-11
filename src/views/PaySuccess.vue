@@ -23,7 +23,7 @@
         <div class="goIndex">
             <router-link to="/">返回首页</router-link>
         </div>
-        <div class="goOrderDetail">
+        <div class="goOrderDetail" @click="goOrderDetail">
             <router-link to="/OrderDetail">查看订单</router-link>
         </div>
     </div>
@@ -32,6 +32,20 @@
 <script>
   export default {
     name: "PaySuccess",
+    data() {
+      return {
+        type: ""
+      }
+    },
+    created() {
+      console.log(this.$route.query)
+      this.type = this.$route.query.type
+    },
+    methods: {
+      goOrderDetail() {
+        this.$router.push({path: '/OrderDetail', query: {'type': this.type}})
+      }
+    }
   }
 </script>
 
@@ -56,6 +70,7 @@
             color: #000000;
             line-height: 0.25rem;
             font-weight: 400;
+            margin-top: 0.11rem;
         }
     }
 

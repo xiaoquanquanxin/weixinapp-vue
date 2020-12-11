@@ -1,11 +1,12 @@
 import Page404 from '@/views/Page404.vue'
 import Login from "@/views/Login.vue";
-import PayIndex from "@/views/payment/PayIndex.vue";
+import PayIndex from "@/views/PayIndex.vue";
 import PaymentList from "@/views/payment/PaymentList.vue";
 import ConfirmPayment from "@/views/payment/ConfirmPayment.vue";
 import PaySuccess from "@/views/PaySuccess.vue";
 import OrderDetail from "@/views/order/OrderDetail.vue";
 import Prepayment from "@/views/prepay/Prepayment.vue";
+import ConfirmPrepay from "@/views/prepay/ConfirmPrepay.vue";
 //	同步路由
 export const syncRoutesList = [
   {
@@ -68,6 +69,12 @@ export const syncRoutesList = [
     path: '/Prepayment',
     name: 'Prepayment',
     component: Prepayment,
+
+  },
+  {
+    path: '/ConfirmPrepay',
+    name: 'ConfirmPrepay',
+    component: ConfirmPrepay,
 
   },
 ];

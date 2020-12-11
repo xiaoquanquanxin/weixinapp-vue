@@ -1,11 +1,11 @@
 <template>
     <div class="container">
-        <div class="room">房间：实地·遵义蔷薇国际-D3地块(7、8地块及03地…</div>
+        <div class="room world">房间：实地·遵义蔷薇国际-D3地块(7、8地块及03地…</div>
         <div class="content">
 
             <div class="payment-box">
                 <div class="payment-list" v-for="item in billList" :key="item.billDetails[0].billIds">
-                    <h3>[{{item.billMonth}}]</h3>
+                    <h3>【{{item.billMonth}}】</h3>
                     <div v-for="items in item.billDetails" :key="items.billIds">
                         <p class="paymen-name">{{items.paidName}}</p>
                         <p class="payment-money">￥{{items.paidTotal}}</p>
@@ -22,7 +22,7 @@
                     </label>
                     <b>¥ {{totleMoney}}</b>
                 </div>
-                <div class="payment" @click="goPay">立即缴费</div>
+                <div class="payment" @click="goPay">微信支付</div>
             </div>
         </div>
     </div>
@@ -88,17 +88,13 @@
 
     .room {
         width: 100%;
-        height: 0.3rem;
+        height: 0.45rem;
+        line-height: 0.45rem;
         text-align: left;
-        padding: 0.06rem 0.1rem;
-        padding-right: 0.35rem;
+        padding: 0 0.1rem;
         box-sizing: border-box;
-        background-color: rgba(0, 0, 0, 0.14);
-        font-size: 0.13rem;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        opacity: 0.75;
+        background-color: #ffffff;
+        font-size: 0.14rem;
         color: #000000;
         flex: none;
     }

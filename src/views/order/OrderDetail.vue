@@ -10,9 +10,14 @@
             </div>
             <div class="orderList">
                 <div class="payment">
-                    <p class="room">房间: 实地·遵义蔷薇国际-D3地块(7、8地块及03地块及03地块及03地</p>
+                    <p class="room world">房间: 实地·遵义蔷薇国际-D3地块(7、8地块及03地块及03地块及03地</p>
+                    <!--                    预缴订单-->
+                    <div class="prepay" v-if="type == 'pre'">
+                        <p class="paymen-name">住宅物业管理费</p>
+                        <p class="payMoney">实付：<span>¥535.00</span></p>
+                    </div>
                     <!--                    订单-->
-                    <div>
+                    <div v-else>
                         <div class="payment-box" v-for="item in 3" :key="item">
                             <div class="payment-list">
                                 <h3>[2019]</h3>
@@ -33,11 +38,6 @@
                         <p class="payMoney">实付：<span>¥535.00</span></p>
                     </div>
 
-                    <!--                    预缴订单-->
-                    <div class="prepay">
-                        <p class="paymen-name">住宅物业管理费</p>
-                        <p class="payMoney">实付：<span>¥535.00</span></p>
-                    </div>
 
                 </div>
                 <div class="payment">
@@ -82,11 +82,14 @@
       return {
         minutes: 15,
         seconds: 0,
-        maxtime: 15 * 60,
-        timer: null
+        maxtime: 15 * 60 - 1,
+        timer: null,
+        type: ""
       }
     },
     created() {
+      console.log(this.$route.query)
+      this.type = this.$route.query.type
       this.timer = setInterval(this.CountDown, 1000);
     },
     methods: {
@@ -168,9 +171,6 @@
 
                 .room {
                     font-size: 0.13rem;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                    white-space: nowrap;
                     border-bottom: 0.01rem solid #ECECEC;
                     line-height: 0.5rem;
                 }
@@ -222,14 +222,17 @@
                         color: #DF4949;
                     }
                 }
-                .prepay{
+
+                .prepay {
                     margin-top: 0.16rem;
                     display: flex;
                     justify-content: space-between;
-                    .payMoney{
+
+                    .payMoney {
                         margin-top: 0;
                     }
-                    .paymen-name{
+
+                    .paymen-name {
                         font-size: 0.13rem;
                         color: #505050;
                     }
