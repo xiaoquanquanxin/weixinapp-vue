@@ -53,21 +53,21 @@
         data: {'json': JSON.stringify(data)},
       }).then((res) => {
         // resolve(data) billIds
-        this.totleMoney = res.data.totalMoney
         this.billIDsList.map((billItem) => {
           res.data.content.map((item) => {
             // eslint-disable-next-line no-debugger
             if (item.billDetails[0].billIds == billItem) {
               this.billList.push(item)
+              this.totleMoney += item.billDetails[0].paidTotal
             }
           })
         })
       })
       console.log(navigator.userAgent) //  获取手机型号
     },
-    methods:{
-      goPay(){
-        this.$router.push({path:'/PaySuccess'})
+    methods: {
+      goPay() {
+        this.$router.push({path: '/PaySuccess'})
       }
     }
   }
