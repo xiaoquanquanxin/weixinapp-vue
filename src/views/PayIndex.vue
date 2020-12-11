@@ -7,7 +7,7 @@
             <div @click="goPage('Prepayment')">预缴费用</div>
         </div>
         <div class="payment right-button">
-            <router-link to="/">缴费记录</router-link>
+            <router-link to="/PaymentRecords">缴费记录</router-link>
         </div>
     </div>
 </template>
@@ -54,6 +54,11 @@
         div {
             width: 100%;
             height: 100%;
+        }
+        a{
+            width: 100%;
+            height: 100%;
+            display: block;
         }
     }
 

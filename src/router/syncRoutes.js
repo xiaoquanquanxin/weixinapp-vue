@@ -7,6 +7,7 @@ import PaySuccess from "@/views/PaySuccess.vue";
 import OrderDetail from "@/views/order/OrderDetail.vue";
 import Prepayment from "@/views/prepay/Prepayment.vue";
 import ConfirmPrepay from "@/views/prepay/ConfirmPrepay.vue";
+import PaymentRecords from "@/views/PaymentRecords.vue";
 //	同步路由
 export const syncRoutesList = [
   {
@@ -75,6 +76,12 @@ export const syncRoutesList = [
     path: '/ConfirmPrepay',
     name: 'ConfirmPrepay',
     component: ConfirmPrepay,
+
+  },
+  {
+    path: '/PaymentRecords',
+    name: 'PaymentRecords',
+    component: PaymentRecords,
 
   },
 ];
