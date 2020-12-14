@@ -31,9 +31,6 @@
         outerData: null // 用于记录外部传进来的数据，也可以给外部监听userBehavior，事件的函数提供判断到底是哪个事件触发的
       }
     },
-    created() {
-      console.log(this.type)
-    },
     methods: {
       show (content, config) {
         this.content = content || 'Say Something ...'

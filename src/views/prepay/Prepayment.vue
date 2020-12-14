@@ -3,7 +3,7 @@
         <div class="header world bg" @click="choose">房间: 实地·遵义蔷薇国际-D3地块(7、8地块及03地…</div>
         <div class="payment">
             <div>预缴费项</div>
-            <div class="bg payment-name" @click="choose">预收住宅管理费（A1-1505）</div>
+            <div class="bg payment-name" @click="choose">{{feeName}}</div>
         </div>
         <div class="payment-box">
             <div class="payment-list">
@@ -93,7 +93,7 @@
                 </section>
             </div>
         </div>
-        <ios-select ref="mychild" @func="setRoom" :paidData="room"></ios-select>
+        <ios-select ref="mychild" @func="setRoom" :paidData="iosData"></ios-select>
         <!--        confirm 组件-->
         <Confrim ref="myConfirm" @userBehavior="userBehaviorFun" type="alert"></Confrim>
     </div>
@@ -110,14 +110,10 @@
       return {
         rates: false, // 收费标准
         custom: false, // 自定义
-        room: [
-          {'id': '10001', 'value': '实地 - 遵义蔷薇国际 - D3地块(7、8地块及周边地块还有啥来着)'},
-          {'id': '10002', 'value': '中山 - 遵义蔷薇国际 - D3地块(7、8地块及周边地块还有啥来着'},
-          {'id': '10003', 'value': '广州 - 遵义蔷薇国际 - D3地块(7、8地块及周边地块还有啥来着'},
-          {'id': '10004', 'value': '北京 - 遵义蔷薇国际 - D3地块(7、8地块及周边地块还有啥来着'},
-          {'id': '10005', 'value': '天津 - 遵义蔷薇国际 - D3地块(7、8地块及周边地块还有啥来着'},
-        ],
-        roomName: "实地-遵义蔷薇国际"
+        feeName: "",
+        iosData: [],
+        roomName: "实地-遵义蔷薇国际",
+        feeId:''
       }
     },
     components: {
@@ -125,26 +121,33 @@
       Confrim
     },
     created() {
-      let data = {
-        pmdsRoomId: '4a7477c8-7a28-46ce-bfc9-678e6dd71aaa',
-        cmdsId: '575cd6b8b1c54389936cf47fe8347a40'
-      };
-      $.ajax({
-        crossDomain: true,//兼容ie8,9
-        type: "post",
-        url: '/bpi/property/prepayment/hasFeeItem',
-        contentType: "application/x-www-form-urlencoded",
-        data: data,
-        success: (res) => {
-          if(res.code == '4000'){
-            this.$refs.myConfirm.show(res.msg)
-          }
-          this.getFeeInfo()
-        }
-      })
+        // 先获取有没有预缴订单
+        this.getFeeItem()
     },
     methods: {
-      getFeeInfo(){
+      getFeeItem(){
+        let data = {
+          pmdsRoomId: '4a7477c8-7a28-46ce-bfc9-678e6dd71aaa',
+          cmdsId: '575cd6b8b1c54389936cf47fe8347a40'
+        };
+        $.ajax({
+          crossDomain: true,//兼容ie8,9
+          type: "post",
+          url: '/bpi/property/prepayment/hasFeeItem',
+          contentType: "application/x-www-form-urlencoded",
+          data: data,
+          success: (res) => {
+            if (res.code == '4000') {
+              this.$refs.myConfirm.show(res.msg)
+            }
+            if(!res.data){
+              this.$refs.myConfirm.show('费项异常，暂不能进行预缴')
+            }
+            this.getFeeInfo()
+          }
+        })
+      },
+      getFeeInfo() {
         let data = {
           pmdsRoomId: '4a7477c8-7a28-46ce-bfc9-678e6dd71aaa',
           cmdsId: '575cd6b8b1c54389936cf47fe8347a40'
@@ -156,14 +159,44 @@
           contentType: "application/x-www-form-urlencoded",
           data: data,
           success: (res) => {
+            if (res.code == 2000) {
+              this.feeName = `${res.data[0].feeName}(${res.data[0].itemSourceName})`
+              let arr = [];
+              res.data.map((item) => {
+                arr.push({
+                  'id': item.feeId, 'value': `${item.feeName}(${item.itemSourceName})`
+                })
+              })
+              this.iosData = arr
+              this.feeId = res.data[0].feeId
+              this.getFeeChargeStandard()
+            }
+          }
+        })
+      },
+      getFeeChargeStandard(){
+        // eslint-disable-next-line no-debugger
+        // debugger
+        let data = {
+          pmdsRoomId: '4a7477c8-7a28-46ce-bfc9-678e6dd71aaa',
+          cmdsId: '575cd6b8b1c54389936cf47fe8347a40',
+          feeId:this.feeId,
+          itemSourceName:1
+        };
+        $.ajax({
+          crossDomain: true,//兼容ie8,9
+          type: "post",
+          url: '/bpi/property/prepayment/getFeeChargeStandard',
+          contentType: "application/x-www-form-urlencoded",
+          data: data,
+          success: (res) => {
             console.log(res)
           }
         })
       },
       setRoom(value) {
         console.log(value)
-        this.roomName = value.value
-
+        this.feeId = value.id
       },
       // 收费标准
       showRates() {
