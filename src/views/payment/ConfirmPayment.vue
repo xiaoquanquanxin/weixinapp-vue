@@ -98,7 +98,7 @@
             contentType: "application/x-www-form-urlencoded",
             data: {'json': JSON.stringify(json)},
             success: (res) => {
-              if (res.code == 1000) {
+              if (res.code == 2000) {
                 resolve(res)
               } else {
                 reject(res)
@@ -128,7 +128,7 @@
           contentType: "application/x-www-form-urlencoded",
           data: dataP2,
           success: (res) => {
-            if (res.code == 1000) {
+            if (res.code == 2000) {
               this.payOrder()
             }
           },

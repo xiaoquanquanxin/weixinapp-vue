@@ -52,35 +52,9 @@
       }
     },
     created() {
-      // 获取费用项目列表
-      let data = {
-        roomIDs: '4a7477c8-7a28-46ce-bfc9-678e6dd71aaa',
-        userID: '575cd6b8b1c54389936cf47fe8347a40'
-      };
 
-      $.ajax({
-        crossDomain: true,//兼容ie8,9
-        type: "post",
-        url: '/bpi/getUnpaidBill.do',
-        contentType: "application/x-www-form-urlencoded",
-        data: {'json': JSON.stringify(data)},
-      }).then((res) => {
-        // resolve(data)
-        // eslint-disable-next-line no-debugger
-
-        this.paidOutList = res.data.content
-
-        this.paidOutList.map((item) => {
-          // 拿到选中费项列表
-          this.billIDsList.push(item.billDetails[0].billIds);
-          // 默认选中所有费项
-          this.$set(item.billDetails[0], 'checked', true)
-          // 默认选中所有费项
-          this.totleMoney += item.billDetails[0].paidTotal
-        })
-        // this.allChecked = true;
-      })
-
+        this.getPaymentList() // 获取项目列表
+        this.getUnpaidBill() // 获取冻结账单列表
     },
     computed: {
       // allChecked() {
@@ -88,6 +62,52 @@
       // }
     },
     methods: {
+      getPaymentList(){
+        // 获取费用项目列表
+        let data = {
+          roomIDs: '4a7477c8-7a28-46ce-bfc9-678e6dd71aaa',
+          userID: '575cd6b8b1c54389936cf47fe8347a40'
+        };
+        $.ajax({
+          crossDomain: true,//兼容ie8,9
+          type: "post",
+          url: '/bpi/getUnpaidBill.do',
+          contentType: "application/x-www-form-urlencoded",
+          data: {'json': JSON.stringify(data)},
+          success:(res)=>{
+            this.paidOutList = res.data.content
+
+            this.paidOutList.map((item) => {
+              // 拿到选中费项列表
+              this.billIDsList.push(item.billDetails[0].billIds);
+              // 默认选中所有费项
+              this.$set(item.billDetails[0], 'checked', true)
+              // 默认选中所有费项
+              this.totleMoney += item.billDetails[0].paidTotal
+            })
+          }
+        })
+      },
+      getUnpaidBill(){
+        let data = {
+          "roomIds": "4a7477c8-7a28-46ce-bfc9-678e6dd71aaa",
+          "contactNumber":"18201538993"
+        };
+        $.ajax({
+          crossDomain: true,//兼容ie8,9
+          type: "post",
+          url: '/bpi/getUnpaidBillTranV1.do',
+          contentType: "application/x-www-form-urlencoded",
+          data: {'json': JSON.stringify(data)},
+          success:(res)=>{
+            if(res.data.length){
+              this.isFreeze = 1
+            }else{
+              this.isFreeze = 0
+            }
+          }
+        })
+      },
       // ...mapActions('paidOut', [
       //   'setAllChecked',
       // ]),
@@ -161,7 +181,7 @@
 
     .freeze {
         position: fixed;
-        bottom: 0.4rem;
+        bottom: 0.5rem;
         height: 0.2rem;
         line-height: 0.2rem;
         font-size: 0.14rem;
@@ -194,13 +214,8 @@
         width: 100%;
         height: 0.5rem;
         background: #ffffff;
-    }
-
-    .box-shadow {
-        box-shadow: 0 -2px 10px 0 #cbc7c7;
         padding: 0 0.1rem;
         box-sizing: border-box;
-
         .checkbox {
             display: inline-block;
             width: 0.14rem;
@@ -258,6 +273,11 @@
                 height: 100%;
             }
         }
+    }
+
+    .box-shadow {
+        box-shadow: 0 -2px 10px 0 #cbc7c7;
+
     }
 
 </style>

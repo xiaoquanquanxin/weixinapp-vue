@@ -82,7 +82,7 @@
             <div class="gopay">去支付</div>
         </div>
         <!--        confirm 组件-->
-        <Confrim ref="myConfirm" @userBehavior="userBehaviorFun"></Confrim>
+        <Confrim ref="myConfirm" @userBehavior="userBehaviorFun" type="confirm"></Confrim>
     </div>
 </template>
 

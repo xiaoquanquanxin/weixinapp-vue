@@ -19,6 +19,7 @@
 
 <script type="text/ecmascript-6">
   export default {
+    props:['type'],
     data () {
       return {
         isShowConfirm: false, // 用于控制整个窗口的显示/隐藏
@@ -26,9 +27,12 @@
         content: 'Say Something ...', // 提示框的内容
         cancelText: '取消', // 取消按钮的文字
         confirmText: '确认', // 确认按钮的文字
-        type: 'confirm', // 表明弹框的类型：confirm - 确认弹窗（有取消按钮）；alert - 通知弹框（没有取消按钮）
+        // type: 'confirm', // 表明弹框的类型：confirm - 确认弹窗（有取消按钮）；alert - 通知弹框（没有取消按钮）
         outerData: null // 用于记录外部传进来的数据，也可以给外部监听userBehavior，事件的函数提供判断到底是哪个事件触发的
       }
+    },
+    created() {
+      console.log(this.type)
     },
     methods: {
       show (content, config) {
@@ -39,7 +43,7 @@
           this.titleText = config.titleText || '操作提示'
           this.cancelText = config.cancelText || '取消'
           this.confirmText = config.confirmText || '确认'
-          this.type = config.type || 'confirm'
+          // this.type = config.type || 'confirm'
           this.outerData = config.data || null
         }
 
@@ -50,7 +54,7 @@
         this.titleText = '操作提示'
         this.cancelText = '取消'
         this.confirmText = '确认'
-        this.type = 'confirm'
+        // this.type = 'confirm'
         this.outerData = null
       },
       clickFun (type) {

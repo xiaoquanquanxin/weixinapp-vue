@@ -27,24 +27,19 @@
                         <p class="price"><span>¥</span>182.90</p>
                     </div>
                     <div class="checked">
-                        <p class="month">1个月</p>
+                        <p class="month">3个月</p>
                         <p class="price"><span>¥</span>182.90</p>
                     </div>
                     <div>
-                        <p class="month">1个月</p>
+                        <p class="month">6个月</p>
                         <p class="price"><span>¥</span>182.90</p>
                     </div>
-                </div>
-                <div class="pay-list">
                     <div>
-                        <p class="month">1个月</p>
+                        <p class="month">12个月</p>
                         <p class="price"><span>¥</span>182.90</p>
                     </div>
                     <div>
                         <p class="month" @click="custom = true">自定义</p>
-                    </div>
-                    <div class="none">
-
                     </div>
                 </div>
             </div>
@@ -99,11 +94,15 @@
             </div>
         </div>
         <ios-select ref="mychild" @func="setRoom" :paidData="room"></ios-select>
+        <!--        confirm 组件-->
+        <Confrim ref="myConfirm" @userBehavior="userBehaviorFun" type="alert"></Confrim>
     </div>
 </template>
 
 <script>
   import iosSelect from "../../components/iosSelect";
+  import Confrim from "../../components/confrim";
+  import $ from 'jquery'
 
   export default {
     name: "Prepayment",
@@ -122,14 +121,49 @@
       }
     },
     components: {
-      iosSelect
+      iosSelect,
+      Confrim
+    },
+    created() {
+      let data = {
+        pmdsRoomId: '4a7477c8-7a28-46ce-bfc9-678e6dd71aaa',
+        cmdsId: '575cd6b8b1c54389936cf47fe8347a40'
+      };
+      $.ajax({
+        crossDomain: true,//兼容ie8,9
+        type: "post",
+        url: '/bpi/property/prepayment/hasFeeItem',
+        contentType: "application/x-www-form-urlencoded",
+        data: data,
+        success: (res) => {
+          if(res.code == '4000'){
+            this.$refs.myConfirm.show(res.msg)
+          }
+          this.getFeeInfo()
+        }
+      })
     },
     methods: {
+      getFeeInfo(){
+        let data = {
+          pmdsRoomId: '4a7477c8-7a28-46ce-bfc9-678e6dd71aaa',
+          cmdsId: '575cd6b8b1c54389936cf47fe8347a40'
+        };
+        $.ajax({
+          crossDomain: true,//兼容ie8,9
+          type: "post",
+          url: '/bpi/property/prepayment/queryFeeInfo',
+          contentType: "application/x-www-form-urlencoded",
+          data: data,
+          success: (res) => {
+            console.log(res)
+          }
+        })
+      },
       setRoom(value) {
         console.log(value)
         this.roomName = value.value
-        this.$showToast.show('hello2020!', 2000)
-        // this.$showToast.hide()
+
       },
       // 收费标准
       showRates() {
@@ -137,6 +171,11 @@
       },
       choose() {
         this.$refs.mychild.choose()
+      },
+      userBehaviorFun(typeClick) {
+        if (typeClick == 'clickConfirm') {
+          this.$router.push({path: '/'})
+        }
       }
     }
   }
@@ -169,10 +208,6 @@
 
     .pay {
         padding-top: 0.22rem;
-    }
-
-    .none {
-        visibility: hidden;
     }
 
     .payment {
@@ -225,8 +260,8 @@
 
     .pay-list {
         display: flex;
-        justify-content: space-around;
         margin-bottom: 0.14rem;
+        flex-wrap: wrap;
 
         div {
             width: 1.09rem;
@@ -239,6 +274,7 @@
             flex-direction: column;
             display: flex;
             justify-content: center;
+            margin: 0 0.04rem 0.1rem 0.1rem;
 
             .month {
                 font-size: 0.13rem;
