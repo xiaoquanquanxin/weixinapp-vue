@@ -1,12 +1,28 @@
 <template>
     <div class="container">
         <div class="content">
-            <div class="banner">
+            <div class="banner" v-if="payType == 1">
                 <div>
                     <p class="type">待支付</p>
                     <p class="name">05-08 11:09</p>
                 </div>
                 <div class="spaceTime">{{minutes}}分{{seconds}}秒后订单自动关闭</div>
+            </div>
+            <div class="banner" v-if="payType == 2">
+                <div>
+                    <p class="type">支付成功</p>
+                    <p class="name">05-08 11:09</p>
+                </div>
+                <div class="spaceTime">感谢您使用在线缴费！</div>
+            </div>
+            <div class="banner" v-if="payType == 3">
+                <div>
+                    <p class="type">已取消</p>
+                    <p class="name">05-08 11:09</p>
+                </div>
+                <div class="spaceTime" v-if="isType == 1">付款超时，订单已关闭！</div>
+                <div class="spaceTime" v-if="isType == 2">取消成功，订单已关闭！</div>
+
             </div>
             <div class="orderList">
                 <div class="payment">
@@ -84,13 +100,18 @@
         seconds: 0,
         maxtime: 15 * 60 - 1,
         timer: null,
-        type: ""
+        isType:"1", // 是否为超时取消
+        payType:"2", // 支付状态
+        type: "" // 预缴或欠缴
       }
     },
     created() {
       console.log(this.$route.query)
       this.type = this.$route.query.type
-      this.timer = setInterval(this.CountDown, 1000);
+      if(this.payType == 1){
+        this.timer = setInterval(this.CountDown, 1000);
+      }
+
     },
     methods: {
       CountDown() {
@@ -102,6 +123,8 @@
           --this.maxtime;
         } else {
           // window.reload()
+          this.payType = 3;
+
           clearInterval(this.timer);
         }
       },
