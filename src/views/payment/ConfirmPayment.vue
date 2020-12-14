@@ -35,8 +35,11 @@
     name: "ConfirmPayment",
     data() {
       return {
-        billList: [],
-        totleMoney: 0
+        billList: [],  // 选中订单列表
+        billIDsList: [], // 选中订单id
+        totleMoney: 0,
+        billData: "", // 未缴账单列表
+        billDetails:"" // 创建订单需要列表格式
       }
     },
     created() {
@@ -53,20 +56,94 @@
         data: {'json': JSON.stringify(data)},
       }).then((res) => {
         // resolve(data) billIds
+        this.billData = res.data
         this.billIDsList.map((billItem) => {
           res.data.content.map((item) => {
-            // eslint-disable-next-line no-debugger
             if (item.billDetails[0].billIds == billItem) {
               this.billList.push(item)
               this.totleMoney += item.billDetails[0].paidTotal
             }
           })
         })
+        let arr = [];
+        this.billList.map((item)=>{
+          item.billDetails.map((_item)=>{
+            _item.roomID = res.data.roomIds
+            _item.period = item.billMonth
+            _item.billId = _item.billIds
+            _item.buildingID = 1   //  没数据 暂时写死       😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈
+            arr.push(_item)
+          })
+        })
+        this.billDetails = arr;
       })
       console.log(navigator.userAgent) //  获取手机型号
     },
     methods: {
       goPay() {
+        let json = {
+          "customerId": "575cd6b8b1c54389936cf47fe8347a40",
+          "contactNumber": "18201538993",
+          "paidIDs": this.billIDsList.join(','),
+          "terminalSource": "0",
+          "hqUserId": "0",
+          "projectID": "1"
+        }
+
+        new Promise(((resolve, reject) => {
+          $.ajax({
+            crossDomain: true,//兼容ie8,9
+            type: "post",
+            url: '/bpi/submitOrder.do',
+            contentType: "application/x-www-form-urlencoded",
+            data: {'json': JSON.stringify(json)},
+            success: (res) => {
+              if (res.code == 1000) {
+                resolve(res)
+              } else {
+                reject(res)
+              }
+            },
+          })
+        })).then((result) => {
+          this.creatOrder(result)
+        })
+      },
+      creatOrder(result){
+        let dataP2 = {
+          userID: '575cd6b8b1c54389936cf47fe8347a40',
+          orderCode: result.data.orderId,
+          payType: 0,
+          orderDate: 0,
+          billDetails: JSON.stringify(this.billDetails),
+          orderMoney: result.data.orderMoney,
+          terminalSource: 0,
+          projectID: 1
+        }
+        // eslint-disable-next-line no-debugger
+        $.ajax({
+          crossDomain: true,//兼容ie8,9
+          type: "post",
+          url: '/bpi/submitCommBill.do',
+          contentType: "application/x-www-form-urlencoded",
+          data: dataP2,
+          success: (res) => {
+            if (res.code == 1000) {
+              this.payOrder()
+            }
+          },
+        })
+      },
+      payOrder(){
+        // window.__initWX_configData = {
+        //   debug: false,
+        //   appId: data.appId,
+        //   timestamp: data.timestamp,
+        //   nonceStr: data.nonceStr,
+        //   signature: data.signature,
+        //   jsApiList: []
+        // };
+        // wx.config(window.__initWX_configData);
         this.$router.push({path: '/PaySuccess'})
       }
     }

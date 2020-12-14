@@ -6,9 +6,12 @@
                 <div v-for="items in item.billDetails" :key="items.billIds" class="paid-cont"
                      @click="choosepaid(items.billIds)">
                     <div>
-                        <span v-if="paidName === 'paidOut'" :class="['checkbox',{'isChecked':items.checked}]"></span>{{items.paidName}}
+                        <span v-if="paidName === 'paidOut'" :class="['checkbox',{'isChecked':items.checked}]"></span>
+                        <div class="world">
+                            {{items.paidName}}
+                        </div>
                     </div>
-                    <div>
+                    <div class="paid-pay">
                         ￥{{items.paidTotal}}
                     </div>
                 </div>
@@ -57,7 +60,7 @@
         // let isCheck = this.paidData.every((item)=>{
         //   return item.billDetails[0].checked
         // })
-        this.$emit('func',id)
+        this.$emit('func', id)
         // console.log(this.billdsList)
         // this.setAllChecked(isCheck)
       }
@@ -66,6 +69,8 @@
 </script>
 
 <style scoped lang="less">
+    @import "~@/assets/css/common.less";
+
     .form-item {
         font-size: 0.16rem;
     }
@@ -81,22 +86,34 @@
 
     .year {
         border-bottom: 1px solid #eeeeee;
+        font-size: 0.14rem;
     }
 
     .paid-cont {
         display: flex;
         justify-content: space-between;
         padding-right: 0.1rem;
+        font-size: 0.13rem;
+        color: #333333;
+        >div{
+            display: flex;
+            align-items: center;
+            .world{
+                width: 2.6rem;
+            }
+        }
+
     }
 
     .checkbox {
-        display: inline-block;
+        display: block;
         width: 0.14rem;
         height: 0.14rem;
         border: 0.01rem solid #979797;
         border-radius: 100%;
         margin-right: 0.1rem;
     }
+
     .isChecked {
         background-image: url("~@/assets/images/checked.png");
         background-size: cover;
