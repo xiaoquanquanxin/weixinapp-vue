@@ -10,7 +10,11 @@
                 <h3>预缴余额</h3>
                 <div>
                     <p class="paymen-name">住宅物业管理费</p>
-                    <p class="payment-money">￥123</p>
+                    <p class="payment-money">￥{{balanceAmount}}</p>
+                </div>
+                <div v-if="enoughDeductionDate">
+                    <p class="paymen-name">暂存款可扣至</p>
+                    <p class="payment-money">{{enoughDeductionDate}}</p>
                 </div>
             </div>
         </div>
@@ -22,30 +26,22 @@
 
             <div class="pay">
                 <div class="pay-list">
-                    <div>
-                        <p class="month">1个月</p>
-                        <p class="price"><span>¥</span>182.90</p>
+                    <div v-for="item in paymentList" :key="item.index" :class="{'checked':item.checked}">
+                        <p class="month">{{item.paymentName}}</p>
+                        <p class="price"><span>¥</span>{{item.price}}</p>
                     </div>
-                    <div class="checked">
-                        <p class="month">3个月</p>
-                        <p class="price"><span>¥</span>182.90</p>
-                    </div>
-                    <div>
-                        <p class="month">6个月</p>
-                        <p class="price"><span>¥</span>182.90</p>
-                    </div>
-                    <div>
-                        <p class="month">12个月</p>
-                        <p class="price"><span>¥</span>182.90</p>
-                    </div>
-                    <div>
+                    <div v-if="paymentList.length<= 4">
                         <p class="month" @click="custom = true">自定义</p>
                     </div>
                 </div>
             </div>
-            <div :class="['footer',{'is-custom':custom}]">
+            <div v-if="isFreeze" class="footer is-freeze">
+                您有已出账单未结算，不能预缴
+            </div>
+            <div v-else :class="['footer',{'is-custom':custom}]">
                 <router-link to="ConfirmPrepay">立即缴费</router-link>
             </div>
+
         </div>
         <!--        收费标准-->
         <div :class="['rates olay ios-select-widget-box one-level-box fadeInUp',{'fadeOutDown':!rates}]" v-if="rates"
@@ -59,9 +55,9 @@
                 <section class="iosselect-box">
                     <div class="one-level-contain oneLevelContain" style="font-size: 16px; height: 150px;">
                         <ul class="select-one-level" style="transform: translate(0px, 0px) translateZ(0px);">
-                            <li>
-                                <p>2020-02</p>
-                                <p>145元</p>
+                            <li v-for="item in feeCharge" :key="item.index">
+                                <p>{{item.startDate}}</p>
+                                <p>{{item.amount}}元</p>
                             </li>
                         </ul>
                     </div>
@@ -82,11 +78,11 @@
                         <ul class="select-one-level" style="transform: translate(0px, 0px) translateZ(0px);">
                             <li>
                                 <p>预缴月数</p>
-                                <p><span>-</span> 3 <span>+</span></p>
+                                <p><span @click="monthRed">-</span> 3 <span @click="monthAdd">+</span></p>
                             </li>
                             <li>
                                 <p>实际金额</p>
-                                <p class="money">￥731.60</p>
+                                <p class="money">￥{{731.60}}</p>
                             </li>
                         </ul>
                     </div>
@@ -113,7 +109,13 @@
         feeName: "",
         iosData: [],
         roomName: "实地-遵义蔷薇国际",
-        feeId:''
+        feeId: '',
+        isFreeze: 0, // 是否有欠缴
+        maxMonth: 0, // 允许缴纳最大月数
+        paymentList: [], // 快捷支付列表
+        balanceAmount: "", // 费项余额
+        enoughDeductionDate: "", // 暂存款日期
+        feeCharge: [] // 收费标准
       }
     },
     components: {
@@ -121,11 +123,12 @@
       Confrim
     },
     created() {
-        // 先获取有没有预缴订单
-        this.getFeeItem()
+      // 先获取有没有预缴订单
+      this.getFeeItem()
     },
     methods: {
-      getFeeItem(){
+      // 查询是否有预缴订单
+      getFeeItem() {
         let data = {
           pmdsRoomId: '4a7477c8-7a28-46ce-bfc9-678e6dd71aaa',
           cmdsId: '575cd6b8b1c54389936cf47fe8347a40'
@@ -140,13 +143,14 @@
             if (res.code == '4000') {
               this.$refs.myConfirm.show(res.msg)
             }
-            if(!res.data){
+            if (!res.data) {
               this.$refs.myConfirm.show('费项异常，暂不能进行预缴')
             }
             this.getFeeInfo()
           }
         })
       },
+      // 查询预缴费项信息
       getFeeInfo() {
         let data = {
           pmdsRoomId: '4a7477c8-7a28-46ce-bfc9-678e6dd71aaa',
@@ -164,24 +168,30 @@
               let arr = [];
               res.data.map((item) => {
                 arr.push({
-                  'id': item.feeId, 'value': `${item.feeName}(${item.itemSourceName})`
+                  'id': item.feeId,
+                  'value': `${item.feeName}(${item.itemSourceName})`,
+                  'itemSourceName': item.itemSourceName
                 })
               })
               this.iosData = arr
-              this.feeId = res.data[0].feeId
+              this.feeId = res.data[0].feeId //预付款收费项目ID
+              this.itemSourceName = res.data[0].itemSourceName //数据来源：房间号、表具编号、车位号
+              this.balanceAmount = res.data[0].balanceAmount //预存款余额
+              this.calcTimeUint = res.data[0].calcTimeUint  //账单周期
               this.getFeeChargeStandard()
+              this.getFeeitemDetails()
             }
           }
         })
       },
-      getFeeChargeStandard(){
-        // eslint-disable-next-line no-debugger
-        // debugger
+      // 获取费项收费标准
+      getFeeChargeStandard() {
+
         let data = {
           pmdsRoomId: '4a7477c8-7a28-46ce-bfc9-678e6dd71aaa',
           cmdsId: '575cd6b8b1c54389936cf47fe8347a40',
-          feeId:this.feeId,
-          itemSourceName:1
+          feeId: this.feeId,
+          itemSourceName: this.itemSourceName
         };
         $.ajax({
           crossDomain: true,//兼容ie8,9
@@ -190,13 +200,57 @@
           contentType: "application/x-www-form-urlencoded",
           data: data,
           success: (res) => {
-            console.log(res)
+            this.feeCharge = res.data
           }
         })
+      },
+      // 获取专项预缴费项订单明细
+      getFeeitemDetails() {
+        let data = {
+          pmdsRoomId: '4a7477c8-7a28-46ce-bfc9-678e6dd71aaa',
+          cmdsId: '575cd6b8b1c54389936cf47fe8347a40',
+          feeId: this.feeId,
+          itemSourceName: this.itemSourceName,
+          customMonths: 1
+        };
+        $.ajax({
+          crossDomain: true,//兼容ie8,9
+          type: "post",
+          url: '/bpi/property/prepayment/queryFeeitemDetails',
+          data: data,
+          success: (res) => {
+            this.enoughDeductionDate = res.data.enoughDeductionDate
+            this.isFreeze = res.data.hasOutstandingBill
+            this.maxMonth = res.data.maxMonth
+            let arr = [], price = 0;
+            for (let i = 0, len = res.data.feeItems.length; i < len; i++) {
+              if (i > res.data.maxMonth) break
+              if (i == 0 || i == 2 || i == 5 || i == 11) {
+                price += parseFloat(res.data.feeItems[i].perUnit)
+                res.data.feeItems[i].price = price
+                res.data.feeItems[i].paymentName = `${i+1}个月`
+                res.data.feeItems[i].checked = i == 2 ? true : false
+                arr.push(res.data.feeItems[i])
+              }
+              if (i > 11) {
+                break;
+              }
+            }
+            this.paymentList = arr;
+            console.log(this.paymentList)
+          }
+        })
+      },
+      monthRed(){
+
+      },
+      monthAdd(){
+
       },
       setRoom(value) {
         console.log(value)
         this.feeId = value.id
+        this.itemSourceName = value.itemSourceName
       },
       // 收费标准
       showRates() {
@@ -336,6 +390,7 @@
 
         li {
             display: flex;
+            opacity: 1;
             justify-content: space-between;
         }
     }
@@ -378,6 +433,11 @@
             height: 100%;
             color: #ffffff;
         }
+    }
+
+    .is-freeze {
+        color: #ffffff;
+        background: #a4a1a1;
     }
 
     .is-custom {
