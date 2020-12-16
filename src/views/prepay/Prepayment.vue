@@ -24,7 +24,7 @@
         </div>
         <div class="content">
 
-            <div class="pay">
+            <div v-if="calcTimeUint == 2" class="pay">
                 <div class="pay-list">
                     <div v-for="(item,index) in paymentList" :key="index">
                         <div @click="customFunc(item)" :class="{'checked':item.checked}" v-if="item.type === 1">
@@ -38,6 +38,10 @@
                         </div>
                     </div>
                 </div>
+            </div>
+            <div v-else class="calcTimeUint">
+                <img src="~@/assets/images/calcTimeUint.png">
+                <p>抱歉，暂不支持“季度”和年预缴</p>
             </div>
             <div v-if="isFreeze" class="footer is-freeze">
                 您有已出账单未结算，不能预缴
@@ -85,10 +89,11 @@
                                 <p class="choose-price">
                                     <span @click="monthRed" class="monthRed"></span>
                                     <span class="price">
-                                        <input type="text" v-model="customObj.paymentMonth" @input="getCurPrice(customObj.paymentMonth)">
+                                        <input type="text" v-model="customObj.paymentMonth"
+                                               @input="getCurPrice(customObj.paymentMonth)">
                                     </span>
-                                <span @click="monthAdd" class="monthAdd"></span>
-                             </p>
+                                    <span @click="monthAdd" class="monthAdd"></span>
+                                </p>
                             </li>
                             <li>
                                 <p>实际金额</p>
@@ -128,6 +133,7 @@
           perUnit: null,
         },
         isFreeze: 0, // 是否有欠缴
+        calcTimeUint: "", // 账单周期模型
         maxMonth: 12, // 允许缴纳最大月数
         paymentList: [], // 快捷支付列表
         balanceAmount: "", // 费项余额
@@ -318,7 +324,7 @@
         }
       },
       // 立即缴费
-      goPayment(){
+      goPayment() {
         const checkedItem = this.paymentList.find(item => {
           return item.checked;
         });
@@ -326,17 +332,17 @@
           paymentMonth,
           perUnit
         } = checkedItem;
-        let arr = this.feeItems.slice(0,paymentMonth)
+        let arr = this.feeItems.slice(0, paymentMonth)
 
         let data = {
           pmdsRoomId: '4a7477c8-7a28-46ce-bfc9-678e6dd71aaa', // 房间主数据id
           cmdsId: '575cd6b8b1c54389936cf47fe8347a40', // 用户主数据id
-          userName:"f范秉川", // 客户名称
-          phoneNum:'18500039456', // 用户手机号
-          feeItems:JSON.stringify(arr), // 订单明细 json格式
-          villageInfoId:"1", // 楼盘ID
-          terminalSource:'1', // 终端类型 0 Android 1 iPhone
-          totalAmount:perUnit, // 订单金额
+          userName: "f范秉川", // 客户名称
+          phoneNum: '18500039456', // 用户手机号
+          feeItems: JSON.stringify(arr), // 订单明细 json格式
+          villageInfoId: "1", // 楼盘ID
+          terminalSource: '1', // 终端类型 0 Android 1 iPhone
+          totalAmount: perUnit, // 订单金额
           feeId: this.feeId, // 费项id
         };
         $.ajax({
@@ -346,10 +352,10 @@
           data: data,
           success: (res) => {
             console.log(res)
-            if(res.code == 2000){
+            if (res.code == 2000) {
               // this.$router.push('ConfirmPayment')
             }
-            this.$router.push({path: '/ConfirmPrepay', query: {'feeName': this.feeName,'perUnit':perUnit}})
+            this.$router.push({path: '/ConfirmPrepay', query: {'feeName': this.feeName, 'perUnit': perUnit}})
           }
         })
 
@@ -359,8 +365,8 @@
         this.feeId = value.id
         this.itemSourceName = value.itemSourceName
       },
-      getCurPrice(number){
-        if(number>this.maxMonth){
+      getCurPrice(number) {
+        if (number > this.maxMonth) {
           this.$showToast.show('hello2020!', 2000)
           this.customObj.paymentMonth = number = this.maxMonth
         }
@@ -464,6 +470,17 @@
         }
     }
 
+    .calcTimeUint {
+        text-align: center;
+        font-size: 0.14rem;
+        color: #808080;
+        padding-top: 0.9rem;
+
+        img {
+            width: 8%;
+            margin-bottom: 0.08rem;
+        }
+    }
 
     .pay-list {
         display: flex;
@@ -489,6 +506,7 @@
 
             .price {
                 font-size: 0.16rem;
+
                 span {
                     font-size: 0.12rem;
                 }
@@ -576,6 +594,7 @@
                     border-radius: 0.02rem;
                     display: inline-block;
                     margin: 0 0.15rem;
+
                     input {
                         width: 100%;
                         height: 100%;
