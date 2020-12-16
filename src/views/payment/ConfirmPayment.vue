@@ -135,6 +135,7 @@
         })
       },
       payOrder(){
+        // 微信支付sdk
         // window.__initWX_configData = {
         //   debug: false,
         //   appId: data.appId,
@@ -144,8 +145,45 @@
         //   jsApiList: []
         // };
         // wx.config(window.__initWX_configData);
-        this.$router.push({path: '/PaySuccess'})
-      }
+        this.getTranStatus();
+
+      },
+      // 获取订单状态
+      getTranStatus() {
+        let data = {"transactionId": "20201216154403717"};
+        $.ajax({
+          crossDomain: true,//兼容ie8,9
+          type: "post",
+          url: '/bpi/getTranStatus.do',
+          contentType: "application/x-www-form-urlencoded",
+          data: {'json': JSON.stringify(data)},
+          success: (res) => {
+            console.log(res)
+            if (res.data.status == 0) {
+              this.completePaidOrder();
+            }
+          }
+        })
+      },
+      // 支付后完成订单
+      completePaidOrder() {
+        let data = {
+          "transactionId": "20201216164458550",
+          "updateTime": "2020-12-16 16:45:08",
+          "payMethod": "900"
+        };
+        $.ajax({
+          crossDomain: true,//兼容ie8,9
+          type: "post",
+          url: '/bpi/completePaidOrder.do',
+          contentType: "application/x-www-form-urlencoded",
+          data: {'json': JSON.stringify(data)},
+          success: (res) => {
+            console.log(res)
+            this.$router.push({path: '/PaySuccess',data:res.data})
+          }
+        })
+      },
     }
   }
 </script>

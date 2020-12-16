@@ -82,7 +82,6 @@ export const syncRoutesList = [
     path: '/PaymentRecords',
     name: 'PaymentRecords',
     component: PaymentRecords,
-
   },
 ];
 

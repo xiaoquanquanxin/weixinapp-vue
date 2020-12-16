@@ -347,8 +347,9 @@
           success: (res) => {
             console.log(res)
             if(res.code == 2000){
-              this.$router.push('ConfirmPayment')
+              // this.$router.push('ConfirmPayment')
             }
+            this.$router.push({path: '/ConfirmPrepay', query: {'feeName': this.feeName,'perUnit':perUnit}})
           }
         })
 

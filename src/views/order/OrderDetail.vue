@@ -1,27 +1,26 @@
 <template>
     <div class="container">
         <div class="content">
-            <div class="banner" v-if="payType == 1">
+            <div class="banner" v-if="tranStatus == 0">
                 <div>
                     <p class="type">待支付</p>
                     <p class="name">05-08 11:09</p>
                 </div>
                 <div class="spaceTime">{{minutes}}分{{seconds}}秒后订单自动关闭</div>
             </div>
-            <div class="banner" v-if="payType == 2">
+            <div class="banner" v-if="tranStatus == 2">
                 <div>
                     <p class="type">支付成功</p>
                     <p class="name">05-08 11:09</p>
                 </div>
                 <div class="spaceTime">感谢您使用在线缴费！</div>
             </div>
-            <div class="banner" v-if="payType == 3">
+            <div class="banner" v-if="tranStatus == 3">
                 <div>
                     <p class="type">已取消</p>
-                    <p class="name">05-08 11:09</p>
+                    <p class="name">{{tranDate}}</p>
                 </div>
-                <div class="spaceTime" v-if="isType == 1">付款超时，订单已关闭！</div>
-                <div class="spaceTime" v-if="isType == 2">取消成功，订单已关闭！</div>
+                <div class="spaceTime">{{memo}}</div>
 
             </div>
             <div class="orderList">
@@ -79,7 +78,7 @@
         </div>
         <div class="footer">
             <div class="cancel" @click="cancelOrder">取消订单</div>
-            <div class="gopay">去支付</div>
+            <div class="gopay" @click="goPay">去支付</div>
         </div>
         <!--        confirm 组件-->
         <Confrim ref="myConfirm" @userBehavior="userBehaviorFun" type="confirm"></Confrim>
@@ -88,6 +87,7 @@
 
 <script>
   import Confrim from "../../components/confrim";
+  import $ from "jquery";
 
   export default {
     name: "OrderDetail",
@@ -100,20 +100,63 @@
         seconds: 0,
         maxtime: 15 * 60 - 1,
         timer: null,
-        isType:"1", // 是否为超时取消
-        payType:"2", // 支付状态
+        memo:"", // 取消信息
+        tranDate:"", // 订单时间
+        isType: "1", // 是否为超时取消
+        tranStatus: "1", // 支付状态
         type: "" // 预缴或欠缴
       }
     },
     created() {
       console.log(this.$route.query)
       this.type = this.$route.query.type
-      if(this.payType == 1){
+      if (this.type === 'pre') {
+        this.getPaymentInfo()
+      } else {
+        this.getBillDetailByTrans()
+      }
+      if (this.tranStatus == 1) {
         this.timer = setInterval(this.CountDown, 1000);
       }
 
     },
     methods: {
+      // 获取欠缴账单详情
+      getBillDetailByTrans() {
+        let data = {
+          "transactionid": "20201216154403717",
+          "payMenthod": ""
+        };
+        $.ajax({
+          crossDomain: true,//兼容ie8,9
+          type: "post",
+          url: '/bpi/getBillDetailByTrans.do',
+          contentType: "application/x-www-form-urlencoded",
+          data: {'json': JSON.stringify(data)},
+          success: (res) => {
+            this.tranStatus = res.data.tranStatus
+            this.memo = res.data.memo
+            this.tranDate = res.data.tranDate
+            console.log(res)
+          }
+        })
+      },
+      // 获取预缴订单详情
+      getPaymentInfo() {
+        let data = {
+          orderId: "1" // 订单编号
+        };
+        $.ajax({
+          crossDomain: true,//兼容ie8,9
+          type: "post",
+          url: '/bpi/property/prepayment/getPaymentInfo',
+          contentType: "application/x-www-form-urlencoded",
+          data: data,
+          success: (res) => {
+            console.log(res)
+          }
+        })
+      },
       CountDown() {
         // eslint-disable-next-line no-debugger
         if (this.maxtime >= 0) {
@@ -123,17 +166,79 @@
           --this.maxtime;
         } else {
           // window.reload()
-          this.payType = 3;
+          this.tranStatus = 3;
 
+          this.userBehaviorFun('clickConfirm')
           clearInterval(this.timer);
         }
       },
+      // 获取订单状态
+      getTranStatus() {
+        let data = {"transactionId": "20201216154403717"};
+        $.ajax({
+          crossDomain: true,//兼容ie8,9
+          type: "post",
+          url: '/bpi/getTranStatus.do',
+          contentType: "application/x-www-form-urlencoded",
+          data: {'json': JSON.stringify(data)},
+          success: (res) => {
+            console.log(res)
+            if (res.data.status == 0) {
+              this.completePaidOrder();
+            }
+          }
+        })
+      },
+      // 支付后完成订单
+      completePaidOrder() {
+        let data = {
+          "transactionId": "20201216164458550",
+          "updateTime": "2020-12-16 16:45:08",
+          "payMethod": "900"
+        };
+        $.ajax({
+          crossDomain: true,//兼容ie8,9
+          type: "post",
+          url: '/bpi/completePaidOrder.do',
+          contentType: "application/x-www-form-urlencoded",
+          data: {'json': JSON.stringify(data)},
+          success: (res) => {
+            console.log(res)
+          }
+        })
+      },
+      goPay() {
+        this.getTranStatus()
+      },
       cancelOrder() {
-        this.$refs.myConfirm.show('fadfdf')
+        this.$refs.myConfirm.show('您确定取消订单？')
       },
       userBehaviorFun(typeClick) {
         if (typeClick == 'clickConfirm') {
-          this.$router.go(0)
+          //  如果为预缴订单
+          let url = '', data = null;
+          if (this.type == 'pre') {
+            url = 'property/prepayment/cancelAdvanceOrder'
+            data = {'orderId':""}
+          } else {
+            url = 'cancelPaidOrder.do'
+            data = {
+              "transactionId": "20201216164458550",
+              "updateTime": "2020-12-16 16:45:08",
+              "payMethod": "900"
+            }
+          }
+          $.ajax({
+            crossDomain: true,//兼容ie8,9
+            type: "post",
+            url: '/bpi/' + url,
+            contentType: "application/x-www-form-urlencoded",
+            data: {'json': JSON.stringify(data)},
+            success: (res) => {
+              console.log(res)
+            }
+          })
+          // this.$router.go(0)
         }
       }
     }

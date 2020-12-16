@@ -1,32 +1,52 @@
 <template>
     <div class="container">
-        <div @click="goOrderDetail(type)">
-            <div class="type prepay" v-if="type == 'pre'">预</div>
+        <div @click="goOrderDetail(type)" v-for="(item,index) in paymentList" :key="index">
+            <div class="type prepay" v-if="item.payFeesType">预</div>
             <div class="type payment" v-else>缴</div>
             <div>
-                <h3>预缴订单</h3>
-                <p>下单时间：2020-11-12 14:33:27</p>
-                <p>订单金额：¥182.90</p>
+                <h3 v-if="item.payFeesType">预缴订单</h3>
+                <h3 v-else>缴费订单</h3>
+                <p>下单时间：{{item.orderDate}}</p>
+                <p>订单金额：¥{{item.payMoney}}</p>
             </div>
-            <p class="pay-state" v-if="state">支付成功</p>
-            <p class="pay-state" v-else>已取消</p>
+            <p class="pay-state" v-if="item.orderState == 1">支付成功</p>
+            <p class="pay-state" v-else-if="item.orderState == 2">已取消</p>
+            <p class="pay-state" v-else>待支付</p>
         </div>
     </div>
 </template>
 
 <script>
+  import $ from "jquery";
+
   export default {
     name: "PaymenRecords",
     data() {
       return {
-        type: 'pre',
-        state: true
+        paymentList: [],  // 缴费列表
       }
     },
     created() {
-
+      this.getPropertyAdvanceHistory()
     },
     methods: {
+      getPropertyAdvanceHistory() {
+        let data = {
+          "curPage": "0",
+          "pageNum": "10"
+        };
+        $.ajax({
+          crossDomain: true,//兼容ie8,9
+          type: "post",
+          url: '/bpi/property/prepayment/getPropertyAdvanceHistory',
+          contentType: "application/x-www-form-urlencoded",
+          data: {'json': JSON.stringify(data)},
+          success: (res) => {
+            console.log(res)
+            this.paymentList = res.data;
+          }
+        })
+      },
       goOrderDetail(type) {
         this.$router.push({path: '/OrderDetail', query: {'type': type}})
       }

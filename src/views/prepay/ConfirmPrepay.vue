@@ -3,8 +3,8 @@
         <div class="room world">房间：实地·遵义蔷薇国际-D3地块(7、8地块及03地…</div>
         <div class="payment-list">
             <div>
-                <p class="paymen-name">住宅物业管理费</p>
-                <p class="payment-money">￥130.60</p>
+                <p class="paymen-name">{{feeName}}</p>
+                <p class="payment-money">￥{{perUnit}}</p>
             </div>
         </div>
         <div class="footer" @click="goPay">微信支付</div>
@@ -14,6 +14,16 @@
 <script>
   export default {
     name: "ConfirmPrepay",
+    data(){
+      return{
+        feeName:"",
+        perUnit:""
+      }
+    },
+    created() {
+      this.feeName = this.$route.query.feeName
+      this.perUnit = this.$route.query.perUnit
+    },
     methods: {
       goPay() {
         this.$router.push({path: '/PaySuccess', query: {'type': 'pre'}})

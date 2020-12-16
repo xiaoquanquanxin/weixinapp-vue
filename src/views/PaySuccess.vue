@@ -30,6 +30,7 @@
 </template>
 
 <script>
+
   export default {
     name: "PaySuccess",
     data() {
@@ -39,7 +40,7 @@
     },
     created() {
       console.log(this.$route.query)
-      this.type = this.$route.query.type
+      this.type = this.$route.query.data
     },
     methods: {
       goOrderDetail() {
