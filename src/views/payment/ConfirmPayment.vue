@@ -113,12 +113,12 @@
         let dataP2 = {
           userID: '575cd6b8b1c54389936cf47fe8347a40',
           orderCode: result.data.orderId,
-          payType: 0,
+          payType: 0, // 0 欠缴
           orderDate: 0,
           billDetails: JSON.stringify(this.billDetails),
           orderMoney: result.data.orderMoney,
           terminalSource: 0,
-          projectID: 1
+          projectID: 1   // 项目id
         }
         // eslint-disable-next-line no-debugger
         $.ajax({

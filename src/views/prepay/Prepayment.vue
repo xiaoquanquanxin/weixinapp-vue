@@ -26,20 +26,24 @@
 
             <div class="pay">
                 <div class="pay-list">
-                    <div v-for="item in paymentList" :key="item.index" :class="{'checked':item.checked}">
-                        <p class="month">{{item.paymentName}}</p>
-                        <p class="price"><span>¥</span>{{item.price}}</p>
-                    </div>
-                    <div v-if="paymentList.length<= 4">
-                        <p class="month" @click="custom = true">自定义</p>
+                    <div v-for="(item,index) in paymentList" :key="index">
+                        <div @click="customFunc(item)" :class="{'checked':item.checked}" v-if="item.type === 1">
+                            <p class="month" v-if="!item.paymentMonth">自定义</p>
+                            <p class="month" v-if="item.paymentMonth">{{item.paymentMonth}}个月</p>
+                            <p class="price" v-if="item.paymentMonth"><span>¥</span>{{item.perUnit}}</p>
+                        </div>
+                        <div v-else :class="{'checked':item.checked}" @click="choosePayment(item)">
+                            <p class="month">{{item.paymentMonth}}个月</p>
+                            <p class="price"><span>¥</span>{{item.perUnit}}</p>
+                        </div>
                     </div>
                 </div>
             </div>
             <div v-if="isFreeze" class="footer is-freeze">
                 您有已出账单未结算，不能预缴
             </div>
-            <div v-else :class="['footer',{'is-custom':custom}]">
-                <router-link to="ConfirmPrepay">立即缴费</router-link>
+            <div v-else :class="['footer',{'is-custom':custom}]" @click="goPayment">
+                立即缴费
             </div>
 
         </div>
@@ -55,7 +59,7 @@
                 <section class="iosselect-box">
                     <div class="one-level-contain oneLevelContain" style="font-size: 16px; height: 150px;">
                         <ul class="select-one-level" style="transform: translate(0px, 0px) translateZ(0px);">
-                            <li v-for="item in feeCharge" :key="item.index">
+                            <li v-for="(item,index) in feeCharge" :key="index">
                                 <p>{{item.startDate}}</p>
                                 <p>{{item.amount}}元</p>
                             </li>
@@ -67,7 +71,7 @@
         <!--        自定义-->
         <div :class="['custom olay ios-select-widget-box one-level-box fadeInUp',{'fadeOutDown':!custom}]" v-if="custom"
              @click.stop="custom = false">
-            <div class="layer" style="height: 194px;" @click.stop="custom = true">
+            <div class="layer" style="height: 2.48rem;background: #FFFFFF" @click.stop="custom = true">
                 <header style="height: 44px; line-height: 44px;font-size: 16px" class="iosselect-header">
                     <a style="height: 44px; line-height: 44px" href="javascript:void(0)" @click.stop="custom = false"
                        class="sure">x</a>
@@ -78,11 +82,17 @@
                         <ul class="select-one-level" style="transform: translate(0px, 0px) translateZ(0px);">
                             <li>
                                 <p>预缴月数</p>
-                                <p><span @click="monthRed">-</span> 3 <span @click="monthAdd">+</span></p>
+                                <p class="choose-price">
+                                    <span @click="monthRed" class="monthRed"></span>
+                                    <span class="price">
+                                        <input type="text" v-model="customObj.paymentMonth" @input="getCurPrice(customObj.paymentMonth)">
+                                    </span>
+                                <span @click="monthAdd" class="monthAdd"></span>
+                             </p>
                             </li>
                             <li>
                                 <p>实际金额</p>
-                                <p class="money">￥{{731.60}}</p>
+                                <p class="money">￥{{customObj.perUnit}}</p>
                             </li>
                         </ul>
                     </div>
@@ -110,8 +120,15 @@
         iosData: [],
         roomName: "实地-遵义蔷薇国际",
         feeId: '',
+        feeItems: [], // 专项预缴费项订单明细列表
+        customObj: {
+          type: 1,
+          checked: null,
+          paymentMonth: null,
+          perUnit: null,
+        },
         isFreeze: 0, // 是否有欠缴
-        maxMonth: 0, // 允许缴纳最大月数
+        maxMonth: 12, // 允许缴纳最大月数
         paymentList: [], // 快捷支付列表
         balanceAmount: "", // 费项余额
         enoughDeductionDate: "", // 暂存款日期
@@ -153,8 +170,8 @@
       // 查询预缴费项信息
       getFeeInfo() {
         let data = {
-          pmdsRoomId: '4a7477c8-7a28-46ce-bfc9-678e6dd71aaa',
-          cmdsId: '575cd6b8b1c54389936cf47fe8347a40'
+          pmdsRoomId: '4a7477c8-7a28-46ce-bfc9-678e6dd71aaa', // 房间主数据id
+          cmdsId: '575cd6b8b1c54389936cf47fe8347a40'  // 用户主数据id
         };
         $.ajax({
           crossDomain: true,//兼容ie8,9
@@ -188,10 +205,10 @@
       getFeeChargeStandard() {
 
         let data = {
-          pmdsRoomId: '4a7477c8-7a28-46ce-bfc9-678e6dd71aaa',
-          cmdsId: '575cd6b8b1c54389936cf47fe8347a40',
-          feeId: this.feeId,
-          itemSourceName: this.itemSourceName
+          pmdsRoomId: '4a7477c8-7a28-46ce-bfc9-678e6dd71aaa',  //房间主数据id
+          cmdsId: '575cd6b8b1c54389936cf47fe8347a40',  //用户主数据id
+          feeId: this.feeId,  // 费项id
+          itemSourceName: this.itemSourceName // 数据来源：房间号、表具编号、车位号
         };
         $.ajax({
           crossDomain: true,//兼容ie8,9
@@ -206,12 +223,21 @@
       },
       // 获取专项预缴费项订单明细
       getFeeitemDetails() {
+        // user/userInfo
+        // $.ajax({
+        //   crossDomain: true,//兼容ie8,9
+        //   type: "post",
+        //   url: '/bpi/user/userInfo',
+        //   success: (res) => {
+        //     console.log(res)
+        //   }
+        // })
         let data = {
-          pmdsRoomId: '4a7477c8-7a28-46ce-bfc9-678e6dd71aaa',
-          cmdsId: '575cd6b8b1c54389936cf47fe8347a40',
-          feeId: this.feeId,
-          itemSourceName: this.itemSourceName,
-          customMonths: 1
+          pmdsRoomId: '4a7477c8-7a28-46ce-bfc9-678e6dd71aaa', //房间主数据id
+          cmdsId: '575cd6b8b1c54389936cf47fe8347a40', //  用户主数据id
+          feeId: this.feeId, // 费项id
+          itemSourceName: this.itemSourceName, // 数据来源：房间号、表具编号、车位号
+          customMonths: 1  //  自定义预缴月数
         };
         $.ajax({
           crossDomain: true,//兼容ie8,9
@@ -221,36 +247,128 @@
           success: (res) => {
             this.enoughDeductionDate = res.data.enoughDeductionDate
             this.isFreeze = res.data.hasOutstandingBill
-            this.maxMonth = res.data.maxMonth
-            let arr = [], price = 0;
+            this.maxMonth = res.data.maxMonth;
+            this.feeItems = res.data.feeItems;
+            let arr = [], perUnit = 0;
             for (let i = 0, len = res.data.feeItems.length; i < len; i++) {
-              if (i > res.data.maxMonth) break
+              if (i >= res.data.maxMonth) break
+              perUnit += parseFloat(res.data.feeItems[i].perUnit);
               if (i == 0 || i == 2 || i == 5 || i == 11) {
-                price += parseFloat(res.data.feeItems[i].perUnit)
-                res.data.feeItems[i].price = price
-                res.data.feeItems[i].paymentName = `${i+1}个月`
-                res.data.feeItems[i].checked = i == 2 ? true : false
-                arr.push(res.data.feeItems[i])
+                arr.push({
+                  perUnit: perUnit.toFixed(2),
+                  paymentMonth: i + 1,
+                  checked: i == 2 ? true : false
+                })
               }
               if (i > 11) {
                 break;
               }
             }
+            arr.push(this.customObj);
             this.paymentList = arr;
-            console.log(this.paymentList)
           }
         })
       },
-      monthRed(){
-
+      // 选择快捷支付
+      choosePayment(item) {
+        this.paymentList.map((item) => {
+          item.checked = false;
+        });
+        item.checked = true;
       },
-      monthAdd(){
+      // 自定义
+      customFunc() {
+        //  如果没有价格，那么一定是第一次打开的
 
+        //    我要默认执行选择快捷支付的事件
+        const checkedItem = this.paymentList.find(item => {
+          return item.checked;
+        });
+        const {
+          paymentMonth,
+          perUnit,
+        } = checkedItem;
+        // console.log(JSON.parse(JSON.stringify(this.customObj)));
+        this.paymentList.map((item) => {
+          item.checked = false;
+        });
+        Object.assign(this.customObj, {
+          checked: true,
+          paymentMonth,
+          perUnit,
+        });
+        //  打开弹框
+        this.custom = true;
+      },
+      // 预缴月数 --
+      monthRed() {
+        if (this.customObj.paymentMonth-- > 1) {
+          this.getCurPrice(this.customObj.paymentMonth)
+        } else {
+          this.customObj.paymentMonth = 1
+        }
+      },
+      // 预缴月数 ++
+      monthAdd() {
+        if (this.customObj.paymentMonth++ < this.maxMonth) {
+          this.getCurPrice(this.customObj.paymentMonth)
+        } else {
+          this.customObj.paymentMonth = this.maxMonth
+          // this.$showToast.show('hello2020!', 2000)
+        }
+      },
+      // 立即缴费
+      goPayment(){
+        const checkedItem = this.paymentList.find(item => {
+          return item.checked;
+        });
+        const {
+          paymentMonth,
+          perUnit
+        } = checkedItem;
+        let arr = this.feeItems.slice(0,paymentMonth)
+
+        let data = {
+          pmdsRoomId: '4a7477c8-7a28-46ce-bfc9-678e6dd71aaa', // 房间主数据id
+          cmdsId: '575cd6b8b1c54389936cf47fe8347a40', // 用户主数据id
+          userName:"f范秉川", // 客户名称
+          phoneNum:'18500039456', // 用户手机号
+          feeItems:JSON.stringify(arr), // 订单明细 json格式
+          villageInfoId:"1", // 楼盘ID
+          terminalSource:'1', // 终端类型 0 Android 1 iPhone
+          totalAmount:perUnit, // 订单金额
+          feeId: this.feeId, // 费项id
+        };
+        $.ajax({
+          crossDomain: true,//兼容ie8,9
+          type: "post",
+          url: '/bpi/property/prepayment/createAdvanceOrder',
+          data: data,
+          success: (res) => {
+            console.log(res)
+            if(res.code == 2000){
+              this.$router.push('ConfirmPayment')
+            }
+          }
+        })
+
+        //
       },
       setRoom(value) {
-        console.log(value)
         this.feeId = value.id
         this.itemSourceName = value.itemSourceName
+      },
+      getCurPrice(number){
+        if(number>this.maxMonth){
+          this.$showToast.show('hello2020!', 2000)
+          this.customObj.paymentMonth = number = this.maxMonth
+        }
+        let perUnit = 0
+        for (let i = 0; i < number; i++) {
+          perUnit += parseFloat(this.feeItems[i].perUnit);
+        }
+        this.customObj.perUnit = perUnit.toFixed(2)
+
       },
       // 收费标准
       showRates() {
@@ -345,12 +463,13 @@
         }
     }
 
+
     .pay-list {
         display: flex;
         margin-bottom: 0.14rem;
         flex-wrap: wrap;
 
-        div {
+        > div div {
             width: 1.09rem;
             height: 0.75rem;
             border-radius: 0.04rem;
@@ -368,8 +487,7 @@
             }
 
             .price {
-                font-size: 0.22rem;
-
+                font-size: 0.16rem;
                 span {
                     font-size: 0.12rem;
                 }
@@ -379,6 +497,10 @@
         .checked {
             background: #F5FBFF;
             border: 0.01rem solid #04639D;
+
+            .price {
+                color: #04639D;
+            }
         }
 
     }
@@ -400,16 +522,69 @@
             color: #333333;
         }
 
+        section {
+            padding: 0 0.16rem;
+            box-sizing: border-box;
+        }
+
         li {
             display: flex;
             justify-content: space-between;
             opacity: 1;
-            height: 0.4rem;
-            line-height: 0.4rem;
+            height: 0.6rem;
+            line-height: 0.6rem;
+            border-bottom: 0.01rem solid #ECECEC;
+            padding: 0;
+            font-size: 0.14rem;
 
             .money {
                 color: #ce6a6a;
+                font-size: 0.15rem;
             }
+
+            .choose-price {
+                display: flex;
+                align-items: center;
+
+                img {
+                    width: 0.12rem;
+                }
+
+                span {
+                    background-repeat: no-repeat;
+                    background-position: left center;
+                    background-size: 0.12rem;
+                    width: 0.12rem;
+                    height: 0.12rem;
+                }
+
+                .monthRed {
+                    background-image: url("~@/assets/images/redu.png");
+                }
+
+                .monthAdd {
+                    background-image: url("~@/assets/images/add.png");
+                }
+
+                .price {
+                    width: 0.46rem;
+                    height: 0.3rem;
+                    font-size: 0.15rem;
+                    line-height: 0.3rem;
+                    background: #EDEDED;
+                    border-radius: 0.02rem;
+                    display: inline-block;
+                    margin: 0 0.15rem;
+                    input {
+                        width: 100%;
+                        height: 100%;
+                        border: none;
+                        text-align: center;
+                        background: transparent;
+                    }
+                }
+            }
+
         }
     }
 
@@ -426,13 +601,7 @@
         border-radius: 0.04rem;
         text-align: center;
         line-height: 0.44rem;
-
-        a {
-            display: block;
-            width: 100%;
-            height: 100%;
-            color: #ffffff;
-        }
+        color: #ffffff;
     }
 
     .is-freeze {

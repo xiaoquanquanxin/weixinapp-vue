@@ -1,7 +1,7 @@
 <template>
     <div class="form-item">
         <ul>
-            <li v-for="item in paidData" :key="item.index">
+            <li v-for="(item,index) in paidData" :key="index">
                 <div class="year">{{item.billMonth}}</div>
                 <div v-for="items in item.billDetails" :key="items.billIds" class="paid-cont"
                      @click="choosepaid(items.billIds)">
