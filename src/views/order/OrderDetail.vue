@@ -159,7 +159,7 @@
       },
       CountDown() {
         // eslint-disable-next-line no-debugger
-        if (this.maxtime >= 0) {
+        if (this.maxtime > 0) {
           this.minutes = Math.floor(this.maxtime / 60);
           this.seconds = Math.floor(this.maxtime % 60);
           // if (maxtime == 5 * 60) alert("还剩5分钟");
