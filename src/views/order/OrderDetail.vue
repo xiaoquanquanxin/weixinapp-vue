@@ -76,7 +76,7 @@
                 </div>
             </div>
         </div>
-        <div class="footer">
+        <div class="footer" v-if="tranStatus == 0">
             <div class="cancel" @click="cancelOrder">取消订单</div>
             <div class="gopay" @click="goPay">去支付</div>
         </div>
