@@ -1,17 +1,23 @@
 <template>
     <div class="container">
-        <div @click="goOrderDetail(type)" v-for="(item,index) in paymentList" :key="index">
-            <div class="type prepay" v-if="item.payFeesType">预</div>
-            <div class="type payment" v-else>缴</div>
-            <div>
-                <h3 v-if="item.payFeesType">预缴订单</h3>
-                <h3 v-else>缴费订单</h3>
-                <p>下单时间：{{item.orderDate}}</p>
-                <p>订单金额：¥{{item.payMoney}}</p>
+        <div v-if="noList">
+            <div @click="goOrderDetail(type)" v-for="(item,index) in paymentList" class="list" :key="index">
+                <div class="type prepay" v-if="item.payFeesType">预</div>
+                <div class="type payment" v-else>缴</div>
+                <div>
+                    <h3 v-if="item.payFeesType">预缴订单</h3>
+                    <h3 v-else>缴费订单</h3>
+                    <p>下单时间：{{item.orderDate}}</p>
+                    <p>订单金额：¥{{item.payMoney}}</p>
+                </div>
+                <p class="pay-state" v-if="item.orderState == 1">支付成功</p>
+                <p class="pay-state" v-else-if="item.orderState == 2">已取消</p>
+                <p class="pay-state" v-else>待支付</p>
             </div>
-            <p class="pay-state" v-if="item.orderState == 1">支付成功</p>
-            <p class="pay-state" v-else-if="item.orderState == 2">已取消</p>
-            <p class="pay-state" v-else>待支付</p>
+        </div>
+        <div v-else class="no-message">
+            <img src="~@/assets/images/noMessage.png">
+            <p>暂无缴费记录</p>
         </div>
     </div>
 </template>
@@ -24,6 +30,7 @@
     data() {
       return {
         paymentList: [],  // 缴费列表
+        noList: false
       }
     },
     created() {
@@ -58,7 +65,7 @@
     @import "~@/assets/css/common.less";
 
     .container {
-        > div {
+       .list{
             display: flex;
             font-size: 0.16rem;
             align-items: center;
@@ -104,5 +111,17 @@
 
     .payment {
         background: #56BC8E;
+    }
+
+    .no-message {
+        padding-top: 2.2rem;
+        text-align: center;
+        color: #808080;
+        font-size: 0.13rem;
+
+        img {
+            width: 0.66rem;
+
+        }
     }
 </style>

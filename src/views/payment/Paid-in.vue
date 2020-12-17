@@ -3,7 +3,7 @@
         <payment class="paid-box" :paidData="paidInList" v-if="!noList"></payment>
         <div v-else class="no-message">
             <img src="~@/assets/images/noMessage.png">
-            <p>暂无未缴账单</p>
+            <p>暂无已缴账单</p>
         </div>
     </div>
 </template>
