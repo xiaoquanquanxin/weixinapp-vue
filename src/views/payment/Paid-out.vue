@@ -1,6 +1,6 @@
 <template>
     <div class="paid-box">
-        <div class="form-item item-line">
+        <div class="form-item item-line" v-if="!noList">
             <div class="box">
                 <div class="screening">
                     <div>{{billName}}</div>
@@ -23,6 +23,10 @@
                 </div>
             </div>
         </div>
+        <div v-else class="no-message">
+            <img src="~@/assets/images/noMessage.png">
+            <p>暂无未缴账单</p>
+        </div>
         <ios-select ref="mychild" @func="setRoom" :paidData="paidOutList"></ios-select>
     </div>
 </template>
@@ -43,6 +47,7 @@
     },
     data() {
       return {
+        noList: false, //
         billName: "全部费用",  // 费项名称
         isFreeze: false, // 冻结状态
         allChecked: true, //是否全选
@@ -53,8 +58,8 @@
     },
     created() {
 
-        this.getPaymentList() // 获取项目列表
-        this.getUnpaidBill() // 获取冻结账单列表
+      this.getPaymentList() // 获取项目列表
+      this.getUnpaidBill() // 获取冻结账单列表
     },
     computed: {
       // allChecked() {
@@ -62,7 +67,7 @@
       // }
     },
     methods: {
-      getPaymentList(){
+      getPaymentList() {
         // 获取费用项目列表
         let data = {
           roomIDs: '4a7477c8-7a28-46ce-bfc9-678e6dd71aaa',
@@ -74,24 +79,28 @@
           url: '/bpi/getUnpaidBill.do',
           contentType: "application/x-www-form-urlencoded",
           data: {'json': JSON.stringify(data)},
-          success:(res)=>{
+          success: (res) => {
             this.paidOutList = res.data.content
+            if (this.paidOutList) {
+              this.paidOutList.map((item) => {
+                // 拿到选中费项列表
+                this.billIDsList.push(item.billDetails[0].billIds);
+                // 默认选中所有费项
+                this.$set(item.billDetails[0], 'checked', true)
+                // 默认选中所有费项
+                this.totleMoney += item.billDetails[0].paidTotal
+              })
+            } else {
+              this.noList = true;
+            }
 
-            this.paidOutList.map((item) => {
-              // 拿到选中费项列表
-              this.billIDsList.push(item.billDetails[0].billIds);
-              // 默认选中所有费项
-              this.$set(item.billDetails[0], 'checked', true)
-              // 默认选中所有费项
-              this.totleMoney += item.billDetails[0].paidTotal
-            })
           }
         })
       },
-      getUnpaidBill(){
+      getUnpaidBill() {
         let data = {
           "roomIds": "4a7477c8-7a28-46ce-bfc9-678e6dd71aaa",
-          "contactNumber":"18201538993"
+          "contactNumber": "18201538993"
         };
         $.ajax({
           crossDomain: true,//兼容ie8,9
@@ -99,10 +108,10 @@
           url: '/bpi/getUnpaidBillTranV1.do',
           contentType: "application/x-www-form-urlencoded",
           data: {'json': JSON.stringify(data)},
-          success:(res)=>{
-            if(res.data.length){
+          success: (res) => {
+            if (res.data.length) {
               this.isFreeze = 1
-            }else{
+            } else {
               this.isFreeze = 0
             }
           }
@@ -216,6 +225,7 @@
         background: #ffffff;
         padding: 0 0.1rem;
         box-sizing: border-box;
+
         .checkbox {
             display: inline-block;
             width: 0.14rem;
@@ -280,4 +290,14 @@
 
     }
 
+    .no-message {
+        padding-top: 1.2rem;
+        text-align: center;
+        color: #808080;
+        font-size: 0.13rem;
+        img {
+            width: 0.66rem;
+
+        }
+    }
 </style>
