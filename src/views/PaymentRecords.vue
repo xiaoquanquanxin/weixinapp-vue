@@ -1,7 +1,7 @@
 <template>
     <div class="container">
         <div v-if="noList">
-            <div @click="goOrderDetail(type)" v-for="(item,index) in paymentList" class="list" :key="index">
+            <div @click="goOrderDetail(type)" v-for="(item,index) in paymentList" class="list line" :key="index">
                 <div class="type prepay" v-if="item.payFeesType">预</div>
                 <div class="type payment" v-else>缴</div>
                 <div>
@@ -70,7 +70,6 @@
             font-size: 0.16rem;
             align-items: center;
             background: #ffffff;
-            border-bottom: 0.01rem solid #ECECEC;
             position: relative;
             padding-bottom: 0.12rem;
             box-sizing: border-box;

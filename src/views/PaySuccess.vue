@@ -15,8 +15,8 @@
                     <p class="payment-money">2020-09-09 18:00</p>
                 </div>
                 <div>
-                    <p class="paymen-name">支付方式</p>
-                    <p class="payment-money">在线支付</p>
+                    <p class="paymen-name">订单金额</p>
+                    <p class="payment-money">￥130.60</p>
                 </div>
             </div>
         </div>
@@ -93,7 +93,6 @@
 
                 .paymen-name {
                     color: #505050;
-
                 }
 
                 .payment-money {

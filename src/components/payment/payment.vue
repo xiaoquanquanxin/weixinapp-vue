@@ -1,8 +1,8 @@
 <template>
     <div class="form-item">
         <ul>
-            <li v-for="(item,index) in paidData" :key="index">
-                <div class="year">{{item.billMonth}}</div>
+            <li v-for="(item,index) in paidData" :key="index" class="line">
+                <div class="year line">{{item.billMonth}}</div>
                 <div v-for="items in item.billDetails" :key="items.billIds" class="paid-cont"
                      @click="choosepaid(items.billIds)">
                     <div>
@@ -76,7 +76,6 @@
     }
 
     li {
-        border-bottom: 1px solid #eeeeee;
         padding-left: 0.1rem;
 
         div {
@@ -85,7 +84,6 @@
     }
 
     .year {
-        border-bottom: 1px solid #eeeeee;
         font-size: 0.14rem;
     }
 

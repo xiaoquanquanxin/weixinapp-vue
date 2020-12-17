@@ -63,6 +63,7 @@
         background-position: left 0.1rem center;
         background-repeat: no-repeat;
         background-size: 0.38rem 0.39rem;
+        background-color: #FFFFFF;
         div {
             width: 100%;
             height: 100%;

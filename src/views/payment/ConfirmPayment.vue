@@ -4,7 +4,7 @@
         <div class="content">
 
             <div class="payment-box">
-                <div class="payment-list" v-for="item in billList" :key="item.billDetails[0].billIds">
+                <div class="payment-list line" v-for="item in billList" :key="item.billDetails[0].billIds">
                     <h3>【{{item.billMonth}}】</h3>
                     <div v-for="items in item.billDetails" :key="items.billIds">
                         <p class="paymen-name">{{items.paidName}}</p>
@@ -222,7 +222,6 @@
             padding: 0.13rem;
             box-sizing: border-box;
             background: #ffffff;
-            border-bottom: 0.01rem solid #ECECEC;
 
             h3 {
                 font-size: 0.14rem;

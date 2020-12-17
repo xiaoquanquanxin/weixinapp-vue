@@ -132,7 +132,7 @@
     }
 
     .nav .active {
-        border-bottom: 1px solid #6f2222;
-        color: darkred;
+        border-bottom: 1px solid #04639D;
+        color: #04639D;
     }
 </style>

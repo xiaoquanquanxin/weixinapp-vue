@@ -1,15 +1,15 @@
 <template>
     <div class="container">
         <div class="header world bg" @click="choose">房间: 实地·遵义蔷薇国际-D3地块(7、8地块及03地…</div>
-        <div class="payment">
+        <div class="payment line">
             <div>预缴费项</div>
             <div class="bg payment-name" @click="choose">{{feeName}}</div>
         </div>
         <div class="payment-box">
-            <div class="payment-list">
+            <div class="payment-list line">
                 <h3>预缴余额</h3>
                 <div>
-                    <p class="paymen-name">住宅物业管理费</p>
+                    <p class="paymen-name">{{feeName}}</p>
                     <p class="payment-money">￥{{balanceAmount}}</p>
                 </div>
                 <div v-if="enoughDeductionDate">
@@ -18,7 +18,7 @@
                 </div>
             </div>
         </div>
-        <div class="payment">
+        <div class="payment line">
             <div>费项缴纳</div>
             <div class="bg payment-name" @click="showRates">收费标准</div>
         </div>
@@ -28,8 +28,13 @@
                 <div class="pay-list">
                     <div v-for="(item,index) in paymentList" :key="index">
                         <div @click="customFunc(item)" :class="{'checked':item.checked}" v-if="item.type === 1">
-                            <p class="month" v-if="!item.paymentMonth">自定义</p>
-                            <p class="month" v-if="item.paymentMonth">{{item.paymentMonth}}个月</p>
+                            <p class="month" v-if="!item.paymentMonth">
+                                自定义
+                            </p>
+                            <p class="month" v-if="item.paymentMonth">
+                                {{item.paymentMonth}}个月
+                                <span v-if="item.type === 1">自定义</span>
+                            </p>
                             <p class="price" v-if="item.paymentMonth"><span>¥</span>{{item.perUnit}}</p>
                         </div>
                         <div v-else :class="{'checked':item.checked}" @click="choosePayment(item)">
@@ -432,7 +437,6 @@
         display: flex;
         justify-content: space-between;
         background: #ffffff;
-        border-bottom: 0.01rem solid #ECECEC;
 
         .paymen-name {
             font-size: 0.12rem;
@@ -446,7 +450,6 @@
             padding: 0.13rem;
             box-sizing: border-box;
             background: #ffffff;
-            border-bottom: 0.01rem solid #ECECEC;
 
             h3 {
                 font-size: 0.14rem;
@@ -502,6 +505,18 @@
 
             .month {
                 font-size: 0.13rem;
+                position: relative;
+                span{
+                    position: absolute;
+                    right: -0.08rem;
+                    top: -0.22rem;
+                    width: 0.37rem;
+                    height: 0.15rem;
+                    background: #FFF1ED;
+                    border-radius: 0 0.02rem 0 0.02rem;
+                    color: #E6582F;
+                    font-size: 0.1rem;
+                }
             }
 
             .price {

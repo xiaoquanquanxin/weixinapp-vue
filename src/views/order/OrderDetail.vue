@@ -25,7 +25,7 @@
             </div>
             <div class="orderList">
                 <div class="payment">
-                    <p class="room world">房间: 实地·遵义蔷薇国际-D3地块(7、8地块及03地块及03地块及03地</p>
+                    <p class="room world line">房间: 实地·遵义蔷薇国际-D3地块(7、8地块及03地块及03地块及03地</p>
                     <!--                    预缴订单-->
                     <div class="prepay" v-if="type == 'pre'">
                         <p class="paymen-name">住宅物业管理费</p>
@@ -34,7 +34,7 @@
                     <!--                    订单-->
                     <div v-else>
                         <div class="payment-box" v-for="item in 3" :key="item">
-                            <div class="payment-list">
+                            <div class="payment-list line">
                                 <h3>[2019]</h3>
                                 <div>
                                     <p class="paymen-name">住宅物业管理费</p>
@@ -56,9 +56,9 @@
 
                 </div>
                 <div class="payment">
-                    <div class="room">订单信息</div>
+                    <div class="room line">订单信息</div>
                     <div class="payment-box">
-                        <div class="payment-list pay-message">
+                        <div class="payment-list pay-message line">
                             <div>
                                 <p class="paymen-name">订单号码</p>
                                 <p class="payment-money">2312412531234</p>
@@ -299,7 +299,6 @@
 
                 .room {
                     font-size: 0.13rem;
-                    border-bottom: 0.01rem solid #ECECEC;
                     line-height: 0.5rem;
                 }
 
@@ -310,7 +309,6 @@
                     .payment-list {
                         box-sizing: border-box;
                         background: #ffffff;
-                        border-bottom: 0.01rem solid #ECECEC;
 
                         h3 {
                             font-size: 0.14rem;

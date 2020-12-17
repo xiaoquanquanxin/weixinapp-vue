@@ -1,7 +1,7 @@
 <template>
     <div class="container">
         <div class="room world">房间：实地·遵义蔷薇国际-D3地块(7、8地块及03地…</div>
-        <div class="payment-list">
+        <div class="payment-list line">
             <div>
                 <p class="paymen-name">{{feeName}}</p>
                 <p class="payment-money">￥{{perUnit}}</p>
@@ -52,7 +52,6 @@
         padding: 0.11rem;
         box-sizing: border-box;
         background: #ffffff;
-        border-bottom: 0.01rem solid #ECECEC;
         margin-top: 0.11rem;
 
         h3 {
