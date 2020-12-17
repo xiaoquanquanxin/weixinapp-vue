@@ -125,6 +125,7 @@
                 font-size: .12rem;
                 display: block;
                 height: 100%;
+                color:#808080;
                 border-bottom: 1px solid transparent;
             }
         }
