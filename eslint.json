@@ -102,7 +102,7 @@
     "no-trailing-spaces": 1,
     "no-this-before-super": 0,
     "no-throw-literal": 2,
-    "no-undef": 1,
+    "no-undef": 0,
     "no-undef-init": 2,
     "no-undefined": 2,
     "no-unexpected-multiline": 2,

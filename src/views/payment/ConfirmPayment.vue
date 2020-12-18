@@ -30,6 +30,7 @@
 
 <script>
   import $ from 'jquery'
+  // import wx from 'weixin-js-sdk'
 
   export default {
     name: "ConfirmPayment",
@@ -38,8 +39,9 @@
         billList: [],  // 选中订单列表
         billIDsList: [], // 选中订单id
         totleMoney: 0,
+        isReady: false,
         billData: "", // 未缴账单列表
-        billDetails:"" // 创建订单需要列表格式
+        billDetails: "" // 创建订单需要列表格式
       }
     },
     created() {
@@ -47,7 +49,14 @@
         roomIDs: '4a7477c8-7a28-46ce-bfc9-678e6dd71aaa',
         userID: '575cd6b8b1c54389936cf47fe8347a40'
       };
-      this.billIDsList = this.$route.query.billIDsList
+
+      // 获取微信签名
+      // this.getJsConfig();
+
+
+      this.getPay()  // 调取微信支付
+
+      this.billIDsList = this.$route.query.billIDsList;
       $.ajax({
         crossDomain: true,//兼容ie8,9
         type: "post",
@@ -57,29 +66,71 @@
       }).then((res) => {
         // resolve(data) billIds
         this.billData = res.data
-        this.billIDsList.map((billItem) => {
-          res.data.content.map((item) => {
-            if (item.billDetails[0].billIds == billItem) {
-              this.billList.push(item)
-              this.totleMoney += item.billDetails[0].paidTotal
-            }
+          this.billIDsList.map((billItem) => {
+            res.data.content.map((item) => {
+              if (item.billDetails[0].billIds == billItem) {
+                this.billList.push(item)
+                this.totleMoney += item.billDetails[0].paidTotal
+              }
+            })
           })
-        })
-        let arr = [];
-        this.billList.map((item)=>{
-          item.billDetails.map((_item)=>{
-            _item.roomID = res.data.roomIds
-            _item.period = item.billMonth
-            _item.billId = _item.billIds
-            _item.buildingID = 1   //  没数据 暂时写死       😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈
-            arr.push(_item)
+          let arr = [];
+          this.billList.map((item) => {
+            item.billDetails.map((_item) => {
+              _item.roomID = res.data.roomIds
+              _item.period = item.billMonth
+              _item.billId = _item.billIds
+              _item.buildingID = 1   //  没数据 暂时写死       😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈
+              arr.push(_item)
+            })
           })
-        })
-        this.billDetails = arr;
+          this.billDetails = arr;
       })
       console.log(navigator.userAgent) //  获取手机型号
     },
     methods: {
+      getJsConfig() {
+        $.ajax({
+          crossDomain: true,//兼容ie8,9
+          type: "get",
+          url: 'http://192.168.100.208:5080/wechat-mobile/wx/getJsConfig',
+        }).then((res) => {
+          // 通过config接口注入权限验证配置
+         console.log(res)
+        })
+      },
+      getPay() {
+        $.ajax({
+          crossDomain: true,//兼容ie8,9
+          type: "get",
+          url: '/opi/pay/create_order',  //  获取支付签名
+          success:(result)=>{
+            let res = JSON.parse(result)
+            let {appId,timeStamp, nonceStr, signType, paySign} = res.payParams
+
+            //  唤起微信支付
+            if (typeof WeixinJSBridge != "undefined"){
+              WeixinJSBridge.invoke(
+                'getBrandWCPayRequest', {
+                  "appId": appId,     //公众号名称，由商户传入
+                  "timeStamp": timeStamp,         //时间戳，自1970年以来的秒数
+                  "nonceStr": nonceStr, //随机串
+                  "package": res.payParams.package,
+                  "signType": signType,         //微信签名方式：
+                  "paySign": paySign //微信签名
+                },
+                function (res) {
+                  console.log(res)
+                  if (res.err_msg == "get_brand_wcpay_request:ok") {
+                    // 使用以上方式判断前端返回,微信团队郑重提示：
+                    //res.err_msg将在用户支付成功后返回ok，但并不保证它绝对可靠。
+                  }
+                });
+            }
+
+          }
+        })
+      },
       goPay() {
         let json = {
           "customerId": "575cd6b8b1c54389936cf47fe8347a40",
@@ -109,7 +160,7 @@
           this.creatOrder(result)
         })
       },
-      creatOrder(result){
+      creatOrder(result) {
         let dataP2 = {
           userID: '575cd6b8b1c54389936cf47fe8347a40',
           orderCode: result.data.orderId,
@@ -129,25 +180,12 @@
           data: dataP2,
           success: (res) => {
             if (res.code == 2000) {
-              this.payOrder()
+              this.getPay()  // 调取微信支付
             }
           },
         })
       },
-      payOrder(){
-        // 微信支付sdk
-        // window.__initWX_configData = {
-        //   debug: false,
-        //   appId: data.appId,
-        //   timestamp: data.timestamp,
-        //   nonceStr: data.nonceStr,
-        //   signature: data.signature,
-        //   jsApiList: []
-        // };
-        // wx.config(window.__initWX_configData);
-        this.getTranStatus();
 
-      },
       // 获取订单状态
       getTranStatus() {
         let data = {"transactionId": "20201216154403717"};
@@ -180,7 +218,7 @@
           data: {'json': JSON.stringify(data)},
           success: (res) => {
             console.log(res)
-            this.$router.push({path: '/PaySuccess',data:res.data})
+            this.$router.push({path: '/PaySuccess', data: res.data})
           }
         })
       },

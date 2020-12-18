@@ -4,7 +4,6 @@ import router from './router'
 import store from './store'
 import './assets/css/reset.css'
 import showToast from 'my-showtoast';
-
 Vue.config.productionTip = false;
 
 

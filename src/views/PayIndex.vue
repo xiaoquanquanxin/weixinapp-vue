@@ -24,6 +24,9 @@
     data() {
       return {};
     },
+    created() {
+
+    },
     methods: {
       ...mapActions('test', [
         'setCountAdd',
@@ -36,6 +39,8 @@
         // }).then(()=>{
         //   this.$router.push({path: url})
         // })
+
+
         this.$router.push({path: url})
       }
     }

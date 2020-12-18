@@ -16,7 +16,8 @@
     "vue": "^2.6.11",
     "vue-router": "3.0.2",
     "vue-template-compiler": "^2.6.12",
-    "vuex": "^3.4.0"
+    "vuex": "^3.4.0",
+    "weixin-js-sdk": "^1.6.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",
@@ -40,6 +41,7 @@
     "parserOptions": {
       "parser": "babel-eslint"
     },
+    "globals": {"WeixinJSBridge" : false},
     "rules": {
       "no-debugger": 0
     }
