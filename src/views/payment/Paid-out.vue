@@ -6,7 +6,7 @@
                     <div>{{billName}}</div>
                     <div id="showBank" @click="choose">费项筛选</div>
                 </div>
-                <payment class="context" :paidData="paidOutList" :paidName="'paidOut'" @func="billdsCheck"></payment>
+                <payment class="context" :paidData="paidOutList" :paidName="'paidOut'" @billdsCheck="billdsCheck"></payment>
             </div>
             <div class="freeze" v-if="isFreeze">您有账单被冻结，请支付或取消后再缴费>></div>
             <div :class="['box-footer',{'box-shadow':!isFreeze}]">
@@ -58,8 +58,8 @@
     },
     created() {
 
-      this.getPaymentList() // 获取项目列表
-      this.getUnpaidBill() // 获取冻结账单列表
+      this.getPaymentList() // 获取未缴账单列表
+      this.getUnpaidBillTran() // 获取冻结账单列表
     },
     computed: {
       // allChecked() {
@@ -68,9 +68,8 @@
     },
     methods: {
       getPaymentList() {
-        // 获取费用项目列表
         let data = {
-          roomIDs: '4a7477c8-7a28-46ce-bfc9-678e6dd71aaa',
+          roomIDs: '83a7999d-5177-4d0a-9d58-754aaad5db15',
           userID: '575cd6b8b1c54389936cf47fe8347a40'
         };
         $.ajax({
@@ -97,9 +96,9 @@
           }
         })
       },
-      getUnpaidBill() {
+      getUnpaidBillTran() {
         let data = {
-          "roomIds": "4a7477c8-7a28-46ce-bfc9-678e6dd71aaa",
+          "roomIds": "83a7999d-5177-4d0a-9d58-754aaad5db15",
           "contactNumber": "18201538993"
         };
         $.ajax({
@@ -149,6 +148,7 @@
       },
       // 单费项点击事件
       billdsCheck(id) {
+
         this.paidOutList.map((item) => {
           if (item.billDetails[0].billIds == id) {
             // 遍历费项列表 找到选中费项 控制选中状态
@@ -156,7 +156,7 @@
             // 根据选中费项checked属性 添加/删除 选中费项列表内容
             if (!item.billDetails[0].checked) {
               if (this.billIDsList.indexOf(item.billDetails[0].billIds) != '-1') {
-                this.billdsList.splice(this.billIDsList.indexOf(item.billDetails[0].billIds), 1)
+                this.billIDsList.splice(this.billIDsList.indexOf(item.billDetails[0].billIds), 1)
               }
               this.totleMoney -= item.billDetails[0].paidTotal
             } else {

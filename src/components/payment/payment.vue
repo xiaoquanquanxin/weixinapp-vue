@@ -4,7 +4,7 @@
             <li v-for="(item,index) in paidData" :key="index" class="line">
                 <div class="year line">{{item.billMonth}}</div>
                 <div v-for="items in item.billDetails" :key="items.billIds" class="paid-cont"
-                     @click="choosepaid(items.billIds)">
+                     @click="choosepaid(items.billIds,index)">
                     <div>
                         <span v-if="paidName === 'paidOut'" :class="['checkbox',{'isChecked':items.checked}]"></span>
                         <div class="world">
@@ -45,7 +45,7 @@
       //   //  保存病人信息，这是为了给组件用，而不是页面，所以要store
       //   'setAllChecked',
       // ]),
-      choosepaid(id) {
+      choosepaid(id,index) {
         // console.log(id)
         // this.paidData.map((item,index) => {
         //   if (item.billDetails[0].billIds == id) {
@@ -60,7 +60,17 @@
         // let isCheck = this.paidData.every((item)=>{
         //   return item.billDetails[0].checked
         // })
-        this.$emit('func', id)
+        for(let i = index,len = this.paidData.length;i<len;i++){
+          if(this.paidData[i+1] && this.paidData[i+1].billDetails[0].checked){
+            this.$showToast.show('不能跳月缴费，请把之前的月份账单结清。', 2000)
+            return false
+          }
+          if(!this.paidData[i+1]){
+            this.$emit('billdsCheck', id)
+          }
+        }
+
+
         // console.log(this.billdsList)
         // this.setAllChecked(isCheck)
       }
