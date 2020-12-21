@@ -26,8 +26,9 @@
 
             <div v-if="calcTimeUint == 2" class="pay">
                 <div class="pay-list">
-                    <div v-for="(item,index) in paymentList" :key="index">
-                        <div @click="customFunc(item)" :class="{'checked':item.checked}" v-if="item.type === 1">
+                    <div v-for="(item,index) in paymentList" :key="index"  :class="{'isFrozen':isFrozen}">
+                        <div @click="customFunc(item)" :class="{'checked':item.checked}"
+                             v-if="item.type === 1">
                             <p class="month" v-if="!item.paymentMonth">
                                 自定义
                             </p>
@@ -48,7 +49,7 @@
                 <img src="~@/assets/images/calcTimeUint.png">
                 <p>抱歉，暂不支持“季度”和年预缴</p>
             </div>
-            <div v-if="isFreeze" class="footer is-freeze">
+            <div v-if="isFrozen" class="footer is-freeze">
                 您有已出账单未结算，不能预缴
             </div>
             <div v-else :class="['footer',{'is-custom':custom}]" @click="goPayment">
@@ -69,7 +70,7 @@
                     <div class="one-level-contain oneLevelContain" style="font-size: 16px; height: 150px;">
                         <ul class="select-one-level" style="transform: translate(0px, 0px) translateZ(0px);">
                             <li v-for="(item,index) in feeCharge" :key="index">
-                                <p>{{item.startDate}}</p>
+                                <p>{{item.startDate}} 至 {{item.endDate}}</p>
                                 <p>{{item.amount}}元</p>
                             </li>
                         </ul>
@@ -137,7 +138,7 @@
           paymentMonth: null,
           perUnit: null,
         },
-        isFreeze: 0, // 是否有欠缴
+        isFrozen: 0, // 是否有欠缴
         calcTimeUint: "", // 账单周期模型
         maxMonth: 12, // 允许缴纳最大月数
         paymentList: [], // 快捷支付列表
@@ -158,7 +159,7 @@
       // 查询是否有预缴订单
       getFeeItem() {
         let data = {
-          pmdsRoomId: '4a7477c8-7a28-46ce-bfc9-678e6dd71aaa',
+          pmdsRoomId: '83a7999d-5177-4d0a-9d58-754aaad5db15',
           cmdsId: '575cd6b8b1c54389936cf47fe8347a40'
         };
         $.ajax({
@@ -181,7 +182,7 @@
       // 查询预缴费项信息
       getFeeInfo() {
         let data = {
-          pmdsRoomId: '4a7477c8-7a28-46ce-bfc9-678e6dd71aaa', // 房间主数据id
+          pmdsRoomId: '83a7999d-5177-4d0a-9d58-754aaad5db15', // 房间主数据id
           cmdsId: '575cd6b8b1c54389936cf47fe8347a40'  // 用户主数据id
         };
         $.ajax({
@@ -206,17 +207,21 @@
               this.itemSourceName = res.data[0].itemSourceName //数据来源：房间号、表具编号、车位号
               this.balanceAmount = res.data[0].balanceAmount //预存款余额
               this.calcTimeUint = res.data[0].calcTimeUint  //账单周期
+
+              // 获取费项收费标准
               this.getFeeChargeStandard()
+
+              // 获取专项预缴费项订单明细
               this.getFeeitemDetails()
             }
           }
         })
       },
-      // 获取费项收费标准
+
       getFeeChargeStandard() {
 
         let data = {
-          pmdsRoomId: '4a7477c8-7a28-46ce-bfc9-678e6dd71aaa',  //房间主数据id
+          pmdsRoomId: '83a7999d-5177-4d0a-9d58-754aaad5db15',  //房间主数据id
           cmdsId: '575cd6b8b1c54389936cf47fe8347a40',  //用户主数据id
           feeId: this.feeId,  // 费项id
           itemSourceName: this.itemSourceName // 数据来源：房间号、表具编号、车位号
@@ -232,7 +237,7 @@
           }
         })
       },
-      // 获取专项预缴费项订单明细
+
       getFeeitemDetails() {
         // user/userInfo
         // $.ajax({
@@ -244,7 +249,7 @@
         //   }
         // })
         let data = {
-          pmdsRoomId: '4a7477c8-7a28-46ce-bfc9-678e6dd71aaa', //房间主数据id
+          pmdsRoomId: '83a7999d-5177-4d0a-9d58-754aaad5db15', //房间主数据id
           cmdsId: '575cd6b8b1c54389936cf47fe8347a40', //  用户主数据id
           feeId: this.feeId, // 费项id
           itemSourceName: this.itemSourceName, // 数据来源：房间号、表具编号、车位号
@@ -257,7 +262,7 @@
           data: data,
           success: (res) => {
             this.enoughDeductionDate = res.data.enoughDeductionDate
-            this.isFreeze = res.data.hasOutstandingBill
+            this.isFrozen = res.data.hasOutstandingBill
             this.maxMonth = res.data.maxMonth;
             this.feeItems = res.data.feeItems;
             let arr = [], perUnit = 0;
@@ -268,7 +273,7 @@
                 arr.push({
                   perUnit: perUnit.toFixed(2),
                   paymentMonth: i + 1,
-                  checked: i == 2 ? true : false
+                  checked: i == 2 && !res.data.hasOutstandingBill ? true : false
                 })
               }
               if (i > 11) {
@@ -277,39 +282,46 @@
             }
             arr.push(this.customObj);
             this.paymentList = arr;
+            // // 获取个人冻结订单
+            // this.getUnpaidBillTran()
           }
         })
       },
       // 选择快捷支付
       choosePayment(item) {
-        this.paymentList.map((item) => {
-          item.checked = false;
-        });
-        item.checked = true;
+        if (!this.isFrozen) {
+          this.paymentList.map((item) => {
+            item.checked = false;
+          });
+          item.checked = true;
+        }
+
       },
       // 自定义
       customFunc() {
         //  如果没有价格，那么一定是第一次打开的
+        if (!this.isFrozen) {
+          //    我要默认执行选择快捷支付的事件
+          const checkedItem = this.paymentList.find(item => {
+            return item.checked;
+          });
+          const {
+            paymentMonth,
+            perUnit,
+          } = checkedItem;
+          // console.log(JSON.parse(JSON.stringify(this.customObj)));
+          this.paymentList.map((item) => {
+            item.checked = false;
+          });
+          Object.assign(this.customObj, {
+            checked: true,
+            paymentMonth,
+            perUnit,
+          });
+          //  打开弹框
+          this.custom = true;
+        }
 
-        //    我要默认执行选择快捷支付的事件
-        const checkedItem = this.paymentList.find(item => {
-          return item.checked;
-        });
-        const {
-          paymentMonth,
-          perUnit,
-        } = checkedItem;
-        // console.log(JSON.parse(JSON.stringify(this.customObj)));
-        this.paymentList.map((item) => {
-          item.checked = false;
-        });
-        Object.assign(this.customObj, {
-          checked: true,
-          paymentMonth,
-          perUnit,
-        });
-        //  打开弹框
-        this.custom = true;
       },
       // 预缴月数 --
       monthRed() {
@@ -506,7 +518,8 @@
             .month {
                 font-size: 0.13rem;
                 position: relative;
-                span{
+
+                span {
                     position: absolute;
                     right: -0.08rem;
                     top: -0.22rem;
@@ -646,5 +659,9 @@
 
     .is-custom {
         z-index: 999;
+    }
+
+    .isFrozen {
+        opacity: 0.4;
     }
 </style>

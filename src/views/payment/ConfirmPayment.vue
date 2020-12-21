@@ -46,7 +46,7 @@
     },
     created() {
       let data = {
-        roomIDs: '4a7477c8-7a28-46ce-bfc9-678e6dd71aaa',
+        roomIDs: '83a7999d-5177-4d0a-9d58-754aaad5db15',
         userID: '575cd6b8b1c54389936cf47fe8347a40'
       };
 
@@ -54,7 +54,6 @@
       // this.getJsConfig();
 
 
-      this.getPay()  // 调取微信支付
 
       this.billIDsList = this.$route.query.billIDsList;
       $.ajax({

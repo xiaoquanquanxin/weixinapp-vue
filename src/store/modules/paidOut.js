@@ -1,19 +1,17 @@
 const state = {
-    allChecked: false,
+    totalMoney: 0,
 
 };
-
 const mutations = {
-    SET_CHECKED: (state,allChecked) => {
-        state.allChecked = allChecked;
+    SET_COUNT: (state, count) => {
+        state.totalMoney = count;
     },
 };
 const actions = {
-    setAllChecked: ({commit},allChecked) => {
-        commit('SET_CHECKED',allChecked);
-    },
+    setTotalMoney: ({commit, state},value) => {
+        commit('SET_COUNT', value);
+    }
 };
-
 export default {
     namespaced: true,
     state,

@@ -1,7 +1,7 @@
 <template>
     <div class="container">
         <div class="banner">
-            <p>¥1265.00</p>
+            <p>¥{{totalMoney}}</p>
             <span>未缴总金额</span>
             <div class="world" @click="choose">
                 房间：{{roomName}}
@@ -39,6 +39,11 @@
           {'id': '10005', 'value': '天津 - 遵义蔷薇国际 - D3地块(7、8地块及周边地块还有啥来着'},
         ],
         roomName: "实地-遵义蔷薇国际"
+      }
+    },
+    computed:{
+      totalMoney(){
+        return this.$store.state.paidOut.totalMoney
       }
     },
     methods: {

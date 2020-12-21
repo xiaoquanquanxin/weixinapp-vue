@@ -8,8 +8,10 @@
                 </div>
                 <payment class="context" :paidData="paidOutList" :paidName="'paidOut'" @billdsCheck="billdsCheck"></payment>
             </div>
-            <div class="freeze" v-if="isFreeze">您有账单被冻结，请支付或取消后再缴费>></div>
-            <div :class="['box-footer',{'box-shadow':!isFreeze}]">
+            <div class="freeze" v-if="isFrozen">
+                <router-link to="/PaymentRecords">您有账单被冻结，请支付或取消后再缴费>></router-link>
+            </div>
+            <div :class="['box-footer',{'box-shadow':!isFrozen}]">
                 <!--                <input type="checkbox" :checked="allChecked" id="allChecked">-->
                 <div class="allCheck">
                     <div class="all-box">
@@ -19,7 +21,9 @@
                         </label>
                         <b>¥ {{totleMoney}}</b>
                     </div>
-                    <div class="payment" @click="goConfirmPayment">立即缴费</div>
+
+                    <div v-if="isFrozen" class="payment isFrozen">立即缴费</div>
+                    <div v-else class="payment" @click="goConfirmPayment">立即缴费</div>
                 </div>
             </div>
         </div>
@@ -36,7 +40,8 @@
 
   import payment from "../../components/payment/payment";
   import iosSelect from "../../components/iosSelect";
-  // import {mapActions} from "vuex";
+
+  import {mapActions} from "vuex";
   import $ from 'jquery'
 
   export default {
@@ -49,7 +54,7 @@
       return {
         noList: false, //
         billName: "全部费用",  // 费项名称
-        isFreeze: false, // 冻结状态
+        isFrozen: false, // 冻结状态
         allChecked: true, //是否全选
         billIDsList: [], // 选中的费项列表
         paidOutList: [], // 费项列表
@@ -80,14 +85,18 @@
           data: {'json': JSON.stringify(data)},
           success: (res) => {
             this.paidOutList = res.data.content
+            this.setTotalMoney(res.data.totalMoney)
             if (this.paidOutList) {
               this.paidOutList.map((item) => {
                 // 拿到选中费项列表
                 this.billIDsList.push(item.billDetails[0].billIds);
-                // 默认选中所有费项
-                this.$set(item.billDetails[0], 'checked', true)
-                // 默认选中所有费项
-                this.totleMoney += item.billDetails[0].paidTotal
+                // 判断是否有冻结账单
+                if(item.billDetails[0].isFrozen === '1'){
+                  // 默认选中所有费项
+                  this.$set(item.billDetails[0], 'checked', true)
+                  // 默认选中所有费项
+                  this.totleMoney += item.billDetails[0].paidTotal
+                }
               })
             } else {
               this.noList = true;
@@ -109,16 +118,16 @@
           data: {'json': JSON.stringify(data)},
           success: (res) => {
             if (res.data.length) {
-              this.isFreeze = 1
+              this.isFrozen = 1
             } else {
-              this.isFreeze = 0
+              this.isFrozen = 0
             }
           }
         })
       },
-      // ...mapActions('paidOut', [
-      //   'setAllChecked',
-      // ]),
+      ...mapActions('paidOut', [
+        'setTotalMoney',
+      ]),
       // iosSelect 激活组件
       choose() {
         this.$refs.mychild.choose()
@@ -131,8 +140,11 @@
       },
       //  全选按钮点击事件
       allCheck() {
+
         this.paidOutList.map((item) => {
-          this.$set(item.billDetails[0], 'checked', !this.allChecked)
+          if(item.billDetails[0].isFrozen === '1'){
+            this.$set(item.billDetails[0], 'checked', !this.allChecked)
+          }
         })
         // this.setAllChecked(!this.allChecked) // 更改全选按钮状态
         this.isCheckedAll()
@@ -144,6 +156,7 @@
           totleMoney: this.totleMoney,
           billIDsList: this.billIDsList
         }
+        console.log(this.billIDsList)
         this.$router.push({path: '/ConfirmPayment', query})
       },
       // 单费项点击事件
@@ -169,8 +182,13 @@
       },
       isCheckedAll() {
         // 控制全选按钮
-        this.allChecked = this.paidOutList.every((item) => {
-          return item.billDetails[0].checked
+        let checkedItem = this.paidOutList.filter(item => {
+          return item.billDetails[0].isFrozen == '1';
+        });
+        this.allChecked = checkedItem.every((item) => {
+          if(item.billDetails[0].isFrozen === '1'){
+            return item.billDetails[0].checked
+          }
         })
       }
     }
@@ -185,19 +203,22 @@
     }
 
     .context {
-        padding-bottom: 0.6rem;
+        padding-bottom: 0.8rem;
     }
 
     .freeze {
         position: fixed;
         bottom: 0.5rem;
-        height: 0.2rem;
-        line-height: 0.2rem;
-        font-size: 0.14rem;
+        height: 0.3rem;
+        line-height: 0.3rem;
+        font-size: 0.13rem;
         padding-left: 0.16rem;
-        background: red;
+        background: #DE8748;
         width: 100%;
-        color: #ffffff;
+        text-align: center;
+        a{
+            color: #ffffff;
+        }
     }
 
     .screening {
@@ -299,5 +320,9 @@
             width: 0.66rem;
 
         }
+    }
+
+    .isFrozen {
+        opacity: 0.4;
     }
 </style>
