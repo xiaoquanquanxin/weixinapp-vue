@@ -161,7 +161,6 @@
       },
       // 单费项点击事件
       billdsCheck(id) {
-
         this.paidOutList.map((item) => {
           if (item.billDetails[0].billIds == id) {
             // 遍历费项列表 找到选中费项 控制选中状态

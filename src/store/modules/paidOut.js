@@ -8,7 +8,7 @@ const mutations = {
     },
 };
 const actions = {
-    setTotalMoney: ({commit, state},value) => {
+    setTotalMoney: ({commit},value) => {
         commit('SET_COUNT', value);
     }
 };

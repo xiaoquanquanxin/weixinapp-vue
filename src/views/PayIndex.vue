@@ -14,6 +14,7 @@
 </template>
 <script>
   import {mapActions} from 'vuex';
+  import $ from "jquery";
 
   export default {
     computed: {
@@ -25,7 +26,23 @@
       return {};
     },
     created() {
-
+      $.ajax({
+        crossDomain: true,//兼容ie8,9
+        type: "get",
+        url: 'http://192.168.100.208:5080/wechat-mobile/wx/getJsConfig',
+      }).then((res) => {
+        // 通过config接口注入权限验证配置
+        console.log(res)
+      })
+      $.ajax({
+        crossDomain: true,//兼容ie8,9
+        type: "get",
+        headers:"onBNR6oOaFKvW09R7P3nJ9EEjIPU",
+        url: 'http://192.168.100.208:5080/wechat-mobile/user/userInfo',
+      }).then((res) => {
+        // 通过config接口注入权限验证配置
+        console.log(res)
+      })
     },
     methods: {
       ...mapActions('test', [
@@ -48,7 +65,7 @@
 </script>
 <style scoped lang="less">
     // 列表组件布局 用react的话 直接把下面注释就可以
-    .banner{
+    .banner {
         width: 100%;
         height: 1.78rem;
         background-image: url("../assets/images/payIndex-banner.png");
@@ -56,6 +73,7 @@
         background-repeat: no-repeat;
         background-size: cover;
     }
+
     .payment {
         height: 0.5rem;
         line-height: 0.5rem;
@@ -69,24 +87,29 @@
         background-repeat: no-repeat;
         background-size: 0.38rem 0.39rem;
         background-color: #FFFFFF;
+
         div {
             width: 100%;
             height: 100%;
         }
-        a{
+
+        a {
             width: 100%;
             height: 100%;
             display: block;
             color: #333333;
         }
     }
-    .paid-out{
+
+    .paid-out {
         background-image: url("../assets/images/paid-out.png");
     }
-    .prepayment{
+
+    .prepayment {
         background-image: url("../assets/images/prepayment.png");
     }
-    .paymentRecords{
+
+    .paymentRecords {
         background-image: url("../assets/images/paymentRecords.png");
     }
 

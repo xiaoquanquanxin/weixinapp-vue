@@ -92,7 +92,7 @@
         $.ajax({
           crossDomain: true,//兼容ie8,9
           type: "get",
-          url: 'http://192.168.100.208:5080/wechat-mobile/wx/getJsConfig',
+          url: 'mpi/wx/getJsConfig',
         }).then((res) => {
           // 通过config接口注入权限验证配置
          console.log(res)

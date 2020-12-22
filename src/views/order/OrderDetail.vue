@@ -4,7 +4,7 @@
             <div class="banner" v-if="tranStatus == 0">
                 <div>
                     <p class="type">待支付</p>
-                    <p class="name">05-08 11:09</p>
+                    <p class="name">{{tranDate}}</p>
                 </div>
                 <div class="spaceTime">{{minutes}}分{{seconds}}秒后订单自动关闭</div>
             </div>
@@ -124,7 +124,7 @@
       // 获取欠缴账单详情
       getBillDetailByTrans() {
         let data = {
-          "transactionid": "20201216154403717",
+          "transactionid": "20201221153245866",
           "payMenthod": ""
         };
         $.ajax({
@@ -136,7 +136,7 @@
           success: (res) => {
             this.tranStatus = res.data.tranStatus
             this.memo = res.data.memo
-            this.tranDate = res.data.tranDate
+            this.tranDate = res.data.tranDate.substring(0,16)
             console.log(res)
           }
         })
@@ -280,6 +280,7 @@
 
             .spaceTime {
                 color: #C6DDEB;
+                font-size: 0.12rem;
             }
         }
 

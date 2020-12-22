@@ -10,6 +10,14 @@ module.exports = {
                     '^/bpi': ''
                 }
             },
+            // mobile
+            '/mpi': {
+                target: 'http://192.168.100.208:5080/wechat-mobile/',
+                changeOrigin: true,
+                pathRewrite: {
+                    '^/mpi': '/wx'
+                }
+            },
             // 少杰
             '/opi': {
                 target: 'http://pzjnkm.natappfree.cc/',

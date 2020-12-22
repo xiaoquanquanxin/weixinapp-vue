@@ -63,18 +63,14 @@
         //   return item.billDetails[0].checked
         // })
         if(isFrozen){
-          for (let i = index, len = this.paidData.length; i < len; i++) {
-            if (this.paidData[i + 1] && this.paidData[i + 1].billDetails[0].checked) {
+          for (let i = 0; i < index; i++) {
+            if (this.paidData[i] && !this.paidData[i].billDetails[0].checked) {
               this.$showToast.show('不能跳月缴费，请把之前的月份账单结清。', 2000)
               return false
             }
-            if (!this.paidData[i + 1]) {
-              this.$emit('billdsCheck', id)
-            }
           }
         }
-
-
+        this.$emit('billdsCheck', id)
 
         // console.log(this.billdsList)
         // this.setAllChecked(isCheck)
