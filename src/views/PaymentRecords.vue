@@ -31,27 +31,20 @@
     data() {
       return {
         paymentList: [],  // 缴费列表
-        curPage:0,
-        pageNum:10,
-        height:0,
+        curPage: 0,
+        pageNum: 10,
+        height: 0,
         winHei: screen.availHeight, //屏幕高度
       }
     },
     created() {
       this.getPropertyAdvanceHistory()
     },
-    watch: {
-      'paymentList': function () {
-        this.$nextTick(function () {
-          console.log(111111)
-        })
-      }
-    },
     methods: {
       // 获取缴费列表
-      getPropertyAdvanceHistory() {
+      getPropertyAdvanceHistory(done) {
         let data = {
-          "curPage":this.curPage,
+          "curPage": this.curPage,
           "pageNum": this.pageNum,
           "userID": 1   // 微信用户id
         };
@@ -62,17 +55,25 @@
           contentType: "application/x-www-form-urlencoded",
           data: data,
           success: (res) => {
-            this.paymentList.concat(res.data)
+            if (res.data.length) {
+              this.paymentList = this.paymentList.concat(res.data)
+              if (done) {
+                done()
+              }
+            } else {
+              if (done) {
+                done(true)
+              }
+            }
           }
         })
       },
       goOrderDetail(number, type) {
         this.$router.push({path: '/OrderDetail', query: {'orderId': number, 'type': type}})
       },
-      getMoreList(done){
+      getMoreList(done) {
         this.curPage++
-        this.getPropertyAdvanceHistory()
-        done(true)
+        this.getPropertyAdvanceHistory(done)
       }
     }
   }

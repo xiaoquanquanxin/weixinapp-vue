@@ -144,7 +144,7 @@
           paymentMonth: null,
           perUnit: null,
         },
-        isFrozen: 0, // 是否有欠缴
+        isFrozen: 1, // 是否有欠缴
         calcTimeUint: "", // 账单周期模型
         maxMonth: 12, // 允许缴纳最大月数
         paymentList: [], // 快捷支付列表
