@@ -40,7 +40,8 @@
       getPropertyAdvanceHistory() {
         let data = {
           "curPage": "0",
-          "pageNum": "10"
+          "pageNum": "10",
+          "userID":"575cd6b8b1c54389936cf47fe8347a40"
         };
         $.ajax({
           crossDomain: true,//兼容ie8,9

@@ -25,7 +25,7 @@
         <div class="content">
 
             <div v-if="calcTimeUint == 2" class="pay">
-                <div class="pay-list">
+                <div v-if="paymentList.length" class="pay-list">
                     <div v-for="(item,index) in paymentList" :key="index"  :class="{'isFrozen':isFrozen}">
                         <div @click="customFunc(item)" :class="{'checked':item.checked}"
                              v-if="item.type === 1">
@@ -44,11 +44,16 @@
                         </div>
                     </div>
                 </div>
+                <div v-else class="calcTimeUint">
+                    <img src="~@/assets/images/calcTimeUint.png">
+                    <p>该费项没有收费设置</p>
+                </div>
             </div>
             <div v-else class="calcTimeUint">
                 <img src="~@/assets/images/calcTimeUint.png">
                 <p>抱歉，暂不支持“季度”和年预缴</p>
             </div>
+
             <div v-if="isFrozen" class="footer is-freeze">
                 您有已出账单未结算，不能预缴
             </div>
@@ -239,15 +244,6 @@
       },
 
       getFeeitemDetails() {
-        // user/userInfo
-        // $.ajax({
-        //   crossDomain: true,//兼容ie8,9
-        //   type: "post",
-        //   url: '/bpi/user/userInfo',
-        //   success: (res) => {
-        //     console.log(res)
-        //   }
-        // })
         let data = {
           pmdsRoomId: '83a7999d-5177-4d0a-9d58-754aaad5db15', //房间主数据id
           cmdsId: '575cd6b8b1c54389936cf47fe8347a40', //  用户主数据id
@@ -282,6 +278,7 @@
             }
             arr.push(this.customObj);
             this.paymentList = arr;
+
             // // 获取个人冻结订单
             // this.getUnpaidBillTran()
           }
