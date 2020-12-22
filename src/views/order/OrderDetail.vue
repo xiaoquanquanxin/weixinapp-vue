@@ -110,21 +110,24 @@
     created() {
       console.log(this.$route.query)
       this.type = this.$route.query.type
-      if (this.type === 'pre') {
-        this.getPaymentInfo()
-      } else {
-        this.getBillDetailByTrans()
-      }
-      if (this.tranStatus == 1) {
-        this.timer = setInterval(this.CountDown, 1000);
-      }
+      this.getOrderList()
 
     },
     methods: {
+      getOrderList(){
+        if (this.type === 'pre') {
+          this.getPaymentInfo()
+        } else {
+          this.getBillDetailByTrans()
+        }
+        if (this.tranStatus == 1) {
+          this.timer = setInterval(this.CountDown, 1000);
+        }
+      },
       // 获取欠缴账单详情
       getBillDetailByTrans() {
         let data = {
-          "transactionid": "20201221153245866",
+          "transactionid": "20201222110339465",
           "payMenthod": ""
         };
         $.ajax({
@@ -137,6 +140,7 @@
             this.tranStatus = res.data.tranStatus
             this.memo = res.data.memo
             this.tranDate = res.data.tranDate.substring(0,16)
+            this.transactionid = res.data.transactionid
             console.log(res)
           }
         })
@@ -144,7 +148,7 @@
       // 获取预缴订单详情
       getPaymentInfo() {
         let data = {
-          orderId: "1" // 订单编号
+          orderId: "20201222110339465" // 订单编号
         };
         $.ajax({
           crossDomain: true,//兼容ie8,9
@@ -223,8 +227,8 @@
           } else {
             url = 'cancelPaidOrder.do'
             data = {
-              "transactionId": "20201221153245866",
-              "updateTime": "2020-12-21 15:32:46",
+              "transactionId": this.transactionid,
+              "updateTime": this.tranDate,
               "payMethod": "900"
             }
           }
@@ -236,6 +240,7 @@
             data: {'json': JSON.stringify(data)},
             success: (res) => {
               console.log(res)
+              this.getOrderList()
             }
           })
           // this.$router.go(0)

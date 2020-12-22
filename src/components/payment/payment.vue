@@ -48,32 +48,25 @@
       //   'setAllChecked',
       // ]),
       choosepaid(id, index,isFrozen) {
-        // console.log(id)
-        // this.paidData.map((item,index) => {
-        //   if (item.billDetails[0].billIds == id) {
-        //     if(item.billDetails[0].checked){
-        //       this.billdsList.splice(index,1)
-        //     }else{
-        //       this.billdsList.push(item.billDetails[0])
-        //     }
-        //     this.$set(item.billDetails[0], 'checked', !item.billDetails[0].checked)
-        //   }
-        // })
-        // let isCheck = this.paidData.every((item)=>{
-        //   return item.billDetails[0].checked
-        // })
+        // debugger
         if(isFrozen){
+          //  判断之前月份有没有没勾选
           for (let i = 0; i < index; i++) {
             if (this.paidData[i] && !this.paidData[i].billDetails[0].checked) {
               this.$showToast.show('不能跳月缴费，请把之前的月份账单结清。', 2000)
               return false
             }
           }
+          //  判断之后月份有没有勾选
+          for (let i = index, len = this.paidData.length; i < len; i++) {
+            if (this.paidData[i + 1] && this.paidData[i + 1].billDetails[0].checked) {
+              this.$showToast.show('不能跳月缴费，请把之前的月份账单结清。', 2000)
+              return false
+            }
+          }
+          // 都不满足则不是跳月缴费 可以操作勾选
+          this.$emit('billdsCheck', id)
         }
-        this.$emit('billdsCheck', id)
-
-        // console.log(this.billdsList)
-        // this.setAllChecked(isCheck)
       }
     }
   }

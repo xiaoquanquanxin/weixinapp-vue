@@ -140,10 +140,15 @@
       },
       //  全选按钮点击事件
       allCheck() {
-
         this.paidOutList.map((item) => {
           if(item.billDetails[0].isFrozen === '1'){
             this.$set(item.billDetails[0], 'checked', !this.allChecked)
+            if (!item.billDetails[0].checked) {
+              this.totleMoney -= item.billDetails[0].paidTotal
+            }else{
+              this.totleMoney += item.billDetails[0].paidTotal
+            }
+
           }
         })
         // this.setAllChecked(!this.allChecked) // 更改全选按钮状态
@@ -156,7 +161,6 @@
           totleMoney: this.totleMoney,
           billIDsList: this.billIDsList
         }
-        console.log(this.billIDsList)
         this.$router.push({path: '/ConfirmPayment', query})
       },
       // 单费项点击事件
