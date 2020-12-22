@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-        <div v-if="noList">
+        <div v-if="paymentList.length">
             <div @click="goOrderDetail(type)" v-for="(item,index) in paymentList" class="list line" :key="index">
                 <div class="type prepay" v-if="item.payFeesType">预</div>
                 <div class="type payment" v-else>缴</div>
@@ -30,7 +30,6 @@
     data() {
       return {
         paymentList: [],  // 缴费列表
-        noList: false
       }
     },
     created() {
@@ -41,14 +40,14 @@
         let data = {
           "curPage": "0",
           "pageNum": "10",
-          "userID":"575cd6b8b1c54389936cf47fe8347a40"
+          "userID":1   // 微信用户id
         };
         $.ajax({
           crossDomain: true,//兼容ie8,9
           type: "post",
           url: '/bpi/property/prepayment/getPropertyAdvanceHistory',
           contentType: "application/x-www-form-urlencoded",
-          data: {'json': JSON.stringify(data)},
+          data: data,
           success: (res) => {
             console.log(res)
             this.paymentList = res.data;

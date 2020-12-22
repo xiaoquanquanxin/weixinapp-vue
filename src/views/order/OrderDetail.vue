@@ -98,6 +98,7 @@
       return {
         minutes: 15,
         seconds: 0,
+        orderNumber:"", // 订单
         maxtime: 15 * 60 - 1,
         timer: null,
         memo:"", // 取消信息
@@ -127,7 +128,7 @@
       // 获取欠缴账单详情
       getBillDetailByTrans() {
         let data = {
-          "transactionid": "20201222110339465",
+          "transactionid": this.orderNumber,
           "payMenthod": ""
         };
         $.ajax({
@@ -141,6 +142,7 @@
             this.memo = res.data.memo
             this.tranDate = res.data.tranDate.substring(0,16)
             this.transactionid = res.data.transactionid
+            this.orderNumber = res.data.orderNumber
             console.log(res)
           }
         })
@@ -148,7 +150,7 @@
       // 获取预缴订单详情
       getPaymentInfo() {
         let data = {
-          orderId: "20201222110339465" // 订单编号
+          orderId: this.orderNumber // 订单编号
         };
         $.ajax({
           crossDomain: true,//兼容ie8,9
@@ -178,7 +180,7 @@
       },
       // 获取订单状态
       getTranStatus() {
-        let data = {"transactionId": "20201216154403717"};
+        let data = {"transactionId": this.orderNumber};
         $.ajax({
           crossDomain: true,//兼容ie8,9
           type: "post",
@@ -196,7 +198,7 @@
       // 支付后完成订单
       completePaidOrder() {
         let data = {
-          "transactionId": "20201216164458550",
+          "transactionId": this.orderNumber,
           "updateTime": "2020-12-16 16:45:08",
           "payMethod": "900"
         };

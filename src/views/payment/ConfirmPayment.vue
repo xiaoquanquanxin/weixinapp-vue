@@ -161,7 +161,7 @@
       },
       creatOrder(result) {
         let dataP2 = {
-          userID: '575cd6b8b1c54389936cf47fe8347a40', // 微信用户id
+          userID: 1, // 微信用户id
           orderCode: result.data.orderId,
           payType: 0, // 0 欠缴
           orderDate: 0,
