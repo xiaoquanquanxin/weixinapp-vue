@@ -8,14 +8,14 @@
                 </div>
                 <div class="spaceTime">{{minutes}}分{{seconds}}秒后订单自动关闭</div>
             </div>
-            <div class="banner" v-if="tranStatus == 2">
+            <div class="banner" v-if="tranStatus == 1">
                 <div>
                     <p class="type">支付成功</p>
                     <p class="name">05-08 11:09</p>
                 </div>
                 <div class="spaceTime">感谢您使用在线缴费！</div>
             </div>
-            <div class="banner" v-if="tranStatus == 3">
+            <div class="banner" v-if="tranStatus == 2">
                 <div>
                     <p class="type">已取消</p>
                     <p class="name">{{tranDate}}</p>
@@ -27,7 +27,7 @@
                 <div class="payment">
                     <p class="room world line">房间: 实地·遵义蔷薇国际-D3地块(7、8地块及03地块及03地块及03地</p>
                     <!--                    预缴订单-->
-                    <div class="prepay" v-if="type == 'pre'">
+                    <div class="prepay" v-if="type == '1'">
                         <p class="paymen-name">住宅物业管理费</p>
                         <p class="payMoney">实付：<span>¥535.00</span></p>
                     </div>
@@ -98,32 +98,46 @@
       return {
         minutes: 15,
         seconds: 0,
-        orderNumber:"", // 订单
+        orderNumber: "", // 订单
         maxtime: 15 * 60 - 1,
         timer: null,
-        memo:"", // 取消信息
-        tranDate:"", // 订单时间
+        memo: "", // 取消信息
+        tranDate: "", // 订单时间
         isType: "1", // 是否为超时取消
-        tranStatus: "1", // 支付状态
+        tranStatus: "0", // 支付状态
         type: "" // 预缴或欠缴
       }
     },
     created() {
-      console.log(this.$route.query)
       this.type = this.$route.query.type
+      this.orderNumber = this.$route.query.number
       this.getOrderList()
 
     },
     methods: {
-      getOrderList(){
-        if (this.type === 'pre') {
+      getOrderList() {
+        // 0 欠缴  1 预缴
+        if (this.type === '1') {
           this.getPaymentInfo()
         } else {
           this.getBillDetailByTrans()
         }
-        if (this.tranStatus == 1) {
-          this.timer = setInterval(this.CountDown, 1000);
-        }
+      },
+      getTime() {
+        let data = {
+          "orderID":this.orderNumber
+        };
+        $.ajax({
+          crossDomain: true,//兼容ie8,9
+          type: "post",
+          url: '/bpi/getTime.do',
+          contentType: "application/x-www-form-urlencoded",
+          data: {'json': JSON.stringify(data)},
+          success: (res) => {
+            this.maxtime = (new Date(res.data.createTime)*1 + (15*60-1)*1000 - new Date(res.data.nowTime)*1)/1000
+            this.timer = setInterval(this.CountDown, 1000);
+          }
+        })
       },
       // 获取欠缴账单详情
       getBillDetailByTrans() {
@@ -140,10 +154,12 @@
           success: (res) => {
             this.tranStatus = res.data.tranStatus
             this.memo = res.data.memo
-            this.tranDate = res.data.tranDate.substring(0,16)
+            this.tranDate = res.data.tranDate.substring(0, 16)
             this.transactionid = res.data.transactionid
             this.orderNumber = res.data.orderNumber
-            console.log(res)
+            if (this.tranStatus == 0) {
+              this.getTime()
+            }
           }
         })
       },
@@ -159,7 +175,14 @@
           contentType: "application/x-www-form-urlencoded",
           data: data,
           success: (res) => {
-            console.log(res)
+            this.tranStatus = res.data.tranStatus
+            this.memo = res.data.memo
+            this.tranDate = res.data.tranDate.substring(0, 16)
+            this.transactionid = res.data.transactionid
+            this.orderNumber = res.data.transactionid
+            if (this.tranStatus == 0) {
+              this.getTime()
+            }
           }
         })
       },
@@ -173,8 +196,7 @@
         } else {
           // window.reload()
           this.tranStatus = 3;
-
-          this.userBehaviorFun('clickConfirm')
+          // this.userBehaviorFun('clickConfirm')
           clearInterval(this.timer);
         }
       },
@@ -188,7 +210,6 @@
           contentType: "application/x-www-form-urlencoded",
           data: {'json': JSON.stringify(data)},
           success: (res) => {
-            console.log(res)
             if (res.data.status == 0) {
               this.completePaidOrder();
             }
@@ -223,9 +244,10 @@
         if (typeClick == 'clickConfirm') {
           //  如果为预缴订单
           let url = '', data = null;
-          if (this.type == 'pre') {
+          if (this.type == '1') {
             url = 'property/prepayment/cancelAdvanceOrder'
-            data = {'orderId':""}
+            data = {'orderId': this.orderNumber}
+
           } else {
             url = 'cancelPaidOrder.do'
             data = {
@@ -233,13 +255,14 @@
               "updateTime": this.tranDate,
               "payMethod": "900"
             }
+            data = {'json': JSON.stringify(data)}
           }
           $.ajax({
             crossDomain: true,//兼容ie8,9
             type: "post",
             url: '/bpi/' + url,
             contentType: "application/x-www-form-urlencoded",
-            data: {'json': JSON.stringify(data)},
+            data: data,
             success: (res) => {
               console.log(res)
               this.getOrderList()

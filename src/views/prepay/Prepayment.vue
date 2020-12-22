@@ -137,6 +137,7 @@
         roomName: "实地-遵义蔷薇国际",
         feeId: '',
         feeItems: [], // 专项预缴费项订单明细列表
+        roomID: "4a7477c8-7a28-46ce-bfc9-678e6dd71aaa", // 房间id
         customObj: {
           type: 1,
           checked: null,
@@ -164,7 +165,7 @@
       // 查询是否有预缴订单
       getFeeItem() {
         let data = {
-          pmdsRoomId: '83a7999d-5177-4d0a-9d58-754aaad5db15',
+          pmdsRoomId: this.roomID,
           cmdsId: '575cd6b8b1c54389936cf47fe8347a40'
         };
         $.ajax({
@@ -187,7 +188,7 @@
       // 查询预缴费项信息
       getFeeInfo() {
         let data = {
-          pmdsRoomId: '83a7999d-5177-4d0a-9d58-754aaad5db15', // 房间主数据id
+          pmdsRoomId: this.roomID, // 房间主数据id
           cmdsId: '575cd6b8b1c54389936cf47fe8347a40'  // 用户主数据id
         };
         $.ajax({
@@ -226,7 +227,7 @@
       getFeeChargeStandard() {
 
         let data = {
-          pmdsRoomId: '83a7999d-5177-4d0a-9d58-754aaad5db15',  //房间主数据id
+          pmdsRoomId: this.roomID,  //房间主数据id
           cmdsId: '575cd6b8b1c54389936cf47fe8347a40',  //用户主数据id
           feeId: this.feeId,  // 费项id
           itemSourceName: this.itemSourceName // 数据来源：房间号、表具编号、车位号
@@ -245,7 +246,7 @@
 
       getFeeitemDetails() {
         let data = {
-          pmdsRoomId: '83a7999d-5177-4d0a-9d58-754aaad5db15', //房间主数据id
+          pmdsRoomId: this.roomID, //房间主数据id
           cmdsId: '575cd6b8b1c54389936cf47fe8347a40', //  用户主数据id
           feeId: this.feeId, // 费项id
           itemSourceName: this.itemSourceName, // 数据来源：房间号、表具编号、车位号
@@ -349,8 +350,9 @@
         let arr = this.feeItems.slice(0, paymentMonth)
 
         let data = {
-          pmdsRoomId: '4a7477c8-7a28-46ce-bfc9-678e6dd71aaa', // 房间主数据id
+          pmdsRoomId: this.roomID, // 房间主数据id
           cmdsId: '575cd6b8b1c54389936cf47fe8347a40', // 用户主数据id
+          userID: 1, // 用户主数据id
           userName: "f范秉川", // 客户名称
           phoneNum: '18500039456', // 用户手机号
           feeItems: JSON.stringify(arr), // 订单明细 json格式

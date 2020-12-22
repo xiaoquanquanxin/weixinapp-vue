@@ -1,11 +1,11 @@
 <template>
     <div class="container">
         <div v-if="paymentList.length">
-            <div @click="goOrderDetail(type)" v-for="(item,index) in paymentList" class="list line" :key="index">
-                <div class="type prepay" v-if="item.payFeesType">预</div>
+            <div @click="goOrderDetail(item.orderNo,item.payFeesType)" v-for="(item,index) in paymentList" class="list line" :key="index">
+                <div class="type prepay" v-if="Number(item.payFeesType)">预</div>
                 <div class="type payment" v-else>缴</div>
                 <div>
-                    <h3 v-if="item.payFeesType">预缴订单</h3>
+                    <h3 v-if="Number(item.payFeesType)">预缴订单</h3>
                     <h3 v-else>缴费订单</h3>
                     <p>下单时间：{{item.orderDate}}</p>
                     <p>订单金额：¥{{item.payMoney}}</p>
@@ -54,8 +54,8 @@
           }
         })
       },
-      goOrderDetail(type) {
-        this.$router.push({path: '/OrderDetail', query: {'type': type}})
+      goOrderDetail(number,type) {
+        this.$router.push({path: '/OrderDetail', query: {'number': number,'type':type}})
       }
     }
   }
@@ -80,6 +80,7 @@
 
                 h3 {
                     font-size: 0.15rem;
+                    font-weight: 400;
                 }
 
             }
