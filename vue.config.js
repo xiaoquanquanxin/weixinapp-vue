@@ -15,7 +15,7 @@ module.exports = {
                 target: 'http://192.168.100.208:5080/wechat-mobile/',
                 changeOrigin: true,
                 pathRewrite: {
-                    '^/mpi': '/wx'
+                    '^/mpi': ''
                 }
             },
             // 少杰

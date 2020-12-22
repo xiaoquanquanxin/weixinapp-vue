@@ -223,8 +223,8 @@
           } else {
             url = 'cancelPaidOrder.do'
             data = {
-              "transactionId": "20201216164458550",
-              "updateTime": "2020-12-16 16:45:08",
+              "transactionId": "20201221153245866",
+              "updateTime": "2020-12-21 15:32:46",
               "payMethod": "900"
             }
           }

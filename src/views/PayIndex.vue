@@ -29,18 +29,11 @@
       $.ajax({
         crossDomain: true,//兼容ie8,9
         type: "get",
-        url: 'http://192.168.100.208:5080/wechat-mobile/wx/getJsConfig',
+        headers:{
+          'sessionkey':"onBNR6oOaFKvW09R7P3nJ9EEjIPU"
+        },
+        url: 'mpi/user/userInfo',
       }).then((res) => {
-        // 通过config接口注入权限验证配置
-        console.log(res)
-      })
-      $.ajax({
-        crossDomain: true,//兼容ie8,9
-        type: "get",
-        headers:"onBNR6oOaFKvW09R7P3nJ9EEjIPU",
-        url: 'http://192.168.100.208:5080/wechat-mobile/user/userInfo',
-      }).then((res) => {
-        // 通过config接口注入权限验证配置
         console.log(res)
       })
     },
