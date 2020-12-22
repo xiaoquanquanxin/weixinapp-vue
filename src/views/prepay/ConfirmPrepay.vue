@@ -17,16 +17,18 @@
     data(){
       return{
         feeName:"",
-        perUnit:""
+        perUnit:"",
+        orderId:""
       }
     },
     created() {
       this.feeName = this.$route.query.feeName
       this.perUnit = this.$route.query.perUnit
+      this.orderId = this.$route.query.orderId
     },
     methods: {
       goPay() {
-        this.$router.push({path: '/PaySuccess', query: {'type': 'pre'}})
+        this.$router.push({path: '/PaySuccess', query: {'type': '1','orderId':this.orderId}})
       }
     }
   }

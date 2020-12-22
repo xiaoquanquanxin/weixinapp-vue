@@ -1,21 +1,22 @@
 <template>
     <div class="container">
-        <div class="content">
-            <div class="banner" v-if="tranStatus == 0">
+        <!--        预缴账单-->
+        <div class="content" v-if="type == '1'">
+            <div class="banner" v-if="tranStatus === '0'">
                 <div>
                     <p class="type">待支付</p>
                     <p class="name">{{tranDate}}</p>
                 </div>
                 <div class="spaceTime">{{minutes}}分{{seconds}}秒后订单自动关闭</div>
             </div>
-            <div class="banner" v-if="tranStatus == 1">
+            <div class="banner" v-if="tranStatus === '1'">
                 <div>
                     <p class="type">支付成功</p>
                     <p class="name">05-08 11:09</p>
                 </div>
                 <div class="spaceTime">感谢您使用在线缴费！</div>
             </div>
-            <div class="banner" v-if="tranStatus == 2">
+            <div class="banner" v-if="tranStatus === '2'">
                 <div>
                     <p class="type">已取消</p>
                     <p class="name">{{tranDate}}</p>
@@ -31,8 +32,56 @@
                         <p class="paymen-name">住宅物业管理费</p>
                         <p class="payMoney">实付：<span>¥535.00</span></p>
                     </div>
-                    <!--                    订单-->
-                    <div v-else>
+                </div>
+                <div class="payment">
+                    <div class="room line">订单信息</div>
+                    <div class="payment-box">
+                        <div class="payment-list pay-message line">
+                            <div>
+                                <p class="paymen-name">订单号码</p>
+                                <p class="payment-money">2312412531234</p>
+                            </div>
+                            <div>
+                                <p class="paymen-name">下单时间</p>
+                                <p class="payment-money">2020-09-09 18:00</p>
+                            </div>
+                            <div>
+                                <p class="paymen-name">支付方式</p>
+                                <p class="payment-money">在线支付</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--欠缴账单-->
+        <div class="content" v-else>
+            <div class="banner" v-if="tranStatus === '0'">
+                <div>
+                    <p class="type">待支付</p>
+                    <p class="name">{{tranDate}}</p>
+                </div>
+                <div class="spaceTime">{{minutes}}分{{seconds}}秒后订单自动关闭</div>
+            </div>
+            <div class="banner" v-else-if="tranStatus === '3'">
+                <div>
+                    <p class="type">已取消</p>
+                    <p class="name">{{tranDate}}</p>
+                </div>
+                <div class="spaceTime">{{memo}}</div>
+            </div>
+            <div class="banner" v-else>
+                <div>
+                    <p class="type">支付成功</p>
+                    <p class="name">05-08 11:09</p>
+                </div>
+                <div class="spaceTime">感谢您使用在线缴费！</div>
+            </div>
+            <div class="orderList">
+                <div class="payment">
+                    <p class="room world line">房间: 实地·遵义蔷薇国际-D3地块(7、8地块及03地块及03地块及03地</p>
+                    <!--                    预缴订单-->
+                    <div>
                         <div class="payment-box" v-for="item in 3" :key="item">
                             <div class="payment-list line">
                                 <h3>[2019]</h3>
@@ -110,9 +159,8 @@
     },
     created() {
       this.type = this.$route.query.type
-      this.orderNumber = this.$route.query.number
+      this.orderNumber = this.$route.query.orderId
       this.getOrderList()
-
     },
     methods: {
       getOrderList() {
@@ -125,8 +173,9 @@
       },
       getTime() {
         let data = {
-          "orderID":this.orderNumber
+          "orderID": this.orderNumber
         };
+        console.log(data)
         $.ajax({
           crossDomain: true,//兼容ie8,9
           type: "post",
@@ -134,7 +183,7 @@
           contentType: "application/x-www-form-urlencoded",
           data: {'json': JSON.stringify(data)},
           success: (res) => {
-            this.maxtime = (new Date(res.data.createTime)*1 + (15*60-1)*1000 - new Date(res.data.nowTime)*1)/1000
+            this.maxtime = (new Date(res.data.createTime) * 1 + (15 * 60 - 1) * 1000 - new Date(res.data.nowTime) * 1) / 1000
             this.timer = setInterval(this.CountDown, 1000);
           }
         })
@@ -156,7 +205,7 @@
             this.memo = res.data.memo
             this.tranDate = res.data.tranDate.substring(0, 16)
             this.transactionid = res.data.transactionid
-            this.orderNumber = res.data.orderNumber
+            this.orderNumber = res.data.transactionid
             if (this.tranStatus == 0) {
               this.getTime()
             }
@@ -195,8 +244,9 @@
           --this.maxtime;
         } else {
           // window.reload()
-          this.tranStatus = 3;
+          // this.tranStatus = 3;
           // this.userBehaviorFun('clickConfirm')
+          // this.getOrderList()
           clearInterval(this.timer);
         }
       },

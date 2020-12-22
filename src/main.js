@@ -4,6 +4,9 @@ import router from './router'
 import store from './store'
 import './assets/css/reset.css'
 import showToast from 'my-showtoast';
+import VueScroller from 'vue-scroller'
+Vue.use(VueScroller)
+
 Vue.config.productionTip = false;
 
 

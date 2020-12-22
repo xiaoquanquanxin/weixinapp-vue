@@ -1,7 +1,8 @@
 <template>
     <div class="container">
-        <div v-if="paymentList.length">
-            <div @click="goOrderDetail(item.orderNo,item.payFeesType)" v-for="(item,index) in paymentList" class="list line" :key="index">
+        <scroller ref="content" class="content" :on-infinite="getMoreList" v-if="paymentList.length">
+            <div @click="goOrderDetail(item.orderNo,item.payFeesType)" v-for="(item,index) in paymentList"
+                 class="list line" :key="index">
                 <div class="type prepay" v-if="Number(item.payFeesType)">预</div>
                 <div class="type payment" v-else>缴</div>
                 <div>
@@ -14,7 +15,7 @@
                 <p class="pay-state" v-else-if="item.orderState == 2">已取消</p>
                 <p class="pay-state" v-else>待支付</p>
             </div>
-        </div>
+        </scroller>
         <div v-else class="no-message">
             <img src="~@/assets/images/noMessage.png">
             <p>暂无缴费记录</p>
@@ -30,17 +31,29 @@
     data() {
       return {
         paymentList: [],  // 缴费列表
+        curPage:0,
+        pageNum:10,
+        height:0,
+        winHei: screen.availHeight, //屏幕高度
       }
     },
     created() {
       this.getPropertyAdvanceHistory()
     },
+    watch: {
+      'paymentList': function () {
+        this.$nextTick(function () {
+          console.log(111111)
+        })
+      }
+    },
     methods: {
+      // 获取缴费列表
       getPropertyAdvanceHistory() {
         let data = {
-          "curPage": "0",
-          "pageNum": "10",
-          "userID":1   // 微信用户id
+          "curPage":this.curPage,
+          "pageNum": this.pageNum,
+          "userID": 1   // 微信用户id
         };
         $.ajax({
           crossDomain: true,//兼容ie8,9
@@ -49,13 +62,17 @@
           contentType: "application/x-www-form-urlencoded",
           data: data,
           success: (res) => {
-            console.log(res)
-            this.paymentList = res.data;
+            this.paymentList.concat(res.data)
           }
         })
       },
-      goOrderDetail(number,type) {
-        this.$router.push({path: '/OrderDetail', query: {'number': number,'type':type}})
+      goOrderDetail(number, type) {
+        this.$router.push({path: '/OrderDetail', query: {'orderId': number, 'type': type}})
+      },
+      getMoreList(done){
+        this.curPage++
+        this.getPropertyAdvanceHistory()
+        done(true)
       }
     }
   }
@@ -65,7 +82,12 @@
     @import "~@/assets/css/common.less";
 
     .container {
-       .list{
+        .content {
+            overflow-y: scroll;
+            padding-bottom: 0.1rem;
+        }
+
+        .list {
             display: flex;
             font-size: 0.16rem;
             align-items: center;
