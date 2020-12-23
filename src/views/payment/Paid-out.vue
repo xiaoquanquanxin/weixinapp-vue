@@ -6,7 +6,8 @@
                     <div>{{billName}}</div>
                     <div id="showBank" @click="choose">费项筛选</div>
                 </div>
-                <payment class="context" :paidData="paidOutList" :paidName="'paidOut'" @billdsCheck="billdsCheck"></payment>
+                <payment class="context" :paidData="paidOutList" :paidName="'paidOut'"
+                         @billdsCheck="billdsCheck"></payment>
             </div>
             <div class="freeze" v-if="isFrozen">
                 <router-link to="/PaymentRecords">您有账单被冻结，请支付或取消后再缴费>></router-link>
@@ -91,7 +92,7 @@
                 // 拿到选中费项列表
                 this.billIDsList.push(item.billDetails[0].billIds);
                 // 判断是否有冻结账单
-                if(item.billDetails[0].isFrozen === '1'){
+                if (item.billDetails[0].isFrozen === '1') {
                   // 默认选中所有费项
                   this.$set(item.billDetails[0], 'checked', true)
                   // 默认选中所有费项
@@ -141,18 +142,18 @@
       //  全选按钮点击事件
       allCheck() {
         this.paidOutList.map((item) => {
-          if(item.billDetails[0].isFrozen === '1'){
+          if (item.billDetails[0].isFrozen === '1') {
             this.$set(item.billDetails[0], 'checked', !this.allChecked)
             if (!item.billDetails[0].checked) {
               this.totleMoney -= item.billDetails[0].paidTotal
-            }else{
+            } else {
               this.totleMoney += item.billDetails[0].paidTotal
             }
 
           }
         })
         // this.setAllChecked(!this.allChecked) // 更改全选按钮状态
-        this.isCheckedAll()
+        this.setBillIDsList()
       },
       // 立即缴费
       goConfirmPayment() {
@@ -161,6 +162,7 @@
           totleMoney: this.totleMoney,
           billIDsList: this.billIDsList
         }
+        console.log(this.billIDsList)
         this.$router.push({path: '/ConfirmPayment', query})
       },
       // 单费项点击事件
@@ -180,20 +182,34 @@
               this.totleMoney += item.billDetails[0].paidTotal
             }
           }
+
         })
         this.isCheckedAll()
       },
+      setBillIDsList() {
+        this.isCheckedAll()
+        this.billIDsList = []
+        if (!this.allChecked) {
+          this.billIDsList = []
+        } else {
+          this.paidOutList.map((item) => {
+            this.billIDsList.push(item.billDetails[0].billIds)
+          })
+        }
+      },
       isCheckedAll() {
         // 控制全选按钮
+        // 筛选未冻结列表
         let checkedItem = this.paidOutList.filter(item => {
           return item.billDetails[0].isFrozen == '1';
         });
         this.allChecked = checkedItem.every((item) => {
-          if(item.billDetails[0].isFrozen === '1'){
+          if (item.billDetails[0].isFrozen === '1') {
             return item.billDetails[0].checked
           }
         })
-      }
+      },
+
     }
   }
 </script>
@@ -219,7 +235,8 @@
         background: #DE8748;
         width: 100%;
         text-align: center;
-        a{
+
+        a {
             color: #ffffff;
         }
     }
@@ -319,6 +336,7 @@
         text-align: center;
         color: #808080;
         font-size: 0.13rem;
+
         img {
             width: 0.66rem;
 
