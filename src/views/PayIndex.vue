@@ -26,16 +26,16 @@
       return {};
     },
     created() {
-      $.ajax({
-        crossDomain: true,//兼容ie8,9
-        type: "get",
-        headers:{
-          'sessionkey':"onBNR6oOaFKvW09R7P3nJ9EEjIPU"
-        },
-        url: 'mpi/user/userInfo',
-      }).then((res) => {
-        console.log(res)
-      })
+      // $.ajax({
+      //   crossDomain: true,//兼容ie8,9
+      //   type: "get",
+      //   headers:{
+      //     'sessionkey':"onBNR6oOaFKvW09R7P3nJ9EEjIPU"
+      //   },
+      //   url: 'mpi/user/userInfo',
+      // }).then((res) => {
+      //   console.log(res)
+      // })
     },
     methods: {
       ...mapActions('test', [
