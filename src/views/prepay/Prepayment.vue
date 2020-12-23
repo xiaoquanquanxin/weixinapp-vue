@@ -22,8 +22,7 @@
             <div>费项缴纳</div>
             <div class="bg payment-name" @click="showRates">收费标准</div>
         </div>
-        <div class="content">
-
+        <div class="content" v-if="calcTimeUint">
             <div v-if="calcTimeUint == 2" class="pay">
                 <div v-if="paymentList.length" class="pay-list">
                     <div v-for="(item,index) in paymentList" :key="index"  :class="{'isFrozen':isFrozen}">
@@ -144,7 +143,7 @@
           paymentMonth: null,
           perUnit: null,
         },
-        isFrozen: 1, // 是否有欠缴
+        isFrozen: 0, // 是否有欠缴
         calcTimeUint: "", // 账单周期模型
         maxMonth: 12, // 允许缴纳最大月数
         paymentList: [], // 快捷支付列表
