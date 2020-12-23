@@ -1,4 +1,3 @@
-import Page404 from '@/views/Page404.vue'
 import Login from "@/views/Login.vue";
 import PayIndex from "@/views/PayIndex.vue";
 import PaymentList from "@/views/payment/PaymentList.vue";
@@ -12,26 +11,20 @@ import PaymentRecords from "@/views/PaymentRecords.vue";
 export const syncRoutesList = [
   {
     path: '*',
-    redirect: 'PayIndex',
+    redirect: '/wechat-pay/PayIndex',
   },
   {
-    path: '/404',
-    name: '404',
-    component: Page404,
-  },
-  {
-    path: '/login',
+    path: '/wechat-pay/login',
     name: 'login',
     component: Login,
   },
   {
-    path: '/PayIndex',
+    path: '/wechat-pay/PayIndex',
     name: 'PayIndex',
     component: PayIndex,
-
   },
   {
-    path: '/PaymentList',
+    path: '/wechat-pay/PaymentList',
     name: 'PaymentList',
     component: PaymentList,
     children: [
@@ -49,37 +42,37 @@ export const syncRoutesList = [
   },
 
   {
-    path: '/ConfirmPayment',
+    path: '/wechat-pay/ConfirmPayment',
     name: 'ConfirmPayment',
     component: ConfirmPayment,
 
   },
   {
-    path: '/PaySuccess',
+    path: '/wechat-pay/PaySuccess',
     name: 'PaySuccess',
     component: PaySuccess,
 
   },
   {
-    path: '/OrderDetail',
+    path: '/wechat-pay/OrderDetail',
     name: 'OrderDetail',
     component: OrderDetail,
 
   },
   {
-    path: '/Prepayment',
+    path: '/wechat-pay/Prepayment',
     name: 'Prepayment',
     component: Prepayment,
 
   },
   {
-    path: '/ConfirmPrepay',
+    path: '/wechat-pay/ConfirmPrepay',
     name: 'ConfirmPrepay',
     component: ConfirmPrepay,
 
   },
   {
-    path: '/PaymentRecords',
+    path: '/wechat-pay/PaymentRecords',
     name: 'PaymentRecords',
     component: PaymentRecords,
   },

@@ -2,13 +2,13 @@
     <div>
         <div class="banner"></div>
         <div class="payment right-button paid-out">
-            <div @click="goPage('PaymentList/Paid-out')">物业缴费</div>
+            <div @click="goPage('/wechat-pay/PaymentList/Paid-out')">物业缴费</div>
         </div>
         <div class="payment right-button prepayment">
-            <div @click="goPage('Prepayment')">预缴费用</div>
+            <div @click="goPage('/wechat-pay/Prepayment')">预缴费用</div>
         </div>
         <div class="payment right-button paymentRecords">
-            <router-link to="/PaymentRecords">缴费记录</router-link>
+            <router-link to="/wechat-pay/PaymentRecords">缴费记录</router-link>
         </div>
     </div>
 </template>
