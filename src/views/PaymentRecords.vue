@@ -1,6 +1,7 @@
 <template>
     <div class="container">
-        <scroller ref="content" class="content" :on-infinite="getMoreList" v-if="paymentList.length">
+        <!--        vue-cli scroller组件-->
+        <scroller class="content" :on-infinite="getMoreList" v-if="paymentList.length">
             <div @click="goOrderDetail(item.orderNo,item.payFeesType)" v-for="(item,index) in paymentList"
                  class="list line" :key="index">
                 <div class="type prepay" v-if="Number(item.payFeesType)">预</div>
