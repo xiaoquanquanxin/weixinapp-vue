@@ -26,6 +26,7 @@
 
 <script>
   import $ from "jquery";
+  import {ipUri} from "../main";
 
   export default {
     name: "PaymenRecords",
@@ -52,7 +53,8 @@
         $.ajax({
           crossDomain: true,//兼容ie8,9
           type: "post",
-          url: '/bpi/property/prepayment/getPropertyAdvanceHistory',
+          // url: '/bpi/property/prepayment/getPropertyAdvanceHistory',
+          url: `${ipUri["/bpi"]}/property/prepayment/getPropertyAdvanceHistory`,
           contentType: "application/x-www-form-urlencoded",
           data: data,
           success: (res) => {

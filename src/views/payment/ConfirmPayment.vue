@@ -30,6 +30,7 @@
 
 <script>
   import $ from 'jquery'
+  import {ipUri} from "../../main";
   // import wx from 'weixin-js-sdk'
 
   export default {
@@ -40,6 +41,7 @@
         billIDsList: [], // 选中订单id
         totleMoney: 0,
         isReady: false,
+        typeDate: null, // 下单详情
         billData: "", // 未缴账单列表
         billDetails: "" // 创建订单需要列表格式
       }
@@ -53,7 +55,8 @@
       $.ajax({
         crossDomain: true,//兼容ie8,9
         type: "post",
-        url: '/bpi/getUnpaidBill.do',
+        // url: '/bpi/getUnpaidBill.do',
+        url: `${ipUri["/bpi"]}/getUnpaidBill.do`,
         contentType: "application/x-www-form-urlencoded",
         data: {'json': JSON.stringify(data)},
       }).then((res) => {
@@ -97,10 +100,14 @@
           $.ajax({
             crossDomain: true,//兼容ie8,9
             type: "post",
-            url: '/bpi/submitOrder.do',
+            // url: '/bpi/submitOrder.do',
+            url: `${ipUri["/bpi"]}/submitOrder.do`,
             contentType: "application/x-www-form-urlencoded",
             data: {'json': JSON.stringify(json)},
             success: (res) => {
+              this.orderNumber = res.data.orderId
+              this.typeDate = res.data
+              this.typeDate['type'] = '0';
               if (res.code == 2000) {
                 resolve(res)
               } else {
@@ -128,7 +135,8 @@
         $.ajax({
           crossDomain: true,//兼容ie8,9
           type: "post",
-          url: '/bpi/submitCommBill.do',
+          // url: '/bpi/submitCommBill.do',
+          url: `${ipUri["/bpi"]}/submitCommBill.do`,
           contentType: "application/x-www-form-urlencoded",
           data: dataP2,
           success: (res) => {
@@ -145,12 +153,14 @@
         $.ajax({
           crossDomain: true,//兼容ie8,9
           type: "post",
-          url: '/bpi/getTranStatus.do',
+          // url: '/bpi/getTranStatus.do',
+          url: `${ipUri["/bpi"]}/getTranStatus.do`,
           contentType: "application/x-www-form-urlencoded",
           data: {'json': JSON.stringify(data)},
           success: (res) => {
             if (res.data.status == 0) {
-              this.getPay() // 微信支付
+              // this.getPay() // 微信支付
+              this.completePaidOrder()
             }
           }
         })
@@ -199,12 +209,12 @@
         $.ajax({
           crossDomain: true,//兼容ie8,9
           type: "post",
-          url: '/bpi/completePaidOrder.do',
+          // url: '/bpi/completePaidOrder.do',
+          url: `${ipUri["/bpi"]}/completePaidOrder.do`,
           contentType: "application/x-www-form-urlencoded",
           data: {'json': JSON.stringify(data)},
-          success: (res) => {
-            console.log(res)
-            this.$router.push({path: '/PaySuccess', data: res.data})
+          success: () => {
+            this.$router.push({path: '/PaySuccess', query: this.typeDate})
           }
         })
       },

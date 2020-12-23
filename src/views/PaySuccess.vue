@@ -40,12 +40,12 @@
     },
     created() {
       console.log(this.$route.query)
-      this.type = this.$route.query.data
       this.orderId = this.$route.query.orderId
+      this.type = this.$route.query.type
     },
     methods: {
       goOrderDetail() {
-        this.$router.push({path: '/OrderDetail', query: {'type': '1','orderId':this.orderId}})
+        this.$router.push({path: '/OrderDetail', query: {'type': this.type, 'orderId': this.orderId}})
       }
     }
   }

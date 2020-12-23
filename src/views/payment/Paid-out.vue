@@ -41,7 +41,7 @@
 
   import payment from "../../components/payment/payment";
   import iosSelect from "../../components/iosSelect";
-
+  import {ipUri} from "../../main";
   import {mapActions} from "vuex";
   import $ from 'jquery'
 
@@ -63,7 +63,7 @@
       }
     },
     created() {
-
+      console.log(ipUri)
       this.getPaymentList() // 获取未缴账单列表
       this.getUnpaidBillTran() // 获取冻结账单列表
     },
@@ -71,6 +71,7 @@
       // allChecked() {
       //   return this.$store.state.paidOut.allChecked
       // }
+
     },
     methods: {
       getPaymentList() {
@@ -81,7 +82,8 @@
         $.ajax({
           crossDomain: true,//兼容ie8,9
           type: "post",
-          url: '/bpi/getUnpaidBill.do',
+          url: `${ipUri["/bpi"]}/getUnpaidBill.do`,
+          // url: `/bpi/getUnpaidBill.do`,
           contentType: "application/x-www-form-urlencoded",
           data: {'json': JSON.stringify(data)},
           success: (res) => {
@@ -114,7 +116,8 @@
         $.ajax({
           crossDomain: true,//兼容ie8,9
           type: "post",
-          url: '/bpi/getUnpaidBillTranV1.do',
+          // url: '/bpi/getUnpaidBillTranV1.do',
+          url: `${ipUri["/bpi"]}/getUnpaidBillTranV1.do`,
           contentType: "application/x-www-form-urlencoded",
           data: {'json': JSON.stringify(data)},
           success: (res) => {

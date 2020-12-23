@@ -124,6 +124,7 @@
   import iosSelect from "../../components/iosSelect";
   import Confrim from "../../components/confrim";
   import $ from 'jquery'
+  import {ipUri} from "../../main";
 
   export default {
     name: "Prepayment",
@@ -170,7 +171,8 @@
         $.ajax({
           crossDomain: true,//兼容ie8,9
           type: "post",
-          url: '/bpi/property/prepayment/hasFeeItem',
+          // url: '/bpi/property/prepayment/hasFeeItem',
+          url: `${ipUri["/bpi"]}/property/prepayment/hasFeeItem`,
           contentType: "application/x-www-form-urlencoded",
           data: data,
           success: (res) => {
@@ -193,7 +195,8 @@
         $.ajax({
           crossDomain: true,//兼容ie8,9
           type: "post",
-          url: '/bpi/property/prepayment/queryFeeInfo',
+          // url: '/bpi/property/prepayment/queryFeeInfo',
+          url: `${ipUri["/bpi"]}/property/prepayment/queryFeeInfo`,
           contentType: "application/x-www-form-urlencoded",
           data: data,
           success: (res) => {
@@ -234,7 +237,8 @@
         $.ajax({
           crossDomain: true,//兼容ie8,9
           type: "post",
-          url: '/bpi/property/prepayment/getFeeChargeStandard',
+          // url: '/bpi/property/prepayment/getFeeChargeStandard',
+          url: `${ipUri["/bpi"]}/property/prepayment/getFeeChargeStandard`,
           contentType: "application/x-www-form-urlencoded",
           data: data,
           success: (res) => {
@@ -254,7 +258,8 @@
         $.ajax({
           crossDomain: true,//兼容ie8,9
           type: "post",
-          url: '/bpi/property/prepayment/queryFeeitemDetails',
+          // url: '/bpi/property/prepayment/queryFeeitemDetails',
+          url: `${ipUri["/bpi"]}/property/prepayment/queryFeeitemDetails`,
           data: data,
           success: (res) => {
             this.enoughDeductionDate = res.data.enoughDeductionDate
@@ -347,34 +352,7 @@
           perUnit
         } = checkedItem;
         let arr = this.feeItems.slice(0, paymentMonth)
-
-        let data = {
-          pmdsRoomId: this.roomID, // 房间主数据id
-          cmdsId: '575cd6b8b1c54389936cf47fe8347a40', // 用户主数据id
-          userID: 1, // 用户主数据id
-          userName: "f范秉川", // 客户名称
-          phoneNum: '18500039456', // 用户手机号
-          feeItems: JSON.stringify(arr), // 订单明细 json格式
-          villageInfoId: "1", // 楼盘ID
-          terminalSource: '1', // 终端类型 0 Android 1 iPhone
-          totalAmount: perUnit, // 订单金额
-          feeId: this.feeId, // 费项id
-        };
-        $.ajax({
-          crossDomain: true,//兼容ie8,9
-          type: "post",
-          url: '/bpi/property/prepayment/createAdvanceOrder',
-          data: data,
-          success: (res) => {
-            console.log(res)
-            if (res.code == 2000) {
-              // this.$router.push('ConfirmPayment')
-              this.$router.push({path: '/ConfirmPrepay', query: {'feeName': this.feeName, 'perUnit': perUnit,'orderId':res.data.orderCode}})
-            }
-
-          }
-        })
-
+        this.$router.push({path: '/ConfirmPrepay', query: {'type':'1','feeName': this.feeName, 'perUnit': perUnit,'arr':arr}})
         //
       },
       setRoom(value) {
