@@ -8,7 +8,7 @@
             <div @click="goPage('/wechat-pay/Prepayment')">预缴费用</div>
         </div>
         <div class="payment right-button paymentRecords">
-            <router-link to="/wechat-pay/PaymentRecords">缴费记录</router-link>
+            <div @click="goPage('/wechat-pay/PaymentRecords')">缴费记录</div>
         </div>
     </div>
 </template>
