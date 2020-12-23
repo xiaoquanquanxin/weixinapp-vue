@@ -84,7 +84,6 @@
     methods: {
       goPay() {
         // this.getPay();
-
         let json = {
           "customerId": "575cd6b8b1c54389936cf47fe8347a40",
           "contactNumber": "18201538993",
@@ -134,10 +133,26 @@
           data: dataP2,
           success: (res) => {
             if (res.code == 2000) {
-              // 创建好订单 走支付流程
-              this.getPay()  // 调取微信支付
+              // 创建好订单 先查看订单状态是不是待支付
+              this.getTranStatus()
             }
           },
+        })
+      },
+      // 获取订单状态
+      getTranStatus() {
+        let data = {"transactionId": this.orderNumber};
+        $.ajax({
+          crossDomain: true,//兼容ie8,9
+          type: "post",
+          url: '/bpi/getTranStatus.do',
+          contentType: "application/x-www-form-urlencoded",
+          data: {'json': JSON.stringify(data)},
+          success: (res) => {
+            if (res.data.status == 0) {
+              this.getPay() // 微信支付
+            }
+          }
         })
       },
       // 下单支付
@@ -165,11 +180,31 @@
                   if (res.err_msg == "get_brand_wcpay_request:ok") {
                     // 使用以上方式判断前端返回,微信团队郑重提示：
                     //res.err_msg将在用户支付成功后返回ok，但并不保证它绝对可靠。
-                    this.$router.push({path: '/PaySuccess', data: res.data})
+                    // 完成订单
+                    this.completePaidOrder();
                   }
-                });
+                }
+              );
             }
-
+          }
+        })
+      },
+      // 支付后完成订单
+      completePaidOrder() {
+        let data = {
+          "transactionId": this.orderNumber,
+          "updateTime": "2020-12-16 16:45:08",
+          "payMethod": "900"
+        };
+        $.ajax({
+          crossDomain: true,//兼容ie8,9
+          type: "post",
+          url: '/bpi/completePaidOrder.do',
+          contentType: "application/x-www-form-urlencoded",
+          data: {'json': JSON.stringify(data)},
+          success: (res) => {
+            console.log(res)
+            this.$router.push({path: '/PaySuccess', data: res.data})
           }
         })
       },
