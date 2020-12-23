@@ -20,7 +20,7 @@ module.exports = {
             },
             // 少杰
             '/opi': {
-                target: 'http://pzjnkm.natappfree.cc/',
+                target: 'http://6tccfq.natappfree.cc/',
                 changeOrigin: true,
                 pathRewrite: {
                     '^/opi': '/api'

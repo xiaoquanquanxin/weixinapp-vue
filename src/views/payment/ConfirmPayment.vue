@@ -49,12 +49,6 @@
         roomIDs: '83a7999d-5177-4d0a-9d58-754aaad5db15',
         userID: '575cd6b8b1c54389936cf47fe8347a40'
       };
-
-      // 获取微信签名
-      // this.getJsConfig();
-
-
-
       this.billIDsList = this.$route.query.billIDsList;
       $.ajax({
         crossDomain: true,//兼容ie8,9
@@ -75,7 +69,7 @@
           })
           let arr = [];
           this.billList.map((item) => {
-            item.billDetails.map((_item) => {
+            item.billDetails.map((_item) => {  //  提交给后台的数据格式
               _item.roomID = res.data.roomIds
               _item.period = item.billMonth
               _item.billId = _item.billIds
@@ -88,19 +82,9 @@
       console.log(navigator.userAgent) //  获取手机型号
     },
     methods: {
-      getJsConfig() {
-        $.ajax({
-          crossDomain: true,//兼容ie8,9
-          type: "get",
-          url: 'mpi/wx/getJsConfig',
-        }).then((res) => {
-          // 通过config接口注入权限验证配置
-         console.log(res)
-        })
-      },
+      // 下单支付
       getPay() {
         $.ajax({
-          crossDomain: true,//兼容ie8,9
           type: "get",
           url: '/opi/pay/create_order',  //  获取支付签名
           success:(result)=>{
@@ -131,33 +115,35 @@
         })
       },
       goPay() {
-        let json = {
-          "customerId": "575cd6b8b1c54389936cf47fe8347a40",
-          "contactNumber": "18201538993",
-          "paidIDs": this.billIDsList.join(','),
-          "terminalSource": "0",
-          "hqUserId": "0",
-          "projectID": "1"
-        }
+        this.getPay();
 
-        new Promise(((resolve, reject) => {
-          $.ajax({
-            crossDomain: true,//兼容ie8,9
-            type: "post",
-            url: '/bpi/submitOrder.do',
-            contentType: "application/x-www-form-urlencoded",
-            data: {'json': JSON.stringify(json)},
-            success: (res) => {
-              if (res.code == 2000) {
-                resolve(res)
-              } else {
-                reject(res)
-              }
-            },
-          })
-        })).then((result) => {
-          this.creatOrder(result)
-        })
+        // let json = {
+        //   "customerId": "575cd6b8b1c54389936cf47fe8347a40",
+        //   "contactNumber": "18201538993",
+        //   "paidIDs": this.billIDsList.join(','),
+        //   "terminalSource": "0",
+        //   "hqUserId": "0",
+        //   "projectID": "1"
+        // }
+        //
+        // new Promise(((resolve, reject) => {
+        //   $.ajax({
+        //     crossDomain: true,//兼容ie8,9
+        //     type: "post",
+        //     url: '/bpi/submitOrder.do',
+        //     contentType: "application/x-www-form-urlencoded",
+        //     data: {'json': JSON.stringify(json)},
+        //     success: (res) => {
+        //       if (res.code == 2000) {
+        //         resolve(res)
+        //       } else {
+        //         reject(res)
+        //       }
+        //     },
+        //   })
+        // })).then((result) => {
+        //   this.creatOrder(result)
+        // })
       },
       creatOrder(result) {
         let dataP2 = {

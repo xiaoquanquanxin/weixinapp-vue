@@ -39,7 +39,7 @@
                         <div class="payment-list pay-message line">
                             <div>
                                 <p class="paymen-name">订单号码</p>
-                                <p class="payment-money">2312412531234</p>
+                                <p class="payment-money">{{transactionid}}</p>
                             </div>
                             <div>
                                 <p class="paymen-name">下单时间</p>
@@ -160,14 +160,18 @@
     created() {
       this.type = this.$route.query.type
       this.orderNumber = this.$route.query.orderId
+      // this.orderNumber = '20201223110413498'
+      // 获取订单信息
       this.getOrderList()
     },
     methods: {
       getOrderList() {
         // 0 欠缴  1 预缴
         if (this.type === '1') {
+          //  获取预缴订单详情
           this.getPaymentInfo()
         } else {
+          //  获取欠缴订单详情
           this.getBillDetailByTrans()
         }
       },
@@ -175,7 +179,6 @@
         let data = {
           "orderID": this.orderNumber
         };
-        console.log(data)
         $.ajax({
           crossDomain: true,//兼容ie8,9
           type: "post",
@@ -183,6 +186,7 @@
           contentType: "application/x-www-form-urlencoded",
           data: {'json': JSON.stringify(data)},
           success: (res) => {
+            // 计算出下单到现在的时间 进行倒计时
             this.maxtime = (new Date(res.data.createTime) * 1 + (15 * 60 - 1) * 1000 - new Date(res.data.nowTime) * 1) / 1000
             this.timer = setInterval(this.CountDown, 1000);
           }
@@ -201,11 +205,17 @@
           contentType: "application/x-www-form-urlencoded",
           data: {'json': JSON.stringify(data)},
           success: (res) => {
+            // 支付状态
             this.tranStatus = res.data.tranStatus
+            // 支付信息
             this.memo = res.data.memo
+            // 下单时间
             this.tranDate = res.data.tranDate.substring(0, 16)
+            // 订单id
             this.transactionid = res.data.transactionid
+            // 订单号
             this.orderNumber = res.data.transactionid
+            // 如果支付状态为待支付 则开启倒计时
             if (this.tranStatus == 0) {
               this.getTime()
             }
@@ -228,7 +238,7 @@
             this.memo = res.data.memo
             this.tranDate = res.data.tranDate.substring(0, 16)
             this.transactionid = res.data.transactionid
-            this.orderNumber = res.data.transactionid
+            this.orderNumber = res.data.transactionid // 欠缴没有订单id 只有订单号 所以取消订单的时候为了统一一个变量名新增的一个变量
             if (this.tranStatus == 0) {
               this.getTime()
             }
@@ -240,13 +250,12 @@
         if (this.maxtime > 0) {
           this.minutes = Math.floor(this.maxtime / 60);
           this.seconds = Math.floor(this.maxtime % 60);
-          // if (maxtime == 5 * 60) alert("还剩5分钟");
           --this.maxtime;
         } else {
-          // window.reload()
-          // this.tranStatus = 3;
-          // this.userBehaviorFun('clickConfirm')
-          // this.getOrderList()
+          //  重新获取订单详情
+          // this.getOrderList()     // 先注释掉 因为目前后台没跑定时程序 所以永远都是待支付
+
+          //  清除定时器
           clearInterval(this.timer);
         }
       },
@@ -261,6 +270,7 @@
           data: {'json': JSON.stringify(data)},
           success: (res) => {
             if (res.data.status == 0) {
+              // 完成订单
               this.completePaidOrder();
             }
           }
@@ -284,7 +294,9 @@
           }
         })
       },
+      // 去支付
       goPay() {
+        // 获取订单状态
         this.getTranStatus()
       },
       cancelOrder() {
