@@ -12,23 +12,56 @@
 </template>
 
 <script>
+  import $ from "jquery";
+  import {ipUri} from "../../main";
+
   export default {
     name: "ConfirmPrepay",
     data(){
       return{
         feeName:"",
         perUnit:"",
+        type:"",
+        arr:[],
         orderId:""
       }
     },
     created() {
       this.feeName = this.$route.query.feeName
       this.perUnit = this.$route.query.perUnit
-      this.orderId = this.$route.query.orderId
+      this.arr = this.$route.query.arr
+      this.type = this.$route.query.type
     },
     methods: {
       goPay() {
-        this.$router.push({path: '/PaySuccess', query: {'type': '1','orderId':this.orderId}})
+        let data = {
+          pmdsRoomId: this.roomID, // 房间主数据id
+          cmdsId: '575cd6b8b1c54389936cf47fe8347a40', // 用户主数据id
+          userID: 1, // 用户主数据id
+          userName: "f范秉川", // 客户名称
+          phoneNum: '18500039456', // 用户手机号
+          feeItems: JSON.stringify(this.arr), // 订单明细 json格式
+          villageInfoId: "1", // 楼盘ID
+          terminalSource: '1', // 终端类型 0 Android 1 iPhone
+          totalAmount: this.perUnit, // 订单金额
+          feeId: this.feeId, // 费项id
+        };
+        $.ajax({
+          crossDomain: true,//兼容ie8,9
+          type: "post",
+          // url: '/bpi/property/prepayment/createAdvanceOrder',
+          url: `${ipUri["/bpi"]}/property/prepayment/createAdvanceOrder`,
+          data: data,
+          success: (res) => {
+            console.log(res)
+            if (res.code == 2000) {
+              // this.$router.push('ConfirmPayment')
+
+            }
+
+          }
+        })
+        this.$router.push({path: '/PaySuccess', query: {'type': this.type,'orderId':this.orderId}})
       }
     }
   }

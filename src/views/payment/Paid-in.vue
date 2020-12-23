@@ -11,6 +11,7 @@
 <script>
   import payment from "../../components/payment/payment";
   import $ from 'jquery'
+  import {ipUri} from "../../main";
 
   export default {
     name: "paid-in",
@@ -32,7 +33,8 @@
       $.ajax({
         crossDomain: true,//兼容ie8,9
         type: "post",
-        url: '/bpi/getPaidBill.do',
+        // url: '/bpi/getPaidBill.do',
+        url: `${ipUri["/bpi"]}/getPaidBill.do`,
         contentType: "application/x-www-form-urlencoded",
         data: {'json': JSON.stringify(data)},
       }).then((res) => {

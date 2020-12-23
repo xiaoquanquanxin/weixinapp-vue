@@ -39,7 +39,7 @@
                         <div class="payment-list pay-message line">
                             <div>
                                 <p class="paymen-name">订单号码</p>
-                                <p class="payment-money">{{transactionid}}</p>
+                                <p class="payment-money">{{orderNumber}}</p>
                             </div>
                             <div>
                                 <p class="paymen-name">下单时间</p>
@@ -137,6 +137,7 @@
 <script>
   import Confrim from "../../components/confrim";
   import $ from "jquery";
+  import {ipUri} from "../../main";
 
   export default {
     name: "OrderDetail",
@@ -160,7 +161,7 @@
     created() {
       this.type = this.$route.query.type
       this.orderNumber = this.$route.query.orderId
-      // this.orderNumber = '20201223110413498'
+      // this.orderNumber = '20201223145406842'
       // 获取订单信息
       this.getOrderList()
     },
@@ -182,7 +183,8 @@
         $.ajax({
           crossDomain: true,//兼容ie8,9
           type: "post",
-          url: '/bpi/getTime.do',
+          // url: '/bpi/getTime.do',
+          url: `${ipUri["/bpi"]}/getTime.do`,
           contentType: "application/x-www-form-urlencoded",
           data: {'json': JSON.stringify(data)},
           success: (res) => {
@@ -201,7 +203,8 @@
         $.ajax({
           crossDomain: true,//兼容ie8,9
           type: "post",
-          url: '/bpi/getBillDetailByTrans.do',
+          // url: '/bpi/getBillDetailByTrans.do',
+          url: `${ipUri["/bpi"]}/getBillDetailByTrans.do`,
           contentType: "application/x-www-form-urlencoded",
           data: {'json': JSON.stringify(data)},
           success: (res) => {
@@ -230,7 +233,8 @@
         $.ajax({
           crossDomain: true,//兼容ie8,9
           type: "post",
-          url: '/bpi/property/prepayment/getPaymentInfo',
+          // url: '/bpi/property/prepayment/getPaymentInfo',
+          url: `${ipUri["/bpi"]}/property/prepayment/getPaymentInfo`,
           contentType: "application/x-www-form-urlencoded",
           data: data,
           success: (res) => {
@@ -265,7 +269,8 @@
         $.ajax({
           crossDomain: true,//兼容ie8,9
           type: "post",
-          url: '/bpi/getTranStatus.do',
+          // url: '/bpi/getTranStatus.do',
+          url: `${ipUri["/bpi"]}/getTranStatus.do`,
           contentType: "application/x-www-form-urlencoded",
           data: {'json': JSON.stringify(data)},
           success: (res) => {
@@ -319,7 +324,8 @@
         $.ajax({
           crossDomain: true,//兼容ie8,9
           type: "post",
-          url: '/bpi/completePaidOrder.do',
+          // url: '/bpi/completePaidOrder.do',
+          url: `${ipUri["/bpi"]}/completePaidOrder.do`,
           contentType: "application/x-www-form-urlencoded",
           data: {'json': JSON.stringify(data)},
           success: (res) => {
@@ -356,7 +362,8 @@
           $.ajax({
             crossDomain: true,//兼容ie8,9
             type: "post",
-            url: '/bpi/' + url,
+            // url: '/bpi/' + url,
+            url: `${ipUri["/bpi"]}/${url}`,
             contentType: "application/x-www-form-urlencoded",
             data: data,
             success: (res) => {

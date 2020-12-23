@@ -1,3 +1,15 @@
+
+
+
+export const ipUri = {
+  '/mpi':'https://hachiseedland-dev.hachi-tech.com',
+  '/bpi':'http://192.168.100.208:8090',
+  '/opi':'http://6tccfq.natappfree.cc/api'
+}
+
+
+
+
 import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
