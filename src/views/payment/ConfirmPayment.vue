@@ -159,8 +159,8 @@
           data: {'json': JSON.stringify(data)},
           success: (res) => {
             if (res.data.status == 0) {
-              // this.getPay() // 微信支付
-              this.completePaidOrder()
+              this.getPay() // 微信支付
+              // this.completePaidOrder()
             }
           }
         })
@@ -214,7 +214,8 @@
           contentType: "application/x-www-form-urlencoded",
           data: {'json': JSON.stringify(data)},
           success: () => {
-            this.$router.push({path: '/PaySuccess', query: this.typeDate})
+            // this.$router.push({path: '/PaySuccess', query: this.typeDate})
+            this.$router.push({path: '/wechat-pay/PaySuccess', query: this.typeDate})
           }
         })
       },

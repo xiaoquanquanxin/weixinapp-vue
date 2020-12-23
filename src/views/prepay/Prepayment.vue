@@ -25,7 +25,7 @@
         <div class="content" v-if="calcTimeUint">
             <div v-if="calcTimeUint == 2" class="pay">
                 <div v-if="paymentList.length" class="pay-list">
-                    <div v-for="(item,index) in paymentList" :key="index"  :class="{'isFrozen':isFrozen}">
+                    <div v-for="(item,index) in paymentList" :key="index" :class="{'isFrozen':isFrozen}">
                         <div @click="customFunc(item)" :class="{'checked':item.checked}"
                              v-if="item.type === 1">
                             <p class="month" v-if="!item.paymentMonth">
@@ -352,7 +352,19 @@
           perUnit
         } = checkedItem;
         let arr = this.feeItems.slice(0, paymentMonth)
-        this.$router.push({path: '/ConfirmPrepay', query: {'type':'1','feeName': this.feeName, 'perUnit': perUnit,'arr':arr}})
+        // this.$router.push({path: '/ConfirmPrepay',
+        this.$router.push({path: '/wechat-pay/ConfirmPrepay',
+          query: {
+            'type': '1',
+            'feeName': this.feeName,
+            'perUnit': perUnit,
+            'arr': arr,
+            'feeId': this.feeId,
+            'roomID': this.roomID,
+            'pmdsRoomId': this.pmdsRoomId
+          }
+        })
+
         //
       },
       setRoom(value) {

@@ -31,6 +31,8 @@
       this.perUnit = this.$route.query.perUnit
       this.arr = this.$route.query.arr
       this.type = this.$route.query.type
+      this.roomID = this.$route.query.roomID
+      this.feeId = this.$route.query.feeId
     },
     methods: {
       goPay() {
@@ -55,13 +57,14 @@
           success: (res) => {
             console.log(res)
             if (res.code == 2000) {
-              // this.$router.push('ConfirmPayment')
-
+              // this.$router.push({path: '/PaySuccess', query: {'type': this.type,'orderId':this.orderId}})
+              this.$router.push({path: '/wechat-pay/PaySuccess', query: {'type': this.type,'orderId':res.data.orderCode}})
             }
 
           }
         })
-        this.$router.push({path: '/PaySuccess', query: {'type': this.type,'orderId':this.orderId}})
+
+
       }
     }
   }

@@ -166,7 +166,8 @@
           billIDsList: this.billIDsList
         }
         console.log(this.billIDsList)
-        this.$router.push({path: '/ConfirmPayment', query})
+        // this.$router.push({path: '/ConfirmPayment', query})
+        this.$router.push({path: '/wechat-pay/ConfirmPayment', query})
       },
       // 单费项点击事件
       billdsCheck(id) {

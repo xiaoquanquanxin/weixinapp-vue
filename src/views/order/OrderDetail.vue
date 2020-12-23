@@ -330,7 +330,8 @@
           data: {'json': JSON.stringify(data)},
           success: (res) => {
             console.log(res)
-            this.$router.push({path: '/PaySuccess', data: res.data})
+            // this.$router.push({path: '/PaySuccess', data: res.data})
+            this.$router.push({path: '/wechat-pay/PaySuccess', data: res.data})
           }
         })
       },
