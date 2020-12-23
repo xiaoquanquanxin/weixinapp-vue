@@ -12,7 +12,7 @@ import PaymentRecords from "@/views/PaymentRecords.vue";
 export const syncRoutesList = [
   {
     path: '*',
-    redirect: '/PayIndex',
+    redirect: 'PayIndex',
   },
   {
     path: '/404',
