@@ -3,7 +3,9 @@
 
 export const ipUri = {
   '/mpi':'https://hachiseedland-dev.hachi-tech.com',
-  '/bpi':'http://192.168.100.208:8090',
+  // '/bpi':'https://hachiappv3-dev.pujiapp.com/api',
+  // '/bpi':'http://192.168.100.208:8090',
+  '/bpi':'https://propertyapi-dev.hachi-tech.com/propertyapi',
   '/opi':'http://6tccfq.natappfree.cc/api'
 }
 

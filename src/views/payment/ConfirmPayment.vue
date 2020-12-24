@@ -169,11 +169,11 @@
       getPay() {
         $.ajax({
           type: "get",
-          url: '/opi/pay/create_order',  //  获取支付签名
+          // url: '/opi/pay/create_order',  //  获取支付签名
+          url: `${ipUri["/opi"]}/pay/create_order`,
           success: (result) => {
             let res = JSON.parse(result)
             let {appId, timeStamp, nonceStr, signType, paySign} = res.payParams
-
             //  唤起微信支付
             if (typeof WeixinJSBridge != "undefined") {
               WeixinJSBridge.invoke(

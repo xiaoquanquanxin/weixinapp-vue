@@ -14,7 +14,7 @@
 </template>
 <script>
   import {mapActions} from 'vuex';
-  import $ from "jquery";
+  // import $ from "jquery";
 
   export default {
     computed: {
@@ -36,6 +36,46 @@
       // }).then((res) => {
       //   console.log(res)
       // })
+      let res = {
+        "payOrderId":
+          "P0020201224135914000015", "sign":
+          "39B81DD3097DE4E088FEA4DF50B49C78", "resCode":
+          "SUCCESS", "payParams":
+          {
+            "timeStamp":
+              "1608789554", "package":
+              "prepay_id=wx24135914885079c9858fd01bd727fb0000", "paySign":
+              "39B7CAC2B5BC9E5678FCE28DAE2CCE8E", "appId":
+              "wx38471b86e45e684f", "signType":
+              "MD5", "nonceStr":
+              "1608789554702"
+          }
+        ,
+        "prepayId":
+          "wx24135914885079c9858fd01bd727fb0000", "retCode":
+          "SUCCESS", "retMsg":
+          ""
+      }
+      let {appId, timeStamp, nonceStr, signType, paySign} = res.payParams
+      WeixinJSBridge.invoke(
+        'getBrandWCPayRequest', {
+          "appId": appId,     //公众号名称，由商户传入
+          "timeStamp": timeStamp,         //时间戳，自1970年以来的秒数
+          "nonceStr": nonceStr, //随机串
+          "package": res.payParams.package,
+          "signType": signType,         //微信签名方式：
+          "paySign": paySign //微信签名
+        },
+        function (res) {
+          console.log(res)
+          if (res.err_msg == "get_brand_wcpay_request:ok") {
+            // 使用以上方式判断前端返回,微信团队郑重提示：
+            //res.err_msg将在用户支付成功后返回ok，但并不保证它绝对可靠。
+            // 完成订单
+            this.completePaidOrder();
+          }
+        }
+      );
     },
     methods: {
       ...mapActions('test', [

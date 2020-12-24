@@ -160,8 +160,8 @@
     },
     created() {
       this.type = this.$route.query.type
-      this.orderNumber = this.$route.query.orderId
-      // this.orderNumber = '20201223145406842'
+      // this.orderNumber = this.$route.query.orderId
+      this.orderNumber = '20201224120001637'
       // 获取订单信息
       this.getOrderList()
     },
@@ -284,7 +284,7 @@
       getPay() {
         $.ajax({
           type: "get",
-          url: '/opi/pay/create_order',  //  获取支付签名
+          url: `${ipUri["/opi"]}/pay/create_order`,  //  获取支付签名
           success: (result) => {
             let res = JSON.parse(result)
             let {appId, timeStamp, nonceStr, signType, paySign} = res.payParams
