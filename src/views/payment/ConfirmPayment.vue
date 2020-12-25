@@ -47,6 +47,7 @@
       }
     },
     created() {
+      // this.getPay();
       let data = {
         roomIDs: '83a7999d-5177-4d0a-9d58-754aaad5db15',
         userID: '575cd6b8b1c54389936cf47fe8347a40'
@@ -86,7 +87,7 @@
     },
     methods: {
       goPay() {
-        // this.getPay();
+
         let json = {
           "customerId": "575cd6b8b1c54389936cf47fe8347a40",
           "contactNumber": "18201538993",

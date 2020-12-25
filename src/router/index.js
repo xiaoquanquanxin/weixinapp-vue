@@ -4,7 +4,7 @@ import {syncRoutesList} from "@/router/syncRoutes"
 
 Vue.use(VueRouter);
 const router = new VueRouter({
-    mode: 'history',
+    mode: 'hash',
     routes: syncRoutesList
 });
 router.beforeEach(async (to, from, next) => {
