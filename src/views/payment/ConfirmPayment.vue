@@ -42,6 +42,7 @@
         totleMoney: 0,
         isReady: false,
         typeDate: null, // 下单详情
+        orderDate: null, // 订单详情 完成订单时需要的参数
         billData: "", // 未缴账单列表
         billDetails: "" // 创建订单需要列表格式
       }
@@ -107,6 +108,7 @@
             data: {'json': JSON.stringify(json)},
             success: (res) => {
               this.orderNumber = res.data.orderId
+              this.orderDate = res.data
               this.createTime = res.data.createTime.substring(0, 16)
               this.typeDate = {
                 createTime:res.data.createTime.substring(0, 16),
@@ -165,9 +167,9 @@
           data: {'json': JSON.stringify(data)},
           success: (res) => {
             if (res.data.status == 0) {
-              // this.getPay() // 微信支付
+              this.getPay() // 微信支付
               // this.completePaidOrder()
-              this.$router.push({path: '/wechat-pay/PaySuccess', query: this.typeDate})
+              // this.$router.push({path: '/wechat-pay/PaySuccess', query: this.typeDate})
             }
           }
         })
@@ -199,6 +201,8 @@
                     //res.err_msg将在用户支付成功后返回ok，但并不保证它绝对可靠。
                     // 完成订单
                     this.completePaidOrder();
+                  }else {
+                    this.$router.push({path: '/wechat-pay/OrderDetail', query: {'type': this.type, 'orderId': this.orderNumber}})
                   }
                 }
               );
@@ -209,9 +213,9 @@
       // 支付后完成订单
       completePaidOrder() {
         let data = {
-          "transactionId": this.orderNumber,
-          "updateTime": "2020-12-16 16:45:08",
-          "payMethod": "900"
+          "transactionId": this.orderDate.orderId,
+          "updateTime": this.orderDate.createTime,
+          "payMethod": this.orderDate.orderMoney
         };
         $.ajax({
           crossDomain: true,//兼容ie8,9

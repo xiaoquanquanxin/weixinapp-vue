@@ -157,7 +157,7 @@
     created() {
       this.type = this.$route.query.type
       this.orderNumber = this.$route.query.orderId
-      // this.orderNumber = '20201225143858550'
+      // this.orderNumber = '20201225153152208'
       // 获取订单信息
       this.getOrderList()
     },

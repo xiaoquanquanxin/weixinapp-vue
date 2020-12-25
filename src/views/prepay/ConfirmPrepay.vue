@@ -60,14 +60,8 @@
             console.log(res)
             if (res.code == 2000) {
               // this.getTranStatus()
-              let data = {
-                createTime: res.data.createTime.substring(0, 16),
-                orderId: res.data.orderCode,  // 订单号  和欠缴区分 欠缴没有订单id
-                orderMoney: res.data.orderMoney,
-                type: 1
-              }
-              this.$router.push({path: '/wechat-pay/PaySuccess', query: data})
-
+              this.orderId = res.data.orderCode
+              this.getTranStatus()
             }
 
           }
@@ -118,6 +112,8 @@
                     //res.err_msg将在用户支付成功后返回ok，但并不保证它绝对可靠。
                     // 完成订单
                     this.completePaidOrder();
+                  }else {
+                    this.$router.push({path: '/wechat-pay/OrderDetail', query: {'type': this.type, 'orderId': this.orderId}})
                   }
                 }
               );
