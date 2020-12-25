@@ -8,13 +8,14 @@
             </div>
         </div>
         <div class="footer" @click="goPay">微信支付</div>
+        <Confrim ref="myConfirm" type="alert"></Confrim>
     </div>
 </template>
 
 <script>
   import $ from "jquery";
   import {ipUri} from "../../main";
-
+  import Confrim from "../../components/confrim";
   export default {
     name: "ConfirmPrepay",
     data() {
@@ -25,6 +26,9 @@
         arr: [],
         orderId: ""
       }
+    },
+    components: {
+      Confrim
     },
     created() {
       this.feeName = this.$route.query.feeName
@@ -63,8 +67,8 @@
               // this.getTranStatus()
               this.orderId = res.data.orderCode
               this.getTranStatus() // 先查询订单状态 是否是待支付
-            }else{
-
+            } else {
+              this.$refs.myConfirm.show(res.msg)
             }
           }
         })
@@ -84,7 +88,7 @@
               this.getPay() // 微信支付
               // this.completePaidOrder()
               // this.$router.push({path: '/wechat-pay/PaySuccess', query: this.typeDate})
-            }else{
+            } else {
               this.$refs.myConfirm.show('您的账单已缴纳，请重新选择！')
             }
           }
@@ -117,8 +121,11 @@
                     //res.err_msg将在用户支付成功后返回ok，但并不保证它绝对可靠。
                     // 完成订单
                     this.completePaidOrder();
-                  }else {
-                    this.$router.push({path: '/wechat-pay/OrderDetail', query: {'type': this.type, 'orderId': this.orderId}})
+                  } else {
+                    this.$router.push({
+                      path: '/wechat-pay/OrderDetail',
+                      query: {'type': this.type, 'orderId': this.orderId}
+                    })
                   }
                 }
               );
