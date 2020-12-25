@@ -59,11 +59,13 @@
           success: (res) => {
             console.log(res)
             if (res.code == 2000) {
+              this.orderDate = res.data
               // this.getTranStatus()
               this.orderId = res.data.orderCode
-              this.getTranStatus()
-            }
+              this.getTranStatus() // 先查询订单状态 是否是待支付
+            }else{
 
+            }
           }
         })
       },
@@ -78,9 +80,12 @@
           contentType: "application/x-www-form-urlencoded",
           data: {'json': JSON.stringify(data)},
           success: (res) => {
-            if (res.data.status == 0) {
+            if (res.data.status == 0) { // 如果状态时待支付
               this.getPay() // 微信支付
               // this.completePaidOrder()
+              // this.$router.push({path: '/wechat-pay/PaySuccess', query: this.typeDate})
+            }else{
+              this.$refs.myConfirm.show('您的账单已缴纳，请重新选择！')
             }
           }
         })

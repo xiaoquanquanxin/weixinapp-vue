@@ -25,12 +25,15 @@
                 <div class="payment" @click="goPay">微信支付</div>
             </div>
         </div>
+        <Confrim ref="myConfirm" type="alert"></Confrim>
     </div>
+
 </template>
 
 <script>
   import $ from 'jquery'
   import {ipUri} from "../../main";
+  import Confrim from "../../components/confrim";
   // import wx from 'weixin-js-sdk'
 
   export default {
@@ -46,6 +49,9 @@
         billData: "", // 未缴账单列表
         billDetails: "" // 创建订单需要列表格式
       }
+    },
+    components: {
+      Confrim
     },
     created() {
       // this.getPay();
@@ -87,18 +93,40 @@
 
     },
     methods: {
+      getUnpaidBillTran() {
+        let data = {
+          "roomIds": "83a7999d-5177-4d0a-9d58-754aaad5db15",
+          "contactNumber": "18201538993"
+        };
+        $.ajax({
+          crossDomain: true,//兼容ie8,9
+          type: "post",
+          // url: '/bpi/getUnpaidBillTranV1.do',
+          url: `${ipUri["/bpi"]}/getUnpaidBillTranV1.do`,
+          contentType: "application/x-www-form-urlencoded",
+          data: {'json': JSON.stringify(data)},
+          success: (res) => {
+            if (res.data.length) {
+              this.isFrozen = 1
+            } else {
+              this.isFrozen = 0
+            }
+          }
+        })
+      },
       goPay() {
-
-        let json = {
-          "customerId": "575cd6b8b1c54389936cf47fe8347a40",
-          "contactNumber": "18201538993",
-          "paidIDs": this.billIDsList.join(','),
-          "terminalSource": "0",
-          "hqUserId": "0",
-          "projectID": "1"
-        }
-        // 提交订单到物业
-        new Promise(((resolve, reject) => {
+        // 查询是否有冻结账单
+        this.getUnpaidBillTran();
+        if (!this.isFrozen) { // 如果没有冻结账单 则发起支付
+          let json = {
+            "customerId": "575cd6b8b1c54389936cf47fe8347a40",
+            "contactNumber": "18201538993",
+            "paidIDs": this.billIDsList.join(','),
+            "terminalSource": "0",
+            "hqUserId": "0",
+            "projectID": "1"
+          }
+          // 提交订单到物业
           $.ajax({
             crossDomain: true,//兼容ie8,9
             type: "post",
@@ -111,22 +139,22 @@
               this.orderDate = res.data
               this.createTime = res.data.createTime.substring(0, 16)
               this.typeDate = {
-                createTime:res.data.createTime.substring(0, 16),
-                orderId:res.data.orderId,
-                orderMoney:this.totleMoney,
-                type:0
+                createTime: res.data.createTime.substring(0, 16),
+                orderId: res.data.orderId,
+                orderMoney: this.totleMoney,
+                type: 0
               }
               if (res.code == 2000) {
-                resolve(res)
+                // 创建订单接口到后台
+                this.creatOrder(res)
               } else {
-                reject(res)
+                this.$refs.myConfirm.show(res.msg)
               }
             },
           })
-        })).then((result) => {
-          // 创建订单接口到后台
-          this.creatOrder(result)
-        })
+        }else{
+          this.$refs.myConfirm.show('您的账单已提交，请不要重复操作！')
+        }
       },
       creatOrder(result) {
         let dataP2 = {
@@ -170,6 +198,8 @@
               this.getPay() // 微信支付
               // this.completePaidOrder()
               // this.$router.push({path: '/wechat-pay/PaySuccess', query: this.typeDate})
+            }else{
+              this.$refs.myConfirm.show('您的账单已缴纳，请重新选择！')
             }
           }
         })
@@ -201,8 +231,11 @@
                     //res.err_msg将在用户支付成功后返回ok，但并不保证它绝对可靠。
                     // 完成订单
                     this.completePaidOrder();
-                  }else {
-                    this.$router.push({path: '/wechat-pay/OrderDetail', query: {'type': this.type, 'orderId': this.orderNumber}})
+                  } else {
+                    this.$router.push({
+                      path: '/wechat-pay/OrderDetail',
+                      query: {'type': this.type, 'orderId': this.orderNumber}
+                    })
                   }
                 }
               );
