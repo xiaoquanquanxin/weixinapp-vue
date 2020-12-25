@@ -10,7 +10,7 @@
                          @billdsCheck="billdsCheck"></payment>
             </div>
             <div class="freeze" v-if="isFrozen">
-                <router-link to="/PaymentRecords">您有账单被冻结，请支付或取消后再缴费>></router-link>
+                <router-link to="/wechat-pay/PaymentRecords">您有账单被冻结，请支付或取消后再缴费>></router-link>
             </div>
             <div :class="['box-footer',{'box-shadow':!isFrozen}]">
                 <!--                <input type="checkbox" :checked="allChecked" id="allChecked">-->

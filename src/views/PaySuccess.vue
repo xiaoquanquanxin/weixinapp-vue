@@ -8,15 +8,15 @@
             <div class="payment-list">
                 <div>
                     <p class="paymen-name">订单号码</p>
-                    <p class="payment-money">2312412531234</p>
+                    <p class="payment-money">{{orderId}}</p>
                 </div>
                 <div>
                     <p class="paymen-name">下单时间</p>
-                    <p class="payment-money">2020-09-09 18:00</p>
+                    <p class="payment-money">{{createTime}}</p>
                 </div>
                 <div>
                     <p class="paymen-name">订单金额</p>
-                    <p class="payment-money">￥130.60</p>
+                    <p class="payment-money">￥{{orderMoney}}</p>
                 </div>
             </div>
         </div>
@@ -35,13 +35,18 @@
     name: "PaySuccess",
     data() {
       return {
-        type: ""
+        type: "",
+        orderId: "",
+        orderMoney: "",
+        createTime: "",
       }
     },
     created() {
       console.log(this.$route.query)
       this.orderId = this.$route.query.orderId
       this.type = this.$route.query.type
+      this.orderMoney = this.$route.query.orderMoney
+      this.createTime = this.$route.query.createTime
     },
     methods: {
       goOrderDetail() {

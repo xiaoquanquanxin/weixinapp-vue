@@ -83,7 +83,7 @@
         })
         this.billDetails = arr;
       })
-      console.log(navigator.userAgent) //  获取手机型号
+
     },
     methods: {
       goPay() {
@@ -107,8 +107,13 @@
             data: {'json': JSON.stringify(json)},
             success: (res) => {
               this.orderNumber = res.data.orderId
-              this.typeDate = res.data
-              this.typeDate['type'] = '0';
+              this.createTime = res.data.createTime.substring(0, 16)
+              this.typeDate = {
+                createTime:res.data.createTime.substring(0, 16),
+                orderId:res.data.orderId,
+                orderMoney:this.totleMoney,
+                type:0
+              }
               if (res.code == 2000) {
                 resolve(res)
               } else {
@@ -160,8 +165,9 @@
           data: {'json': JSON.stringify(data)},
           success: (res) => {
             if (res.data.status == 0) {
-              this.getPay() // 微信支付
+              // this.getPay() // 微信支付
               // this.completePaidOrder()
+              this.$router.push({path: '/wechat-pay/PaySuccess', query: this.typeDate})
             }
           }
         })

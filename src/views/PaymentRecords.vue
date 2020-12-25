@@ -72,7 +72,7 @@
         })
       },
       goOrderDetail(number, type) {
-        this.$router.push({path: '/OrderDetail', query: {'orderId': number, 'type': type}})
+        this.$router.push({path: '/wechat-pay/OrderDetail', query: {'orderId': number, 'type': type}})
       },
       getMoreList(done) {
         this.curPage++

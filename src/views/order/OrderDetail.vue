@@ -12,7 +12,7 @@
             <div class="banner" v-if="tranStatus === '1'">
                 <div>
                     <p class="type">支付成功</p>
-                    <p class="name">05-08 11:09</p>
+                    <p class="name">{{tranDate}}</p>
                 </div>
                 <div class="spaceTime">感谢您使用在线缴费！</div>
             </div>
@@ -29,8 +29,8 @@
                     <p class="room world line">房间: 实地·遵义蔷薇国际-D3地块(7、8地块及03地块及03地块及03地</p>
                     <!--                    预缴订单-->
                     <div class="prepay" v-if="type == '1'">
-                        <p class="paymen-name">住宅物业管理费</p>
-                        <p class="payMoney">实付：<span>¥535.00</span></p>
+                        <p class="paymen-name">{{feeName}}</p>
+                        <p class="payMoney">实付：<span>¥{{payMoney}}</span></p>
                     </div>
                 </div>
                 <div class="payment">
@@ -43,7 +43,7 @@
                             </div>
                             <div>
                                 <p class="paymen-name">下单时间</p>
-                                <p class="payment-money">2020-09-09 18:00</p>
+                                <p class="payment-money">{{tranDate}}</p>
                             </div>
                             <div>
                                 <p class="paymen-name">支付方式</p>
@@ -82,24 +82,16 @@
                     <p class="room world line">房间: 实地·遵义蔷薇国际-D3地块(7、8地块及03地块及03地块及03地</p>
                     <!--                    预缴订单-->
                     <div>
-                        <div class="payment-box" v-for="item in 3" :key="item">
+                        <div class="payment-box" v-for="(item,index) in paymentList" :key="index">
                             <div class="payment-list line">
-                                <h3>[2019]</h3>
-                                <div>
-                                    <p class="paymen-name">住宅物业管理费</p>
-                                    <p class="payment-money">￥130.60</p>
-                                </div>
-                                <div>
-                                    <p class="paymen-name">水费（住宅）</p>
-                                    <p class="payment-money">￥65.60</p>
-                                </div>
-                                <div>
-                                    <p class="paymen-name">车位管理费（20#201）</p>
-                                    <p class="payment-money">￥130.60</p>
+                                <h3>[{{item.billMonth}}]</h3>
+                                <div v-for="(_item,_index) in item.billDetails" :key="_index">
+                                    <p class="paymen-name">{{_item.paidName}}</p>
+                                    <p class="payment-money">￥{{_item.paidTotal}}</p>
                                 </div>
                             </div>
                         </div>
-                        <p class="payMoney">实付：<span>¥535.00</span></p>
+                        <p class="payMoney">实付：<span>¥{{totalMoney}}</span></p>
                     </div>
 
 
@@ -110,11 +102,11 @@
                         <div class="payment-list pay-message line">
                             <div>
                                 <p class="paymen-name">订单号码</p>
-                                <p class="payment-money">2312412531234</p>
+                                <p class="payment-money">{{orderNumber}}</p>
                             </div>
                             <div>
                                 <p class="paymen-name">下单时间</p>
-                                <p class="payment-money">2020-09-09 18:00</p>
+                                <p class="payment-money">{{tranDate}}</p>
                             </div>
                             <div>
                                 <p class="paymen-name">支付方式</p>
@@ -151,17 +143,21 @@
         orderNumber: "", // 订单
         maxtime: 15 * 60 - 1,
         timer: null,
+        paymentList: null, // 欠缴列表
+        totalMoney: 0, // 总费用
         memo: "", // 取消信息
         tranDate: "", // 订单时间
         isType: "1", // 是否为超时取消
         tranStatus: "0", // 支付状态
+        feeName: "", // 预缴费项名称
+        payMoney: "0", // 预缴费项价格
         type: "" // 预缴或欠缴
       }
     },
     created() {
       this.type = this.$route.query.type
-      // this.orderNumber = this.$route.query.orderId
-      this.orderNumber = '20201224120001637'
+      this.orderNumber = this.$route.query.orderId
+      // this.orderNumber = '20201225143858550'
       // 获取订单信息
       this.getOrderList()
     },
@@ -218,6 +214,12 @@
             this.transactionid = res.data.transactionid
             // 订单号
             this.orderNumber = res.data.transactionid
+
+            // 欠缴总费用
+            this.totalMoney = res.data.totalMoney
+
+            //  欠缴列表
+            this.paymentList = res.data.billDetail
             // 如果支付状态为待支付 则开启倒计时
             if (this.tranStatus == 0) {
               this.getTime()
@@ -242,6 +244,8 @@
             this.memo = res.data.memo
             this.tranDate = res.data.tranDate.substring(0, 16)
             this.transactionid = res.data.transactionid
+            this.payMoney = res.data.payMoney
+            this.feeName = res.data.feeName
             this.orderNumber = res.data.transactionid // 欠缴没有订单id 只有订单号 所以取消订单的时候为了统一一个变量名新增的一个变量
             if (this.tranStatus == 0) {
               this.getTime()
