@@ -9,7 +9,7 @@ export const ipUri = {
   '/opi':'http://6tccfq.natappfree.cc/api'  //  少杰 端口
 }
 
-
+// window.domain = 'https://hachiseedland-dev.hachi-tech.com';
 
 
 import Vue from 'vue'

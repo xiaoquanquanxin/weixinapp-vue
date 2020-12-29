@@ -25,7 +25,7 @@
             <div class="paid-box">
                 <div class="form-item item-line" v-if="!noList">
                     <div class="box">
-                        <payment class="context" :paidData="paidOutList" :paidName="'paidOut'"
+                        <payment class="context" :paidData="paidOutListFilter" :paidName="'paidOut'"
                                  @billdsCheck="billdsCheck"></payment>
                     </div>
                     <div class="freeze" v-if="isFrozen">
@@ -51,7 +51,7 @@
                     <img src="~@/assets/images/noMessage.png">
                     <p>暂无未缴账单</p>
                 </div>
-                <ios-select ref="paidOutChild" @func="setCharges" :paidData="paidOutList"></ios-select>
+                <ios-select ref="paidOutChild" @func="setCharges" :paidData="costItem"></ios-select>
             </div>
         </div>
         <!--        已缴账单-->
@@ -83,7 +83,7 @@
         room: [],
         active: true,
         roomName: "",
-        collectable: [], //费项列表
+        costItem: [], //费项列表
         totalMoney: 0, // 未缴总费用
         cmdsId: "", //   房间id
         noList: false, //
@@ -92,6 +92,7 @@
         allChecked: true, //是否全选
         billIDsList: [], // 选中的费项列表
         paidOutList: [], // 未缴账单列表
+        paidOutListFilter: [], // 未缴账单列表
         totleMoney: 0,
         paidInList: [], // 已缴账单列表
       }
@@ -102,31 +103,6 @@
       this.getRoomList();
     },
     methods: {
-      getCollectable() {
-        let data = {
-          projectID: '4a7477c8-7a28-46ce-bfc9-678e6dd71aaa',
-          userID: '575cd6b8b1c54389936cf47fe8347a40',
-          month: '',
-          roomIds: this.roomIds,
-          sType: "",
-          sIds: "",
-          feeIds: ""
-        };
-        $.ajax({
-          crossDomain: true,//兼容ie8,9
-          type: "post",
-          // url: '/bpi/getPaidBill.do',
-          url: `${ipUri["/bpi"]}/getBillDetailByFilter.do`,
-          // contentType: "application/x-www-form-urlencoded",
-          data: {'json': JSON.stringify(data)},
-          success: (res) => {
-            this.paidInList = res.data.content
-            if (!this.paidInList) {
-              this.noList = true
-            }
-          }
-        })
-      },
       setAct() { // 未缴账单点击事件
         this.active = true
         this.getPaymentList() // 获取未缴账单列表
@@ -181,12 +157,10 @@
 
             this.room = roomList;
             this.roomName = roomList[0].value //  默认第一个房间名称
-            this.cmdsId = roomList[0].id  // 默认第一个房间id
-            // this.cmdsId = "83a7999d-5177-4d0a-9d58-754aaad5db15"  // 默认第一个房间id
+            // this.cmdsId = roomList[0].id  // 默认第一个房间id
+            this.cmdsId = "83a7999d-5177-4d0a-9d58-754aaad5db15"  // 默认第一个房间id
             this.getPaymentList() // 获取未缴账单列表
             this.getUnpaidBillTran() // 获取冻结账单列表
-            // 获取费项列表
-            this.getCollectable();
             // this.setCmdsId(this.room[0].cmdsId)
           }
         })
@@ -219,10 +193,17 @@
           data: {'json': JSON.stringify(data)},
           success: (res) => {
             this.totleMoney = 0;
+            this.billIDsList = [];
             if (res.data.content) {
               this.paidOutList = res.data.content
+              this.paidOutListFilter = res.data.content
               this.totalMoney = res.data.totalMoney
-              this.paidOutList.map((item) => {
+              let costItem = [];
+              this.paidOutListFilter.map((item) => {
+                //  拿到项目名称 添加到costItem数组中 去重
+                if(costItem.indexOf(item.billDetails[0].paidName) == -1){
+                  costItem.push(item.billDetails[0].paidName)
+                }
                 // 拿到选中费项列表
                 this.billIDsList.push(item.billDetails[0].billIds);
                 // 判断是否有冻结账单
@@ -232,6 +213,12 @@
                   // 默认选中所有费项
                   this.totleMoney += item.billDetails[0].paidTotal
                 }
+              })
+              costItem.forEach((item)=>{
+                this.costItem.push({
+                  id:"",
+                  value:item
+                })
               })
             } else {
               this.noList = true;
@@ -270,12 +257,31 @@
       // 选择房间
       setCharges(value) {
         this.billName = value.value
-        this.$showToast.show('hello2020!', 2000)
+        this.paidOutListFilter = this.paidOutList.filter((item)=>{
+          if(item.billDetails[0].paidName == value.value){
+            return item
+          }
+        })
+        this.billIDsList = [];
+        this.totleMoney = 0;
+        this.paidOutListFilter.map((item) => {
+          //  拿到项目名称 添加到costItem数组中 去重
+          // 拿到选中费项列表
+          this.billIDsList.push(item.billDetails[0].billIds);
+          // 判断是否有冻结账单
+          if (item.billDetails[0].isFrozen === '1') {
+            // 默认选中所有费项
+            this.$set(item.billDetails[0], 'checked', true)
+            // 默认选中所有费项
+            this.totleMoney += item.billDetails[0].paidTotal
+          }
+        })
+        console.log(this.billIDsList)
         // this.$showToast.hide()
       },
       //  全选按钮点击事件
       allCheck() {
-        this.paidOutList.map((item) => {
+        this.paidOutListFilter.map((item) => {
           if (item.billDetails[0].isFrozen === '1') {
             this.$set(item.billDetails[0], 'checked', !this.allChecked)
             if (!item.billDetails[0].checked) {
@@ -303,7 +309,7 @@
       // 单费项点击事件
       billdsCheck(id) {
         this.totleMoney = 0;
-        this.paidOutList.map((item) => {
+        this.paidOutListFilter.map((item) => {
           if (item.billDetails[0].billIds == id) {
             // 遍历费项列表 找到选中费项 控制选中状态
             this.$set(item.billDetails[0], 'checked', !item.billDetails[0].checked)
@@ -329,7 +335,7 @@
         if (!this.allChecked) {
           this.billIDsList = []
         } else {
-          this.paidOutList.map((item) => {
+          this.paidOutListFilter.map((item) => {
             this.billIDsList.push(item.billDetails[0].billIds)
           })
         }
@@ -337,7 +343,7 @@
       isCheckedAll() {
         // 控制全选按钮
         // 筛选未冻结列表
-        let checkedItem = this.paidOutList.filter(item => {
+        let checkedItem = this.paidOutListFilter.filter(item => {
           return item.billDetails[0].isFrozen == '1';
         });
         this.allChecked = checkedItem.every((item) => {
