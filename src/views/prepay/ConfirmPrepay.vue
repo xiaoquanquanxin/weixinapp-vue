@@ -40,8 +40,8 @@
     },
     methods: {
       goPay() {
-        var u = navigator.userAgent;
-        var isiOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
+        let u = navigator.userAgent;
+        let isiOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
         let data = {
           pmdsRoomId: this.roomID, // 房间主数据id
           cmdsId: '575cd6b8b1c54389936cf47fe8347a40', // 用户主数据id

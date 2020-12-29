@@ -152,7 +152,7 @@
               }
             },
           })
-        }else{
+        } else {
           this.$refs.myConfirm.show('您的账单已提交，请不要重复操作！')
         }
       },
@@ -198,7 +198,7 @@
               this.getPay() // 微信支付
               // this.completePaidOrder()
               // this.$router.push({path: '/wechat-pay/PaySuccess', query: this.typeDate})
-            }else{
+            } else {
               this.$refs.myConfirm.show('您的账单已缴纳，请重新选择！')
             }
           }
@@ -206,10 +206,23 @@
       },
       // 下单支付
       getPay() {
+        let u = navigator.userAgent;
+        let isiOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
+
+        let data = {
+          mchId: '10000000',  // 自定义商户ID，公众号支付传10000000
+          mchOrderNo: this.orderDate.orderId,   //  商户订单号
+          channelId: "WX_JSAPI",  //  渠道id,公众号传"WX_JSAPI"
+          amount: this.orderDate.orderMoney.toFixed(2),  //  支付金额（单位分）
+          clientIp: "web",  //  客户端IP
+          device: isiOS ? 'ios' : 'Android',  //  设备
+          openId: "" //  当前app对应的下openId
+        }
         $.ajax({
           type: "get",
           // url: '/opi/pay/create_order',  //  获取支付签名
           url: `${ipUri["/opi"]}/pay/create_order`,
+          data: data,
           success: (result) => {
             let res = JSON.parse(result)
             let {appId, timeStamp, nonceStr, signType, paySign} = res.payParams
