@@ -219,7 +219,7 @@
           openId: "" //  当前app对应的下openId
         }
         $.ajax({
-          type: "get",
+          type: "POST",
           // url: '/opi/pay/create_order',  //  获取支付签名
           url: `${ipUri["/opi"]}/pay/create_order`,
           data: data,
