@@ -27,18 +27,6 @@ export const syncRoutesList = [
     path: '/wechat-pay/PaymentList',
     name: 'PaymentList',
     component: PaymentList,
-    children: [
-      {
-        path: 'Paid-in',
-        name: 'Paid-in',
-        component: () => import(/* webpackChunkName: "inventory" */ '@/views/payment/Paid-in'),
-      },
-      {
-        path: 'Paid-out',
-        name: 'Paid-out',
-        component: () => import(/* webpackChunkName: "purchaseOrder" */ '@/views/payment/Paid-out'),
-      }]
-
   },
 
   {

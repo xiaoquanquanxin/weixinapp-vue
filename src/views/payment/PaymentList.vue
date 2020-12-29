@@ -8,54 +8,345 @@
                 <!--                <img src="~@/assets/images/right.png">-->
             </div>
         </div>
-        <div class="nav">
+        <div class="nav line">
             <div>
-                <router-link to="/PaymentList/Paid-out" active-class="active" exact>未缴账单</router-link>
+                <a href="#" :class="[{'active':active}]" @click="setAct">未缴账单</a>
             </div>
             <div>
-                <router-link to="/PaymentList/Paid-in" active-class="active">已缴账单</router-link>
+                <a href="#" :class="[{'active':!active}]" @click="setUnAct">已缴账单</a>
             </div>
         </div>
-        <router-view class="content"></router-view>
+        <!--        未缴账单-->
+        <div class="content" v-if="active">
+            <div class="screening">
+                <div>{{billName}}</div>
+                <div id="showBank" @click="paidOutChoose">费项筛选</div>
+            </div>
+            <div class="paid-box">
+                <div class="form-item item-line" v-if="!noList">
+                    <div class="box">
+                        <payment class="context" :paidData="paidOutList" :paidName="'paidOut'"
+                                 @billdsCheck="billdsCheck"></payment>
+                    </div>
+                    <div class="freeze" v-if="isFrozen">
+                        <router-link to="/wechat-pay/PaymentRecords">您有账单被冻结，请支付或取消后再缴费>></router-link>
+                    </div>
+                    <div :class="['box-footer',{'box-shadow':!isFrozen}]">
+                        <!--                <input type="checkbox" :checked="allChecked" id="allChecked">-->
+                        <div class="allCheck">
+                            <div class="all-box">
+                                <label @click="allCheck">
+                                    <span :class="['checkbox',{'isChecked':allChecked}]"></span>
+                                    全选:
+                                </label>
+                                <b>¥ {{totleMoney}}</b>
+                            </div>
+
+                            <div v-if="isFrozen" class="payment isFrozen">立即缴费</div>
+                            <div v-else class="payment" @click="goConfirmPayment">立即缴费</div>
+                        </div>
+                    </div>
+                </div>
+                <div v-else class="no-message">
+                    <img src="~@/assets/images/noMessage.png">
+                    <p>暂无未缴账单</p>
+                </div>
+                <ios-select ref="paidOutChild" @func="setCharges" :paidData="paidOutList"></ios-select>
+            </div>
+        </div>
+        <!--        已缴账单-->
+        <div class="content" v-else>
+            <payment class="paid-box" :paidData="paidInList" v-if="!noList"></payment>
+            <div v-else class="no-message">
+                <img src="~@/assets/images/noMessage.png">
+                <p>暂无已缴账单</p>
+            </div>
+        </div>
         <ios-select ref="mychild" :paidData="room" @func="setRoom"></ios-select>
     </div>
 </template>
 
 <script>
   import iosSelect from "../../components/iosSelect";
+  import $ from "jquery";
+  import {ipUri} from "../../main";
+  import payment from "../../components/payment/payment";
 
   export default {
     name: "PaymentList",
     components: {
-      iosSelect
+      iosSelect,
+      payment,
     },
     data() {
       return {
-        room: [
-          {'id': '10001', 'value': '实地 - 遵义蔷薇国际 - D3地块(7、8地块及周边地块还有啥来着)'},
-          {'id': '10002', 'value': '中山 - 遵义蔷薇国际 - D3地块(7、8地块及周边地块还有啥来着'},
-          {'id': '10003', 'value': '广州 - 遵义蔷薇国际 - D3地块(7、8地块及周边地块还有啥来着'},
-          {'id': '10004', 'value': '北京 - 遵义蔷薇国际 - D3地块(7、8地块及周边地块还有啥来着'},
-          {'id': '10005', 'value': '天津 - 遵义蔷薇国际 - D3地块(7、8地块及周边地块还有啥来着'},
-        ],
-        roomName: "实地-遵义蔷薇国际"
+        room: [],
+        active: true,
+        roomName: "",
+        collectable: [], //费项列表
+        totalMoney: 0, // 未缴总费用
+        cmdsId: "", //   房间id
+        noList: false, //
+        billName: "全部费用",  // 费项名称
+        isFrozen: false, // 冻结状态
+        allChecked: true, //是否全选
+        billIDsList: [], // 选中的费项列表
+        paidOutList: [], // 未缴账单列表
+        totleMoney: 0,
+        paidInList: [], // 已缴账单列表
       }
     },
-    computed:{
-      totalMoney(){
-        return this.$store.state.paidOut.totalMoney
-      }
+
+    created() {
+      //  获取房间列表
+      this.getRoomList();
     },
     methods: {
+      getCollectable() {
+        let data = {
+          projectID: '4a7477c8-7a28-46ce-bfc9-678e6dd71aaa',
+          userID: '575cd6b8b1c54389936cf47fe8347a40',
+          month: '',
+          roomIds: this.roomIds,
+          sType: "",
+          sIds: "",
+          feeIds: ""
+        };
+        $.ajax({
+          crossDomain: true,//兼容ie8,9
+          type: "post",
+          // url: '/bpi/getPaidBill.do',
+          url: `${ipUri["/bpi"]}/getBillDetailByFilter.do`,
+          // contentType: "application/x-www-form-urlencoded",
+          data: {'json': JSON.stringify(data)},
+          success: (res) => {
+            this.paidInList = res.data.content
+            if (!this.paidInList) {
+              this.noList = true
+            }
+          }
+        })
+      },
+      setAct() { // 未缴账单点击事件
+        this.active = true
+        this.getPaymentList() // 获取未缴账单列表
+        this.getUnpaidBillTran() // 获取冻结账单列表
+      },
+      setUnAct() { // 已缴账单点击事件
+        this.active = false
+        // 获取已缴账单列表
+        this.getPaidInList();
+      },
+      // 获取已缴账单列表
+      getPaidInList() {
+        let data = {
+          roomIDs: '4a7477c8-7a28-46ce-bfc9-678e6dd71aaa',
+          userID: '575cd6b8b1c54389936cf47fe8347a40',
+          startDate: '2012-02-05',
+          endDate: '2020-02-05'
+        };
+
+        $.ajax({
+          crossDomain: true,//兼容ie8,9
+          type: "post",
+          // url: '/bpi/getPaidBill.do',
+          url: `${ipUri["/bpi"]}/getPaidBill.do`,
+          contentType: "application/x-www-form-urlencoded",
+          data: {'json': JSON.stringify(data)},
+          success: (res) => {
+            this.paidInList = res.data.content
+            if (!this.paidInList) {
+              this.noList = true
+            }
+          }
+        })
+      },
+      getRoomList() {
+        $.ajax({
+          type: "POST",
+          // url: '/opi/pay/create_order',  //  获取支付签名
+          url: `${ipUri["/bpi"]}/getPmdRooms.do`,
+          contentType: "application/x-www-form-urlencoded",
+          data: {
+            wxUserID: "5"
+          },
+          success: (result) => {
+            let roomList = [];
+            result.data.forEach((item) => {
+              roomList.push({
+                id: item.cmdsId,
+                value: item.roomName
+              })
+            });
+
+            this.room = roomList;
+            this.roomName = roomList[0].value //  默认第一个房间名称
+            this.cmdsId = roomList[0].id  // 默认第一个房间id
+            // this.cmdsId = "83a7999d-5177-4d0a-9d58-754aaad5db15"  // 默认第一个房间id
+            this.getPaymentList() // 获取未缴账单列表
+            this.getUnpaidBillTran() // 获取冻结账单列表
+            // 获取费项列表
+            this.getCollectable();
+            // this.setCmdsId(this.room[0].cmdsId)
+          }
+        })
+      },
+      //  选择房间
       setRoom(value) {
-        console.log(value)
         this.roomName = value.value
+        this.cmdsId = value.id
+        this.getPaymentList() // 获取未缴账单列表
+        this.getUnpaidBillTran() // 获取冻结账单列表
         this.$showToast.show('hello2020!', 2000)
         // this.$showToast.hide()
       },
+      //  唤起弹出层
       choose() {
         this.$refs.mychild.choose()
-      }
+      },
+      // 获取未缴账单列表
+      getPaymentList() {
+        let data = {
+          roomIDs: this.cmdsId,
+          userID: '575cd6b8b1c54389936cf47fe8347a40' // 物管用户id
+        };
+        $.ajax({
+          crossDomain: true,//兼容ie8,9
+          type: "post",
+          url: `${ipUri["/bpi"]}/getUnpaidBill.do`,
+          // url: `/bpi/getUnpaidBill.do`,
+          contentType: "application/x-www-form-urlencoded",
+          data: {'json': JSON.stringify(data)},
+          success: (res) => {
+            this.totleMoney = 0;
+            if (res.data.content) {
+              this.paidOutList = res.data.content
+              this.totalMoney = res.data.totalMoney
+              this.paidOutList.map((item) => {
+                // 拿到选中费项列表
+                this.billIDsList.push(item.billDetails[0].billIds);
+                // 判断是否有冻结账单
+                if (item.billDetails[0].isFrozen === '1') {
+                  // 默认选中所有费项
+                  this.$set(item.billDetails[0], 'checked', true)
+                  // 默认选中所有费项
+                  this.totleMoney += item.billDetails[0].paidTotal
+                }
+              })
+            } else {
+              this.noList = true;
+            }
+
+          }
+        })
+      },
+      // 获取冻结账单列表
+      getUnpaidBillTran() {
+        let data = {
+          "roomIds": this.cmdsId,
+          "contactNumber": "18201538993"
+        };
+        $.ajax({
+          crossDomain: true,//兼容ie8,9
+          type: "post",
+          // url: '/bpi/getUnpaidBillTranV1.do',
+          url: `${ipUri["/bpi"]}/getUnpaidBillTranV1.do`,
+          contentType: "application/x-www-form-urlencoded",
+          data: {'json': JSON.stringify(data)},
+          success: (res) => {
+            if (res.data.length) {
+              this.isFrozen = 1
+            } else {
+              this.isFrozen = 0
+            }
+          }
+        })
+      },
+      // iosSelect 激活组件
+      paidOutChoose() {
+        this.$refs.paidOutChild.choose()
+      },
+
+      // 选择房间
+      setCharges(value) {
+        this.billName = value.value
+        this.$showToast.show('hello2020!', 2000)
+        // this.$showToast.hide()
+      },
+      //  全选按钮点击事件
+      allCheck() {
+        this.paidOutList.map((item) => {
+          if (item.billDetails[0].isFrozen === '1') {
+            this.$set(item.billDetails[0], 'checked', !this.allChecked)
+            if (!item.billDetails[0].checked) {
+              this.totleMoney -= item.billDetails[0].paidTotal
+            } else {
+              this.totleMoney += item.billDetails[0].paidTotal
+            }
+
+          }
+        })
+        // this.setAllChecked(!this.allChecked) // 更改全选按钮状态
+        this.setBillIDsList() //  设置选中的账单id
+      },
+      // 立即缴费
+      goConfirmPayment() {
+        let query = {
+          userID: "575cd6b8b1c54389936cf47fe8347a40",
+          totleMoney: this.totleMoney,
+          billIDsList: this.billIDsList
+        }
+        console.log(this.billIDsList)
+        // this.$router.push({path: '/ConfirmPayment', query})
+        this.$router.push({path: '/wechat-pay/ConfirmPayment', query})
+      },
+      // 单费项点击事件
+      billdsCheck(id) {
+        this.totleMoney = 0;
+        this.paidOutList.map((item) => {
+          if (item.billDetails[0].billIds == id) {
+            // 遍历费项列表 找到选中费项 控制选中状态
+            this.$set(item.billDetails[0], 'checked', !item.billDetails[0].checked)
+            // 根据选中费项checked属性 添加/删除 选中费项列表内容
+            if (!item.billDetails[0].checked) {
+              if (this.billIDsList.indexOf(item.billDetails[0].billIds) != '-1') {
+                this.billIDsList.splice(this.billIDsList.indexOf(item.billDetails[0].billIds), 1)
+              }
+            } else {
+              this.billIDsList.push(item.billDetails[0].billIds)
+            }
+          }
+          if (item.billDetails[0].checked) {
+            this.totleMoney += item.billDetails[0].paidTotal;
+          }
+        });
+        this.totleMoney = this.totleMoney.toFixed(2)
+        this.isCheckedAll()
+      },
+      setBillIDsList() {
+        this.isCheckedAll()
+        this.billIDsList = []
+        if (!this.allChecked) {
+          this.billIDsList = []
+        } else {
+          this.paidOutList.map((item) => {
+            this.billIDsList.push(item.billDetails[0].billIds)
+          })
+        }
+      },
+      isCheckedAll() {
+        // 控制全选按钮
+        // 筛选未冻结列表
+        let checkedItem = this.paidOutList.filter(item => {
+          return item.billDetails[0].isFrozen == '1';
+        });
+        this.allChecked = checkedItem.every((item) => {
+          if (item.billDetails[0].isFrozen === '1') {
+            return item.billDetails[0].checked
+          }
+        })
+      },
+
     }
   }
 </script>
@@ -74,6 +365,7 @@
         background-size: cover;
         flex: none;
         text-align: center;
+
         p {
             margin: 0;
             padding-top: 0.19rem;
@@ -117,6 +409,7 @@
         display: flex;
         height: 0.4rem;
         background: #ffffff;
+        margin-top: 0.1rem;
 
         div {
             height: 0.39rem;
@@ -130,7 +423,7 @@
                 font-size: .12rem;
                 display: block;
                 height: 100%;
-                color:#808080;
+                color: #808080;
                 border-bottom: 1px solid transparent;
             }
         }
@@ -139,5 +432,170 @@
     .nav .active {
         border-bottom: 1px solid #04639D;
         color: #04639D;
+    }
+
+
+    .content {
+        background-color: #F8F8F8;
+        overflow: hidden;
+        /*padding-bottom: 1.0rem;*/
+    }
+
+
+    //  未缴账单
+    .paid-box {
+        height: 100%;
+        overflow-y: scroll;
+    }
+
+    .context {
+        padding-bottom: 1rem;
+    }
+
+    .form-item {
+        background: #ffffff;
+    }
+
+
+    .freeze {
+        position: fixed;
+        bottom: 0.5rem;
+        height: 0.3rem;
+        line-height: 0.3rem;
+        font-size: 0.13rem;
+        padding-left: 0.16rem;
+        background: #DE8748;
+        width: 100%;
+        text-align: center;
+
+        a {
+            color: #ffffff;
+        }
+    }
+
+    .screening {
+        display: flex;
+        justify-content: space-between;
+        background: #f8f8f8;
+        height: 0.4rem;
+        line-height: 0.4rem;
+        padding: 0 0.13rem;
+        color: #909090;
+        font-size: 0.12rem;
+
+        #showBank {
+            font-size: 0.13rem;
+            color: #000000;
+        }
+    }
+
+    .box-footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 0.5rem;
+        background: #ffffff;
+        padding: 0 0.1rem;
+        box-sizing: border-box;
+
+        .checkbox {
+            display: inline-block;
+            width: 0.14rem;
+            height: 0.14rem;
+            border: 0.01rem solid #979797;
+            border-radius: 100%;
+            margin-right: 0.1rem;
+        }
+
+        .isChecked {
+            background-image: url("~@/assets/images/checked.png");
+            background-size: cover;
+            width: 0.16rem;
+            height: 0.16rem;
+            border: none;
+        }
+
+        .allCheck {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            font-size: 0.13rem;
+            font-weight: 400;
+            color: #333333;
+
+            b {
+                font-size: 0.15rem;
+                color: #DF4949;
+                line-height: 0.21rem;
+                margin-left: 0.2rem;
+            }
+        }
+
+        .payment {
+            width: 1rem;
+            height: 0.4rem;
+            background: #04639D;
+            border-radius: 0.05rem;
+            font-size: 0.15rem;
+            color: #FFFFFF;
+            line-height: 0.4rem;
+            text-align: center;
+        }
+
+        .all-box {
+            flex: 1;
+            height: 100%;
+            display: flex;
+            align-items: center;
+
+            label {
+                display: flex;
+                align-items: center;
+                height: 100%;
+            }
+        }
+    }
+
+    .box-shadow {
+        box-shadow: 0 -2px 10px 0 #cbc7c7;
+
+    }
+
+    .no-message {
+        padding-top: 1.2rem;
+        text-align: center;
+        color: #808080;
+        font-size: 0.13rem;
+
+        img {
+            width: 0.66rem;
+
+        }
+    }
+
+    .isFrozen {
+        opacity: 0.4;
+    }
+
+
+    //  已缴账单
+    .paid-box {
+        overflow-y: scroll;
+        background: #ffffff;
+    }
+
+    .no-message {
+        padding-top: 1.2rem;
+        text-align: center;
+        color: #808080;
+        font-size: 0.13rem;
+
+        img {
+            width: 0.66rem;
+
+        }
+
     }
 </style>
