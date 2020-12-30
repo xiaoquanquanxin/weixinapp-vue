@@ -25,7 +25,7 @@
             <div class="paid-box">
                 <div class="form-item item-line" v-if="!noList">
                     <div class="box">
-                        <payment class="context" :paidData="paidOutListFilter" :paidName="'paidOut'"
+                        <payment class="context" :paidData="paidOutListFilter" :isFrozen="isFrozen" :paidName="'paidOut'"
                                  @billdsCheck="billdsCheck"></payment>
                     </div>
                     <div class="freeze" v-if="isFrozen">
@@ -35,7 +35,7 @@
                         <!--                <input type="checkbox" :checked="allChecked" id="allChecked">-->
                         <div class="allCheck">
                             <div class="all-box">
-                                <label @click="allCheck">
+                                <label @click="allCheck" :class="[{'isFrozen':isFrozen}]">
                                     <span :class="['checkbox',{'isChecked':allChecked}]"></span>
                                     全选:
                                 </label>
@@ -283,19 +283,23 @@
       },
       //  全选按钮点击事件
       allCheck() {
-        this.paidOutListFilter.map((item) => {
-          if (item.billDetails[0].isFrozen === '1') {
-            this.$set(item.billDetails[0], 'checked', !this.allChecked)
-            if (!item.billDetails[0].checked) {
-              this.totleMoney -= item.billDetails[0].paidTotal
-            } else {
-              this.totleMoney += item.billDetails[0].paidTotal
-            }
+        // 如果没有冻结账单 则可以操作账单列表
+        if(!this.isFrozen){
+          this.paidOutListFilter.map((item) => {
+            if (item.billDetails[0].isFrozen === '1') {
+              this.$set(item.billDetails[0], 'checked', !this.allChecked)
+              if (!item.billDetails[0].checked) {
+                this.totleMoney -= item.billDetails[0].paidTotal
+              } else {
+                this.totleMoney += item.billDetails[0].paidTotal
+              }
 
-          }
-        })
-        // this.setAllChecked(!this.allChecked) // 更改全选按钮状态
-        this.setBillIDsList() //  设置选中的账单id
+            }
+          })
+          // this.setAllChecked(!this.allChecked) // 更改全选按钮状态
+          this.setBillIDsList() //  设置选中的账单id
+        }
+
       },
       // 立即缴费
       goConfirmPayment() {

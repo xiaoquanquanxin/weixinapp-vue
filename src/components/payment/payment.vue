@@ -4,7 +4,7 @@
             <li v-for="(item,index) in paidData" :key="index" class="line">
                 <div class="year line">{{item.billMonth}}</div>
                 <div v-for="items in item.billDetails" :key="items.billIds"
-                     :class="['paid-cont',{'isFrozen':!Number(items.isFrozen)}]"
+                     :class="['paid-cont',{'isFrozen':isFrozen}]"
                      @click="choosepaid(items.billIds,index,Number(items.isFrozen))">
                     <div>
                         <span v-if="paidName === 'paidOut'" :class="['checkbox',{'isChecked':items.checked}]"></span>
@@ -34,7 +34,7 @@
         // billdsList:[]
       }
     },
-    props: ['paidData', 'paidName', 'isAllChecked'],
+    props: ['paidData', 'paidName', 'isAllChecked','isFrozen'],
     computed: {
       allChecked() {
         return this.$store.state.paidOut.allChecked
@@ -47,9 +47,9 @@
       //   //  保存病人信息，这是为了给组件用，而不是页面，所以要store
       //   'setAllChecked',
       // ]),
-      choosepaid(id, index,isFrozen) {
-        // debugger
-        if(isFrozen){
+      choosepaid(id, index) {
+        // 如果没有冻结账单 则可以操作账单列表
+        if(!this.isFrozen){
           //  判断之前月份有没有没勾选
           for (let i = 0; i < index; i++) {
             if (this.paidData[i] && !this.paidData[i].billDetails[0].checked) {
