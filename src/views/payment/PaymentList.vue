@@ -51,6 +51,7 @@
                     <img src="~@/assets/images/noMessage.png">
                     <p>暂无未缴账单</p>
                 </div>
+<!--                费项弹框-->
                 <ios-select ref="paidOutChild" @func="setCharges" :paidData="costItem"></ios-select>
             </div>
         </div>
@@ -62,6 +63,7 @@
                 <p>暂无已缴账单</p>
             </div>
         </div>
+<!--        房间弹框-->
         <ios-select ref="mychild" :paidData="room" @func="setRoom"></ios-select>
     </div>
 </template>
@@ -103,12 +105,40 @@
       this.getRoomList();
     },
     methods: {
-      setAct() { // 未缴账单点击事件
+      getRoomList() {
+        $.ajax({
+          type: "POST",
+          // url: '/opi/pay/create_order',  //  获取支付签名
+          url: `${ipUri["/bpi"]}/getPmdRooms.do`,
+          contentType: "application/x-www-form-urlencoded",
+          data: {
+            wxUserID: "5"
+          },
+          success: (result) => {
+            let roomList = [];
+            result.data.forEach((item) => {
+              roomList.push({
+                id: item.cmdsId,
+                value: item.roomName
+              })
+            });
+
+            this.room = roomList;
+            this.roomName = roomList[0].value //  默认第一个房间名称
+            // this.cmdsId = roomList[0].id  // 默认第一个房间id
+            this.cmdsId = "83a7999d-5177-4d0a-9d58-754aaad5db15"  // 默认第一个房间id
+            this.getUnpaidBillTran() // 获取冻结账单列表
+            this.getPaymentList() // 获取未缴账单列表
+            // this.setCmdsId(this.room[0].cmdsId)
+          }
+        })
+      },
+      setAct() { // 未缴账单导航点击事件
         this.active = true
         this.getPaymentList() // 获取未缴账单列表
         this.getUnpaidBillTran() // 获取冻结账单列表
       },
-      setUnAct() { // 已缴账单点击事件
+      setUnAct() { // 已缴账单导航点击事件
         this.active = false
         // 获取已缴账单列表
         this.getPaidInList();
@@ -137,34 +167,7 @@
           }
         })
       },
-      getRoomList() {
-        $.ajax({
-          type: "POST",
-          // url: '/opi/pay/create_order',  //  获取支付签名
-          url: `${ipUri["/bpi"]}/getPmdRooms.do`,
-          contentType: "application/x-www-form-urlencoded",
-          data: {
-            wxUserID: "5"
-          },
-          success: (result) => {
-            let roomList = [];
-            result.data.forEach((item) => {
-              roomList.push({
-                id: item.cmdsId,
-                value: item.roomName
-              })
-            });
 
-            this.room = roomList;
-            this.roomName = roomList[0].value //  默认第一个房间名称
-            // this.cmdsId = roomList[0].id  // 默认第一个房间id
-            this.cmdsId = "83a7999d-5177-4d0a-9d58-754aaad5db15"  // 默认第一个房间id
-            this.getPaymentList() // 获取未缴账单列表
-            this.getUnpaidBillTran() // 获取冻结账单列表
-            // this.setCmdsId(this.room[0].cmdsId)
-          }
-        })
-      },
       //  选择房间
       setRoom(value) {
         this.roomName = value.value
@@ -192,19 +195,19 @@
           contentType: "application/x-www-form-urlencoded",
           data: {'json': JSON.stringify(data)},
           success: (res) => {
-            this.totleMoney = 0;
-            this.billIDsList = [];
+            this.totleMoney = 0; // 总价格
+            this.billIDsList = []; // 选中账单id
             if (res.data.content) {
-              this.paidOutList = res.data.content
-              this.paidOutListFilter = res.data.content
+              this.paidOutList = res.data.content //  所有未缴账单列表
+              this.paidOutListFilter = res.data.content // 根据费项
               this.totalMoney = res.data.totalMoney
-              let costItem = [];
+              let costItem = []; // 费项列表
               this.paidOutListFilter.map((item) => {
                 //  拿到项目名称 添加到costItem数组中 去重
-                if(costItem.indexOf(item.billDetails[0].paidName) == -1){
+                if (costItem.indexOf(item.billDetails[0].paidName) == -1) {
                   costItem.push(item.billDetails[0].paidName)
                 }
-                // 拿到选中费项列表
+                // 拿到选中账单id
                 this.billIDsList.push(item.billDetails[0].billIds);
                 // 判断是否有冻结账单
                 if (item.billDetails[0].isFrozen === '1') {
@@ -214,10 +217,10 @@
                   this.totleMoney += item.billDetails[0].paidTotal
                 }
               })
-              costItem.forEach((item)=>{
+              costItem.forEach((item) => { // 把处理好的费项赋值给this.costItem
                 this.costItem.push({
-                  id:"",
-                  value:item
+                  id: "",
+                  value: item
                 })
               })
             } else {
@@ -241,7 +244,7 @@
           contentType: "application/x-www-form-urlencoded",
           data: {'json': JSON.stringify(data)},
           success: (res) => {
-            if (res.data.length) {
+            if (res.data.length) { // 如果有data返回则为有冻结账单
               this.isFrozen = 1
             } else {
               this.isFrozen = 0
@@ -249,16 +252,16 @@
           }
         })
       },
-      // iosSelect 激活组件
+      // iosSelect 激活组件 费项
       paidOutChoose() {
         this.$refs.paidOutChild.choose()
       },
-
-      // 选择房间
+      // 选择费项
       setCharges(value) {
         this.billName = value.value
-        this.paidOutListFilter = this.paidOutList.filter((item)=>{
-          if(item.billDetails[0].paidName == value.value){
+        //  筛选 包含 所选费项的 账单
+        this.paidOutListFilter = this.paidOutList.filter((item) => {
+          if (item.billDetails[0].paidName == value.value) {
             return item
           }
         })
@@ -276,7 +279,6 @@
             this.totleMoney += item.billDetails[0].paidTotal
           }
         })
-        console.log(this.billIDsList)
         // this.$showToast.hide()
       },
       //  全选按钮点击事件
@@ -306,7 +308,7 @@
         // this.$router.push({path: '/ConfirmPayment', query})
         this.$router.push({path: '/wechat-pay/ConfirmPayment', query})
       },
-      // 单费项点击事件
+      // 费项点击事件
       billdsCheck(id) {
         this.totleMoney = 0;
         this.paidOutListFilter.map((item) => {
