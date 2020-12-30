@@ -141,7 +141,7 @@
         roomList: [], // 房间列表
         roomName: "实地-遵义蔷薇国际",
         feeId: '',
-        itemsourcename:"", // 数据来源：房间号、表具编号、车位号
+        itemsourcename: "", // 数据来源：房间号、表具编号、车位号
         feeItems: [], // 专项预缴费项订单明细列表
         roomID: "4a7477c8-7a28-46ce-bfc9-678e6dd71aaa", // 房间id
         customObj: {
@@ -164,8 +164,7 @@
       Confrim
     },
     created() {
-      // 先获取有没有预缴订单
-      this.getFeeItem()
+      // 获取房间列表
       this.getRoomList()
     },
     methods: {
@@ -188,7 +187,9 @@
             });
             this.roomList = roomList;
             this.roomName = roomList[0].value //  默认第一个房间名称
-            this.cmdsId = roomList[0].id  // 默认第一个房间id
+            this.roomID = roomList[0].id  // 默认第一个房间id
+            // 获取当前房间下有没有预缴订单
+            this.getFeeItem()
           }
         })
       },
@@ -401,11 +402,19 @@
       setRoom(value) {
         this.roomID = value.id
         this.roomName = value.value
+        // 重新拉数据
+        // 获取费项收费标准
+        this.getFeeChargeStandard()
+
+        // 获取专项预缴费项订单明细
+        this.getFeeitemDetails()
       },
       setfeeInfo(value) {
         console.log(value)
         this.feeId = value.id
         this.itemsourcename = value.itemsourcename
+        // 查询是否有预缴订单 重新拉数据
+        this.getFeeItem()
       },
       getCurPrice(number) {
         if (number > this.maxMonth) {
