@@ -34,8 +34,8 @@
                     <div :class="['box-footer',{'box-shadow':!isFrozen}]">
                         <!--                <input type="checkbox" :checked="allChecked" id="allChecked">-->
                         <div class="allCheck">
-                            <div class="all-box">
-                                <label @click="allCheck" :class="[{'isFrozen':isFrozen}]">
+                            <div class="all-box" :class="[{'isFrozen':isFrozen}]">
+                                <label @click="allCheck">
                                     <span :class="['checkbox',{'isChecked':allChecked}]"></span>
                                     全选:
                                 </label>
