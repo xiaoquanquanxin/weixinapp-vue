@@ -26,9 +26,9 @@
             </div>
             <div class="orderList">
                 <div class="payment">
-                    <p class="room world line">房间: 实地·遵义蔷薇国际-D3地块(7、8地块及03地块及03地块及03地</p>
+                    <p class="room world line">房间: {{roomName}}</p>
                     <!--                    预缴订单-->
-                    <div class="prepay" v-if="type == '1'">
+                    <div class="prepay">
                         <p class="paymen-name">{{feeName}}</p>
                         <p class="payMoney">实付：<span>¥{{payMoney}}</span></p>
                     </div>
@@ -79,7 +79,7 @@
             </div>
             <div class="orderList">
                 <div class="payment">
-                    <p class="room world line">房间: 实地·遵义蔷薇国际-D3地块(7、8地块及03地块及03地块及03地</p>
+                    <p class="room world line">房间: {{roomName}}</p>
                     <!--                    预缴订单-->
                     <div>
                         <div class="payment-box" v-for="(item,index) in paymentList" :key="index">
@@ -143,6 +143,8 @@
         orderNumber: "", // 订单
         maxtime: 15 * 60 - 1,
         timer: null,
+        roomIds: "", // 房间id
+        roomName: "", // 房间名称
         paymentList: null, // 欠缴列表
         totalMoney: 0, // 总费用
         memo: "", // 取消信息
@@ -171,6 +173,25 @@
           //  获取欠缴订单详情
           this.getBillDetailByTrans()
         }
+
+      },
+      getRoomList() {
+        $.ajax({
+          type: "POST",
+          // url: '/opi/pay/create_order',  //  获取支付签名
+          url: `${ipUri["/bpi"]}/getPmdRooms.do`,
+          contentType: "application/x-www-form-urlencoded",
+          data: {
+            wxUserID: "5"
+          },
+          success: (result) => {
+            result.data.forEach((item)=>{
+              if(item.roomId == this.roomIds){
+                this.roomName = item.roomName
+              }
+            })
+          }
+        })
       },
       getTime() {
         let data = {
@@ -204,6 +225,7 @@
           contentType: "application/x-www-form-urlencoded",
           data: {'json': JSON.stringify(data)},
           success: (res) => {
+
             // 支付状态
             this.tranStatus = res.data.tranStatus
             // 支付信息
@@ -212,12 +234,12 @@
             this.tranDate = res.data.tranDate.substring(0, 16)
             // 订单id
             this.transactionid = res.data.transactionid
-            // 订单号
-            this.orderNumber = res.data.transactionid
 
             // 欠缴总费用
             this.totalMoney = res.data.totalMoney
-
+            //  房间id
+            this.roomIds = res.data.roomIds
+            this.getRoomList(); // 获取房间列表
             //  欠缴列表
             this.paymentList = res.data.billDetail
             // 如果支付状态为待支付 则开启倒计时
@@ -240,12 +262,16 @@
           contentType: "application/x-www-form-urlencoded",
           data: data,
           success: (res) => {
+
             this.tranStatus = res.data.tranStatus
             this.memo = res.data.memo
             this.tranDate = res.data.tranDate.substring(0, 16)
             this.transactionid = res.data.transactionid
             this.payMoney = res.data.payMoney
             this.feeName = res.data.feeName
+            //  房间id
+            this.roomIds = res.data.roomIds
+            this.getRoomList(); // 获取房间列表
             this.orderNumber = res.data.transactionid // 欠缴没有订单id 只有订单号 所以取消订单的时候为了统一一个变量名新增的一个变量
             if (this.tranStatus == 0) {
               this.getTime()
