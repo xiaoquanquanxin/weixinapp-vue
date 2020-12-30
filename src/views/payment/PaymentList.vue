@@ -125,8 +125,8 @@
 
             this.room = roomList;
             this.roomName = roomList[0].value //  默认第一个房间名称
-            // this.cmdsId = roomList[0].id  // 默认第一个房间id
-            this.cmdsId = "83a7999d-5177-4d0a-9d58-754aaad5db15"  // 默认第一个房间id
+            this.cmdsId = roomList[0].id  // 默认第一个房间id
+            // this.cmdsId = "83a7999d-5177-4d0a-9d58-754aaad5db15"  // 默认第一个房间id
             this.getUnpaidBillTran() // 获取冻结账单列表
             this.getPaymentList() // 获取未缴账单列表
             // this.setCmdsId(this.room[0].cmdsId)

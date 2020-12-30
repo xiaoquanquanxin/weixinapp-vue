@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-        <div class="header world bg" @click="choose">房间: 实地·遵义蔷薇国际-D3地块(7、8地块及03地…</div>
+        <div class="header world bg" @click="chooseRoom">房间: {{roomName}}</div>
         <div class="payment line">
             <div>预缴费项</div>
             <div class="bg payment-name" @click="choose">{{feeName}}</div>
@@ -114,7 +114,11 @@
                 </section>
             </div>
         </div>
-        <ios-select ref="mychild" @func="setRoom" :paidData="iosData"></ios-select>
+        <!--        房间列表 select-->
+        <ios-select ref="roomList" @func="setRoom" :paidData="roomList"></ios-select>
+
+        <!--        费项列表-->
+        <ios-select ref="feeInfo" @func="setfeeInfo" :paidData="feeInfo"></ios-select>
         <!--        confirm 组件-->
         <Confrim ref="myConfirm" @userBehavior="userBehaviorFun" type="alert"></Confrim>
     </div>
@@ -133,9 +137,11 @@
         rates: false, // 收费标准
         custom: false, // 自定义
         feeName: "",
-        iosData: [],
+        feeInfo: [], // 费项列表
+        roomList: [], // 房间列表
         roomName: "实地-遵义蔷薇国际",
         feeId: '',
+        itemsourcename:"", // 数据来源：房间号、表具编号、车位号
         feeItems: [], // 专项预缴费项订单明细列表
         roomID: "4a7477c8-7a28-46ce-bfc9-678e6dd71aaa", // 房间id
         customObj: {
@@ -160,8 +166,32 @@
     created() {
       // 先获取有没有预缴订单
       this.getFeeItem()
+      this.getRoomList()
     },
     methods: {
+      getRoomList() {
+        $.ajax({
+          type: "POST",
+          // url: '/opi/pay/create_order',  //  获取支付签名
+          url: `${ipUri["/bpi"]}/getPmdRooms.do`,
+          contentType: "application/x-www-form-urlencoded",
+          data: {
+            wxUserID: "5"
+          },
+          success: (result) => {
+            let roomList = [];
+            result.data.forEach((item) => {
+              roomList.push({
+                id: item.roomId,
+                value: item.roomName
+              })
+            });
+            this.roomList = roomList;
+            this.roomName = roomList[0].value //  默认第一个房间名称
+            this.cmdsId = roomList[0].id  // 默认第一个房间id
+          }
+        })
+      },
       // 查询是否有预缴订单
       getFeeItem() {
         let data = {
@@ -210,7 +240,7 @@
                   'itemSourceName': item.itemSourceName
                 })
               })
-              this.iosData = arr
+              this.feeInfo = arr
               this.feeId = res.data[0].feeId //预付款收费项目ID
               this.itemSourceName = res.data[0].itemSourceName //数据来源：房间号、表具编号、车位号
               this.balanceAmount = res.data[0].balanceAmount //预存款余额
@@ -353,7 +383,8 @@
         } = checkedItem;
         let arr = this.feeItems.slice(0, paymentMonth)
         // this.$router.push({path: '/ConfirmPrepay',
-        this.$router.push({path: '/wechat-pay/ConfirmPrepay',
+        this.$router.push({
+          path: '/wechat-pay/ConfirmPrepay',
           query: {
             'type': '1',
             'feeName': this.feeName,
@@ -368,8 +399,13 @@
         //
       },
       setRoom(value) {
+        this.roomID = value.id
+        this.roomName = value.value
+      },
+      setfeeInfo(value) {
+        console.log(value)
         this.feeId = value.id
-        this.itemSourceName = value.itemSourceName
+        this.itemsourcename = value.itemsourcename
       },
       getCurPrice(number) {
         if (number > this.maxMonth) {
@@ -387,8 +423,11 @@
       showRates() {
         this.rates = true
       },
-      choose() {
-        this.$refs.mychild.choose()
+      choose() { // 费项点击事件
+        this.$refs.feeInfo.choose()
+      },
+      chooseRoom() { // 房间点击事件
+        this.$refs.roomList.choose()
       },
       userBehaviorFun(typeClick) {
         if (typeClick == 'clickConfirm') {
