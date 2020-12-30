@@ -73,7 +73,7 @@
             <div class="banner" v-else>
                 <div>
                     <p class="type">支付成功</p>
-                    <p class="name">05-08 11:09</p>
+                    <p class="name">{{tranDate}}</p>
                 </div>
                 <div class="spaceTime">感谢您使用在线缴费！</div>
             </div>
