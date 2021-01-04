@@ -1,10 +1,10 @@
 <template>
     <div class="container">
-        <div class="room world">房间：实地·遵义蔷薇国际-D3地块(7、8地块及03地…</div>
+        <div class="room world">房间：{{roomName}}</div>
         <div class="content">
 
             <div class="payment-box">
-                <div class="payment-list line" v-for="item in billList" :key="item.billDetails[0].billIds">
+                <div class="payment-list line" v-for="(item,index) in billList" :key="index">
                     <h3>【{{item.billMonth}}】</h3>
                     <div v-for="items in item.billDetails" :key="items.billIds">
                         <p class="paymen-name">{{items.paidName}}</p>
@@ -42,6 +42,8 @@
       return {
         billList: [],  // 选中订单列表
         billIDsList: [], // 选中订单id
+        roomId: "", // 房间id
+        roomName: "", // 房间名称
         totleMoney: 0,
         isReady: false,
         typeDate: null, // 下单详情
@@ -55,11 +57,13 @@
     },
     created() {
       // this.getPay();
-      let data = {
-        roomIDs: '83a7999d-5177-4d0a-9d58-754aaad5db15',
-        userID: '575cd6b8b1c54389936cf47fe8347a40'
-      };
       this.billIDsList = this.$route.query.billIDsList;
+      this.roomId = this.$route.query.roomId;
+      this.getRoomList()
+      let data = {
+        roomIDs: this.roomId,
+        userID: '575cd6b8b1c54389936cf47fe8347a40',
+      };
       $.ajax({
         crossDomain: true,//兼容ie8,9
         type: "post",
@@ -72,10 +76,12 @@
         this.billData = res.data
         this.billIDsList.map((billItem) => {
           res.data.content.map((item) => {
-            if (item.billDetails[0].billIds == billItem) {
-              this.billList.push(item)
-              this.totleMoney += item.billDetails[0].paidTotal
-            }
+            item.billDetails.forEach((_item) => {
+              if (_item.billIds == billItem) {
+                this.billList.push(item)
+                this.totleMoney += _item.paidTotal
+              }
+            })
           })
         })
         let arr = [];
@@ -93,6 +99,25 @@
 
     },
     methods: {
+      //  获取房间列表
+      getRoomList() {
+        $.ajax({
+          type: "POST",
+          // url: '/opi/pay/create_order',  //  获取支付签名
+          url: `${ipUri["/bpi"]}/getPmdRooms.do`,
+          contentType: "application/x-www-form-urlencoded",
+          data: {
+            wxUserID: "5"
+          },
+          success: (result) => {
+            result.data.forEach((item)=>{
+              if(item.roomId == this.roomId){
+                this.roomName = item.roomName
+              }
+            })
+          }
+        })
+      },
       getUnpaidBillTran() {
         let data = {
           "roomIds": "83a7999d-5177-4d0a-9d58-754aaad5db15",
@@ -195,6 +220,7 @@
           data: {'json': JSON.stringify(data)},
           success: (res) => {
             if (res.data.status == 0) {
+
               this.getPay() // 微信支付
               // this.completePaidOrder()
               // this.$router.push({path: '/wechat-pay/PaySuccess', query: this.typeDate})

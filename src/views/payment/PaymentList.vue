@@ -25,7 +25,8 @@
             <div class="paid-box">
                 <div class="form-item item-line" v-if="!noList">
                     <div class="box">
-                        <payment class="context" :paidData="paidOutListFilter" :isFrozen="isFrozen" :paidName="'paidOut'"
+                        <payment class="context" :paidData="paidOutListFilter" :isFrozen="isFrozen"
+                                 :paidName="'paidOut'"
                                  @billdsCheck="billdsCheck"></payment>
                     </div>
                     <div class="freeze" v-if="isFrozen">
@@ -51,7 +52,7 @@
                     <img src="~@/assets/images/noMessage.png">
                     <p>暂无未缴账单</p>
                 </div>
-<!--                费项弹框-->
+                <!--                费项弹框-->
                 <ios-select ref="paidOutChild" @func="setCharges" :paidData="costItem"></ios-select>
             </div>
         </div>
@@ -63,7 +64,7 @@
                 <p>暂无已缴账单</p>
             </div>
         </div>
-<!--        房间弹框-->
+        <!--        房间弹框-->
         <ios-select ref="mychild" :paidData="room" @func="setRoom"></ios-select>
     </div>
 </template>
@@ -87,7 +88,7 @@
         roomName: "",
         costItem: [], //费项列表
         totalMoney: 0, // 未缴总费用
-        cmdsId: "", //   房间id
+        roomId: "", //   房间id
         noList: false, //
         billName: "全部费用",  // 费项名称
         isFrozen: false, // 冻结状态
@@ -125,11 +126,9 @@
 
             this.room = roomList;
             this.roomName = roomList[0].value //  默认第一个房间名称
-            this.cmdsId = roomList[0].id  // 默认第一个房间id
-            // this.cmdsId = "83a7999d-5177-4d0a-9d58-754aaad5db15"  // 默认第一个房间id
+            this.roomId = roomList[0].id  // 默认第一个房间id
             this.getUnpaidBillTran() // 获取冻结账单列表
             this.getPaymentList() // 获取未缴账单列表
-            // this.setCmdsId(this.room[0].cmdsId)
           }
         })
       },
@@ -171,7 +170,7 @@
       //  选择房间
       setRoom(value) {
         this.roomName = value.value
-        this.cmdsId = value.id
+        this.roomId = value.id
         this.getPaymentList() // 获取未缴账单列表
         this.getUnpaidBillTran() // 获取冻结账单列表
         this.$showToast.show('hello2020!', 2000)
@@ -184,8 +183,10 @@
       // 获取未缴账单列表
       getPaymentList() {
         let data = {
-          roomIDs: this.cmdsId,
+          roomIDs: this.roomId,
           userID: '575cd6b8b1c54389936cf47fe8347a40' // 物管用户id
+          // roomIDs: '4a7477c8-7a28-46ce-bfc9-678e6dd71aaa',
+          // userID: '575cd6b8b1c54389936cf47fe8347a40',
         };
         $.ajax({
           crossDomain: true,//兼容ie8,9
@@ -202,20 +203,23 @@
               this.paidOutListFilter = res.data.content // 根据费项
               this.totalMoney = res.data.totalMoney
               let costItem = []; // 费项列表
-              this.paidOutListFilter.map((item) => {
-                //  拿到项目名称 添加到costItem数组中 去重
-                if (costItem.indexOf(item.billDetails[0].paidName) == -1) {
-                  costItem.push(item.billDetails[0].paidName)
-                }
-                // 拿到选中账单id
-                this.billIDsList.push(item.billDetails[0].billIds);
-                // 判断是否有冻结账单
-                if (item.billDetails[0].isFrozen === '1') {
-                  // 默认选中所有费项
-                  this.$set(item.billDetails[0], 'checked', true)
-                  // 默认选中所有费项
-                  this.totleMoney += item.billDetails[0].paidTotal
-                }
+              this.paidOutListFilter.forEach((item) => {
+                item.billDetails.forEach((_item) => {
+                  //  拿到项目名称 添加到costItem数组中 去重
+                  if (costItem.indexOf(_item.paidName) == -1) {
+                    costItem.push(_item.paidName)
+                  }
+                  // 拿到选中账单id
+                  this.billIDsList.push(_item.billIds);
+                  // 判断是否有冻结账单
+                  if (_item.isFrozen === '1') {
+                    // 默认选中所有费项
+                    this.$set(_item, 'checked', true)
+                    // 默认选中所有费项
+                    this.totleMoney += _item.paidTotal
+                  }
+                })
+
               })
               costItem.forEach((item) => { // 把处理好的费项赋值给this.costItem
                 this.costItem.push({
@@ -233,7 +237,8 @@
       // 获取冻结账单列表
       getUnpaidBillTran() {
         let data = {
-          "roomIds": this.cmdsId,
+          "roomIds": this.roomId,
+          // "roomIds": '4a7477c8-7a28-46ce-bfc9-678e6dd71aaa',
           "contactNumber": "18201538993"
         };
         $.ajax({
@@ -261,40 +266,44 @@
         this.billName = value.value
         //  筛选 包含 所选费项的 账单
         this.paidOutListFilter = this.paidOutList.filter((item) => {
-          if (item.billDetails[0].paidName == value.value) {
-            return item
-          }
+          item.billDetails.forEach((_item) => {
+            if (_item.paidName == value.value) {
+              return item
+            }
+          })
         })
         this.billIDsList = [];
         this.totleMoney = 0;
-        this.paidOutListFilter.map((item) => {
-          //  拿到项目名称 添加到costItem数组中 去重
-          // 拿到选中费项列表
-          this.billIDsList.push(item.billDetails[0].billIds);
-          // 判断是否有冻结账单
-          if (item.billDetails[0].isFrozen === '1') {
-            // 默认选中所有费项
-            this.$set(item.billDetails[0], 'checked', true)
-            // 默认选中所有费项
-            this.totleMoney += item.billDetails[0].paidTotal
-          }
+        this.paidOutListFilter.forEach((item) => {
+          item.billDetails.forEach((_item) => {
+            // 拿到选中账单id
+            this.billIDsList.push(_item.billIds);
+            // 判断是否有冻结账单
+            if (_item.isFrozen === '1') {
+              // 默认选中所有费项
+              this.$set(_item, 'checked', true)
+              // 默认选中所有费项
+              this.totleMoney += _item.paidTotal
+            }
+          })
         })
         // this.$showToast.hide()
       },
       //  全选按钮点击事件
       allCheck() {
+        this.totleMoney = 0;
         // 如果没有冻结账单 则可以操作账单列表
-        if(!this.isFrozen){
+        if (!this.isFrozen) {
           this.paidOutListFilter.map((item) => {
-            if (item.billDetails[0].isFrozen === '1') {
-              this.$set(item.billDetails[0], 'checked', !this.allChecked)
-              if (!item.billDetails[0].checked) {
-                this.totleMoney -= item.billDetails[0].paidTotal
-              } else {
-                this.totleMoney += item.billDetails[0].paidTotal
+            item.billDetails.forEach((_item) => {
+              if (_item.isFrozen === '1') {
+                this.$set(_item, 'checked', !this.allChecked)
+                if (_item.checked) {
+                  this.totleMoney += _item.paidTotal;
+                }
               }
+            })
 
-            }
           })
           // this.setAllChecked(!this.allChecked) // 更改全选按钮状态
           this.setBillIDsList() //  设置选中的账单id
@@ -305,10 +314,12 @@
       goConfirmPayment() {
         let query = {
           userID: "575cd6b8b1c54389936cf47fe8347a40",
+          roomId:this.roomId,
           totleMoney: this.totleMoney,
           billIDsList: this.billIDsList
+
         }
-        console.log(this.billIDsList)
+        console.log(query)
         // this.$router.push({path: '/ConfirmPayment', query})
         this.$router.push({path: '/wechat-pay/ConfirmPayment', query})
       },
@@ -316,21 +327,24 @@
       billdsCheck(id) {
         this.totleMoney = 0;
         this.paidOutListFilter.map((item) => {
-          if (item.billDetails[0].billIds == id) {
-            // 遍历费项列表 找到选中费项 控制选中状态
-            this.$set(item.billDetails[0], 'checked', !item.billDetails[0].checked)
-            // 根据选中费项checked属性 添加/删除 选中费项列表内容
-            if (!item.billDetails[0].checked) {
-              if (this.billIDsList.indexOf(item.billDetails[0].billIds) != '-1') {
-                this.billIDsList.splice(this.billIDsList.indexOf(item.billDetails[0].billIds), 1)
+            item.billDetails.forEach((_item) => {
+              if (_item.billIds == id) {
+                // 遍历费项列表 找到选中费项 控制选中状态
+                this.$set(_item, 'checked', !_item.checked)
+                // 根据选中费项checked属性 添加/删除 选中费项列表内容
+                if (!_item.checked) {
+                  if (this.billIDsList.indexOf(_item.billIds) != '-1') {
+                    this.billIDsList.splice(this.billIDsList.indexOf(_item.billIds), 1)
+                  }
+                } else {
+                  this.billIDsList.push(_item.billIds)
+                }
               }
-            } else {
-              this.billIDsList.push(item.billDetails[0].billIds)
-            }
-          }
-          if (item.billDetails[0].checked) {
-            this.totleMoney += item.billDetails[0].paidTotal;
-          }
+              if (_item.checked) {
+                this.totleMoney += _item.paidTotal;
+              }
+            })
+
         });
         this.totleMoney = this.totleMoney.toFixed(2)
         this.isCheckedAll()
@@ -342,7 +356,10 @@
           this.billIDsList = []
         } else {
           this.paidOutListFilter.map((item) => {
-            this.billIDsList.push(item.billDetails[0].billIds)
+            item.billDetails.forEach((_item) => {
+              this.billIDsList.push(_item.billIds)
+            })
+
           })
         }
       },
@@ -350,13 +367,15 @@
         // 控制全选按钮
         // 筛选未冻结列表
         let checkedItem = this.paidOutListFilter.filter(item => {
-          return item.billDetails[0].isFrozen == '1';
+          item.billDetails.forEach((_item) => {
+            return _item.isFrozen == '1';
+          })
         });
-        this.allChecked = checkedItem.every((item) => {
-          if (item.billDetails[0].isFrozen === '1') {
-            return item.billDetails[0].checked
-          }
-        })
+        if(checkedItem.length){
+          this.allChecked = true
+        }else {
+          this.allChecked = false
+        }
       },
 
     }
