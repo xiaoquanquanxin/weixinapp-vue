@@ -54,6 +54,7 @@
           totalAmount: this.perUnit, // 订单金额
           feeId: this.feeId, // 费项id
         };
+        //  先创建预缴账单
         $.ajax({
           crossDomain: true,//兼容ie8,9
           type: "post",
