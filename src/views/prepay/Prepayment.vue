@@ -284,7 +284,7 @@
           cmdsId: '575cd6b8b1c54389936cf47fe8347a40', //  用户主数据id
           feeId: this.feeId, // 费项id
           itemSourceName: this.itemSourceName, // 数据来源：房间号、表具编号、车位号
-          customMonths: 1  //  自定义预缴月数
+          customMonths: 1  //  自定义预缴月数 后台暂时未用的 但是加了判空验证
         };
         $.ajax({
           crossDomain: true,//兼容ie8,9
