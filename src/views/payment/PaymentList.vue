@@ -10,10 +10,10 @@
         </div>
         <div class="nav line">
             <div>
-                <a href="#" :class="[{'active':active}]" @click="setAct">未缴账单</a>
+                <a :class="[{'active':active}]" @click="setAct">未缴账单</a>
             </div>
             <div>
-                <a href="#" :class="[{'active':!active}]" @click="setUnAct">已缴账单</a>
+                <a :class="[{'active':!active}]" @click="setUnAct">已缴账单</a>
             </div>
         </div>
         <!--        未缴账单-->
