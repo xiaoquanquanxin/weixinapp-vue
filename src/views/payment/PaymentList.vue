@@ -118,7 +118,7 @@
             let roomList = [];
             result.data.forEach((item) => {
               roomList.push({
-                id: item.cmdsId,
+                id: item.roomId,
                 value: item.roomName
               })
             });
