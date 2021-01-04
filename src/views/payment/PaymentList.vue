@@ -162,7 +162,10 @@
             this.paidInList = res.data.content
             if (!this.paidInList) {
               this.noList = true
+            }else{
+              this.noList = false
             }
+
           }
         })
       },
@@ -199,6 +202,7 @@
             this.totleMoney = 0; // 总价格
             this.billIDsList = []; // 选中账单id
             if (res.data.content) {
+              this.noList = false;
               this.paidOutList = res.data.content //  所有未缴账单列表
               this.paidOutListFilter = res.data.content // 根据费项
               this.totalMoney = res.data.totalMoney
