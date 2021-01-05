@@ -43,7 +43,7 @@
                                 <b>¥ {{totleMoney}}</b>
                             </div>
 
-                            <div v-if="isFrozen" class="payment isFrozen">立即缴费</div>
+                            <div v-if="isFrozen || totleMoney == 0" class="payment isFrozen">立即缴费</div>
                             <div v-else class="payment" @click="goConfirmPayment">立即缴费</div>
                         </div>
                     </div>
@@ -162,7 +162,7 @@
             this.paidInList = res.data.content
             if (!this.paidInList) {
               this.noList = true
-            }else{
+            } else {
               this.noList = false
             }
 
@@ -174,9 +174,13 @@
       setRoom(value) {
         this.roomName = value.value
         this.roomId = value.id
-        this.getPaymentList() // 获取未缴账单列表
-        this.getUnpaidBillTran() // 获取冻结账单列表
-        this.$showToast.show('hello2020!', 2000)
+        if (this.active) {
+          this.getPaymentList() // 获取未缴账单列表
+          this.getUnpaidBillTran() // 获取冻结账单列表
+        } else {
+          this.getPaidInList(); // 获取已缴账单
+        }
+
         // this.$showToast.hide()
       },
       //  唤起弹出层
@@ -318,7 +322,7 @@
       goConfirmPayment() {
         let query = {
           userID: "575cd6b8b1c54389936cf47fe8347a40",
-          roomId:this.roomId,
+          roomId: this.roomId,
           totleMoney: this.totleMoney,
           billIDsList: this.billIDsList
 
@@ -331,23 +335,23 @@
       billdsCheck(id) {
         this.totleMoney = 0;
         this.paidOutListFilter.map((item) => {
-            item.billDetails.forEach((_item) => {
-              if (_item.billIds == id) {
-                // 遍历费项列表 找到选中费项 控制选中状态
-                this.$set(_item, 'checked', !_item.checked)
-                // 根据选中费项checked属性 添加/删除 选中费项列表内容
-                if (!_item.checked) {
-                  if (this.billIDsList.indexOf(_item.billIds) != '-1') {
-                    this.billIDsList.splice(this.billIDsList.indexOf(_item.billIds), 1)
-                  }
-                } else {
-                  this.billIDsList.push(_item.billIds)
+          item.billDetails.forEach((_item) => {
+            if (_item.billIds == id) {
+              // 遍历费项列表 找到选中费项 控制选中状态
+              this.$set(_item, 'checked', !_item.checked)
+              // 根据选中费项checked属性 添加/删除 选中费项列表内容
+              if (!_item.checked) {
+                if (this.billIDsList.indexOf(_item.billIds) != '-1') {
+                  this.billIDsList.splice(this.billIDsList.indexOf(_item.billIds), 1)
                 }
+              } else {
+                this.billIDsList.push(_item.billIds)
               }
-              if (_item.checked) {
-                this.totleMoney += _item.paidTotal;
-              }
-            })
+            }
+            if (_item.checked) {
+              this.totleMoney += _item.paidTotal;
+            }
+          })
 
         });
         this.totleMoney = this.totleMoney.toFixed(2)
@@ -369,17 +373,12 @@
       },
       isCheckedAll() {
         // 控制全选按钮
-        // 筛选未冻结列表
-        let checkedItem = this.paidOutListFilter.filter(item => {
-          item.billDetails.forEach((_item) => {
-            return _item.isFrozen == '1';
-          })
+        let checkedItem = this.paidOutListFilter.every(item => {
+         return item.billDetails.some((_item) => {
+           return _item.checked
+         })
         });
-        if(checkedItem.length){
-          this.allChecked = true
-        }else {
-          this.allChecked = false
-        }
+        this.allChecked = checkedItem
       },
 
     }
