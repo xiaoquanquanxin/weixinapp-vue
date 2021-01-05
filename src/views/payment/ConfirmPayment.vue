@@ -241,15 +241,17 @@
           mchOrderNo: this.orderDate.orderId,   //  商户订单号
           channelId: "WX_JSAPI",  //  渠道id,公众号传"WX_JSAPI"
           amount: this.orderDate.orderMoney.toFixed(2),  //  支付金额（单位分）
-          clientIp: "web",  //  客户端IP
+          clientIp: "192.168.100.81",  //  客户端IP
           device: isiOS ? 'ios' : 'Android',  //  设备
-          openId: "" //  当前app对应的下openId
+          openId: "ouxLS1GtoZLHu2s_qA93BqIldWnY" //  当前app对应的下openId
         }
         $.ajax({
           type: "POST",
           // url: '/opi/pay/create_order',  //  获取支付签名
           url: `${ipUri["/opi"]}/pay/create_order`,
-          data: data,
+          data: {
+            params:JSON.stringify(data)
+          },
           success: (result) => {
             let res = JSON.parse(result)
             let {appId, timeStamp, nonceStr, signType, paySign} = res.payParams
