@@ -31,6 +31,7 @@
       Confrim
     },
     created() {
+      document.title="预缴确认订单"
       this.feeName = this.$route.query.feeName
       this.perUnit = this.$route.query.perUnit
       this.arr = this.$route.query.arr

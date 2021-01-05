@@ -42,6 +42,7 @@
       }
     },
     created() {
+      document.title="支付成功"
       console.log(this.$route.query)
       this.orderId = this.$route.query.orderId
       this.type = this.$route.query.type

@@ -56,6 +56,7 @@
       Confrim
     },
     created() {
+      document.title="欠缴确认订单"
       // this.getPay();
       this.billIDsList = this.$route.query.billIDsList;
       this.roomId = this.$route.query.roomId;

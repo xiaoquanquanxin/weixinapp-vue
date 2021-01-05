@@ -40,6 +40,7 @@
       }
     },
     created() {
+      document.title="缴费记录"
       this.getPropertyAdvanceHistory()
     },
     methods: {

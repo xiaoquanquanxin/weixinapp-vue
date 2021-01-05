@@ -102,6 +102,7 @@
     },
 
     created() {
+      document.title="欠缴账单列表"
       //  获取房间列表
       this.getRoomList();
     },

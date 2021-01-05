@@ -164,6 +164,7 @@
       Confrim
     },
     created() {
+      document.title="预缴账单"
       // 获取房间列表
       this.getRoomList()
     },

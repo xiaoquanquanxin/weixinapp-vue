@@ -157,6 +157,7 @@
       }
     },
     created() {
+      document.title="订单详情"
       this.type = this.$route.query.type
       this.orderNumber = this.$route.query.orderId
       // this.orderNumber = '20201225153152208'
