@@ -187,7 +187,6 @@
           userID: 1, // 微信用户id
           orderCode: result.data.orderId,
           payType: 0, // 0 欠缴
-          orderDate: 0,
           billDetails: JSON.stringify(this.billDetails),
           orderMoney: result.data.orderMoney,
           terminalSource: 0,
