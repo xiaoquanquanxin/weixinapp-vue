@@ -24,7 +24,7 @@
             <router-link to="/">返回首页</router-link>
         </div>
         <div class="goOrderDetail" @click="goOrderDetail">
-            <router-link to="/OrderDetail">查看订单</router-link>
+            查看订单
         </div>
     </div>
 </template>
