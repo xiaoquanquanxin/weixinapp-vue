@@ -159,6 +159,7 @@
     created() {
       document.title="订单详情"
       this.type = this.$route.query.type
+      this.roomID = this.$route.query.roomID
       this.orderNumber = this.$route.query.orderId
       // this.orderNumber = '20201225153152208'
       // 获取订单信息
@@ -167,7 +168,7 @@
     methods: {
       getOrderList() {
         // 0 欠缴  1 预缴
-        if (this.type === '1') {
+        if (this.type == '1') {
           //  获取预缴订单详情
           this.getPaymentInfo()
         } else {

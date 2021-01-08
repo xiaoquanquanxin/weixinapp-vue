@@ -295,6 +295,7 @@
           data: data,
           success: (res) => {
             this.enoughDeductionDate = res.data.enoughDeductionDate
+            res.data.hasOutstandingBill = false;
             this.isFrozen = res.data.hasOutstandingBill
             this.maxMonth = res.data.maxMonth;
             this.feeItems = res.data.feeItems;

@@ -68,6 +68,7 @@
               this.orderDate = res.data
               // this.getTranStatus()
               this.orderId = res.data.orderCode
+              this.totleMoney = res.data.orderMoney
               this.getTranStatus() // 先查询订单状态 是否是待支付
             } else {
               this.$refs.myConfirm.show(res.msg)
@@ -77,7 +78,7 @@
       },
       // 获取订单状态
       getTranStatus() {
-        let data = {"transactionId": this.orderNumber};
+        let data = {"transactionId": this.orderId};
         $.ajax({
           crossDomain: true,//兼容ie8,9
           type: "post",
@@ -98,10 +99,25 @@
       },
       // 下单支付
       getPay() {
+        let u = navigator.userAgent;
+        let isiOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
+
+        let data = {
+          mchId: '10000000',  // 自定义商户ID，公众号支付传10000000
+          mchOrderNo: this.orderDate.orderId,   //  商户订单号
+          channelId: "WX_JSAPI",  //  渠道id,公众号传"WX_JSAPI"
+          amount: this.orderDate.orderMoney.toFixed(2),  //  支付金额（单位分）
+          clientIp: "192.168.100.81",  //  客户端IP
+          device: isiOS ? 'ios' : 'Android',  //  设备
+          openId: "ouxLS1GtoZLHu2s_qA93BqIldWnY" //  当前app对应的下openId
+        }
         $.ajax({
-          type: "get",
+          type: "POST",
           // url: '/opi/pay/create_order',  //  获取支付签名
           url: `${ipUri["/opi"]}/pay/create_order`,
+          data: {
+            params:JSON.stringify(data)
+          },
           success: (result) => {
             let res = JSON.parse(result)
             let {appId, timeStamp, nonceStr, signType, paySign} = res.payParams
@@ -138,7 +154,7 @@
       // 支付后完成订单
       completePaidOrder() {
         let data = {
-          "transactionId": this.orderNumber,
+          "transactionId": this.orderId,
           "updateTime": "2020-12-16 16:45:08",
           "payMethod": "900"
         };
@@ -149,11 +165,11 @@
           url: `${ipUri["/bpi"]}/completePaidOrder.do`,
           contentType: "application/x-www-form-urlencoded",
           data: {'json': JSON.stringify(data)},
-          success: (res) => {
+          success: () => {
             // this.$router.push({path: '/PaySuccess', query: this.typeDate})
             let data = {
-              createTime: res.data.createTime.substring(0, 16),
-              orderId: res.data.orderId,
+              createTime: this.orderDate.createTime.substring(0, 16),
+              orderId: this.orderId,
               orderMoney: this.totleMoney,
               type: 1
             }
