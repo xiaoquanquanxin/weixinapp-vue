@@ -4,9 +4,9 @@
 export const ipUri = {
   '/mpi':'https://hachiseedland-dev.hachi-tech.com',
   // '/bpi':'https://hachiappv3-dev.pujiapp.com/api',
-  '/bpi':'http://192.168.100.208:3080', //  容丽姐 端口
-  // '/bpi':'https://hachiseedland-dev.hachi-tech.com/v3/api/',
-  '/opi':'http://6tccfq.natappfree.cc/api'  //  少杰 端口
+  // '/bpi':'http://192.168.100.208:3080', //  容丽姐 端口
+  '/bpi':'https://hachiseedland-dev.hachi-tech.com/v3/api/',
+  '/opi':'http://hachi-pay.mynatapp.cc'  //  少杰 端口
 }
 
 // window.domain = 'https://hachiseedland-dev.hachi-tech.com';
