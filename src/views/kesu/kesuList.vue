@@ -70,11 +70,7 @@
         $.ajax({
           crossDomain: true,//兼容ie8,9
           type: "get",
-          headers: {
-            appkey: "7AYzorn2RSbhED2K",
-            t: time,
-            sign: window.md5("7AYzorn2RSbhED2K" + "_" + time + "_" + "JSWdDBcDY62tL3hrVWTl5EylNnh2FHrY").toUpperCase()
-          },
+          headers: createHeader(),
           url: `${ipUri["/wpi"]}/pujiSearchCase`,
           // url: `/wpi/pujiSearchCase`,
           data: data,
@@ -96,11 +92,7 @@
         $.ajax({
           crossDomain: true,//兼容ie8,9
           type: "get",
-          headers: {
-            appkey: "7AYzorn2RSbhED2K",
-            t: time,
-            sign: window.md5("7AYzorn2RSbhED2K" + "_" + time + "_" + "JSWdDBcDY62tL3hrVWTl5EylNnh2FHrY").toUpperCase()
-          },
+          headers: createHeader(),
           // url: `/wpi/getWorkOrder`,
           url: `${ipUri["/wpi"]}/getWorkOrder`,
           data: data,
@@ -152,11 +144,7 @@
         $.ajax({
           crossDomain: true,//兼容ie8,9
           type: "get",
-          headers: {
-            appkey: "7AYzorn2RSbhED2K",
-            t: time,
-            sign: window.md5("7AYzorn2RSbhED2K" + "_" + time + "_" + "JSWdDBcDY62tL3hrVWTl5EylNnh2FHrY").toUpperCase()
-          },
+          headers: createHeader(),
           // url: `/wpi/taskHistory`,
           url: `${ipUri["/wpi"]}/taskHistory`,
           data: data,
