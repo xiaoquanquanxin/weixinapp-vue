@@ -1,16 +1,15 @@
 <template>
     <div class="container">
-        <div class="banner">
-            <p>¥</p>
-            <div class="world">
-                房间：{{roomName}}
-                <!--                <img src="~@/assets/images/right.png">-->
-            </div>
-        </div>
+
+        <button @click="getPujiSearchCase">获取客诉订单列表接口</button>
+        <button @click="getWorkOrder">客诉详情</button>
+        <button @click="taskHistory">客诉处理状态历史接口</button>
+        <button @click="evaluationItems">评价项</button>
+<!--        <button @click="newEvaluationItems">新评价项</button>-->
         <button @click="newWorkOrder">同步客诉单</button>
         <button @click="submitScore">提交评价(返回 400)</button>
         <button @click="viewReviews">查看评价</button>
-        <button @click="newViewReviews">新查看评价</button>
+<!--        <button @click="newViewReviews">新查看评价</button>-->
         <button @click="progressTracking">工单进度跟踪接口</button>
         <button @click="newPujiSearchCase">客诉订单二期列表接口（手机号要求esa加密）</button>
     </div>
@@ -37,11 +36,6 @@
       //  获取房间列表
       this.getRoomList();
 
-      // 评价项
-      this.evaluationItems()
-
-      // 新评价项
-      this.newEvaluationItems()
     },
     methods: {
       getRoomList() {
@@ -58,7 +52,6 @@
             this.custId = result.data[0].cmdsId
             this.roomId = result.data[0].roomId
             this.roomName = result.data[0].roomName
-            this.getPujiSearchCase();
           }
         })
       },
@@ -89,20 +82,15 @@
           data: data,
           success: (res) => {
             console.log(res)
-            // 客诉详情接口
-            this.getWorkOrder(res.data.datas[0].id)
-
-            //  客诉处理状态历史接口
-            this.taskHistory(res.data.datas[0].id)
-
+            this.id = res.data.datas[0].id
           }
         })
       },
       // 客诉详情接口
-      getWorkOrder(id) {
+      getWorkOrder() {
         let time = Date.now()
         let data = {
-          id: id,
+          id: this.id,
           workId: "",  // 工单id (不必填)
           reportResponsibility: "",  // 1：物业   2：地产 (不必填)
 
@@ -155,10 +143,10 @@
         })
       },
       //  客诉处理状态历史接口
-      taskHistory(id) {
+      taskHistory() {
         let time = Date.now()
         let data = {
-          id: id,
+          id: this.id,
           workId: "",  // 工单id (不必填)
           reportResponsibility: "",  // 1：物业   2：地产 (不必填)
 
