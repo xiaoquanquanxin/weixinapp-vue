@@ -41,7 +41,6 @@
       getRoomList() {
         $.ajax({
           type: "POST",
-          // url: '/opi/pay/create_order',  //  获取支付签名
           url: `${ipUri["/bpi"]}/getPmdRooms.do`,
           contentType: "application/x-www-form-urlencoded",
           data: {
@@ -76,9 +75,8 @@
             t: time,
             sign: window.md5("7AYzorn2RSbhED2K" + "_" + time + "_" + "JSWdDBcDY62tL3hrVWTl5EylNnh2FHrY").toUpperCase()
           },
-          // url: '/bpi/getUnpaidBillTranV1.do',
-          // url: `${ipUri["/wpi"]}/pujiSearchCase`,
-          url: `/wpi/pujiSearchCase`,
+          url: `${ipUri["/wpi"]}/pujiSearchCase`,
+          // url: `/wpi/pujiSearchCase`,
           data: data,
           success: (res) => {
             console.log(res)
@@ -103,7 +101,8 @@
             t: time,
             sign: window.md5("7AYzorn2RSbhED2K" + "_" + time + "_" + "JSWdDBcDY62tL3hrVWTl5EylNnh2FHrY").toUpperCase()
           },
-          url: `/wpi/getWorkOrder`,
+          // url: `/wpi/getWorkOrder`,
+          url: `${ipUri["/wpi"]}/getWorkOrder`,
           data: data,
           success: (res) => {
             console.log(res)
@@ -132,9 +131,8 @@
           crossDomain: true,//兼容ie8,9
           type: "POST",
           headers: createHeader(),
-          // url: '/bpi/getUnpaidBillTranV1.do',
-          // url: `${ipUri["/wpi"]}/pujiSearchCase`,
-          url: `/wpi/newWorkOrder`,
+          // url: `/wpi/newWorkOrder`,
+          url: `${ipUri["/wpi"]}/newWorkOrder`,
           data,
           success: (res) => {
             console.log(res)
@@ -159,7 +157,8 @@
             t: time,
             sign: window.md5("7AYzorn2RSbhED2K" + "_" + time + "_" + "JSWdDBcDY62tL3hrVWTl5EylNnh2FHrY").toUpperCase()
           },
-          url: `/wpi/taskHistory`,
+          // url: `/wpi/taskHistory`,
+          url: `${ipUri["/wpi"]}/taskHistory`,
           data: data,
           success: (res) => {
             console.log(res)
@@ -175,7 +174,8 @@
           crossDomain: true,//兼容ie8,9
           type: "get",
           headers: createHeader(),
-          url: `/wpi/evaluationItems`,
+          // url: `/wpi/evaluationItems`,
+          url: `${ipUri["/wpi"]}/evaluationItems`,
           data: data,
           success: (res) => {
             console.log(res)
@@ -205,7 +205,8 @@
           crossDomain: true,//兼容ie8,9
           type: "POST",
           headers: createHeader(),
-          url: `/wpi/submitScore`,
+          // url: `/wpi/submitScore`,
+          url: `${ipUri["/wpi"]}/submitScore`,
           data: JSON.stringify(data),
           success: (res) => {
             console.log(res)
@@ -222,7 +223,8 @@
           crossDomain: true,//兼容ie8,9
           type: "get",
           headers: createHeader(),
-          url: `/wpi/viewReviews`,
+          // url: `/wpi/viewReviews`,
+          url: `${ipUri["/wpi"]}/viewReviews`,
           data: data,
           success: (res) => {
             console.log(res)
@@ -238,7 +240,8 @@
           crossDomain: true,//兼容ie8,9
           type: "get",
           headers: createHeader(),
-          url: `/wpi/progressTracking`,
+          // url: `/wpi/progressTracking`,
+          url: `${ipUri["/wpi"]}/progressTracking`,
           data: data,
           success: (res) => {
             console.log(res)
@@ -264,7 +267,8 @@
           crossDomain: true,//兼容ie8,9
           type: "get",
           headers: createHeader(),
-          url: `/wpi/newPujiSearchCase`,
+          // url: `/wpi/newPujiSearchCase`,
+          url: `${ipUri["/wpi"]}/newPujiSearchCase`,
           data: data,
           success: (res) => {
             console.log(res)
@@ -280,7 +284,8 @@
           crossDomain: true,//兼容ie8,9
           type: "get",
           headers: createHeader(),
-          url: `/wpi/newEvaluationItems`,
+          // url: `/wpi/newEvaluationItems`,
+          url: `${ipUri["/wpi"]}/newEvaluationItems`,
           data: data,
           success: (res) => {
             console.log(res)
@@ -297,7 +302,8 @@
           crossDomain: true,//兼容ie8,9
           type: "get",
           headers: createHeader(),
-          url: `/wpi/newViewReviews`,
+          // url: `/wpi/newViewReviews`,
+          url: `${ipUri["/wpi"]}/newViewReviews`,
           data: data,
           success: (res) => {
             console.log(res)
