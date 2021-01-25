@@ -4,12 +4,12 @@
         <button @click="getPujiSearchCase">获取客诉订单列表接口</button>
         <button @click="getWorkOrder">客诉详情</button>
         <button @click="taskHistory">客诉处理状态历史接口</button>
-        <button @click="evaluationItems">评价项</button>
-<!--        <button @click="newEvaluationItems">新评价项</button>-->
+<!--        <button @click="evaluationItems">评价项</button>-->
+        <button @click="newEvaluationItems">新评价项</button>
         <button @click="newWorkOrder">同步客诉单</button>
         <button @click="submitScore">提交评价(返回 400)</button>
-        <button @click="viewReviews">查看评价</button>
-<!--        <button @click="newViewReviews">新查看评价</button>-->
+<!--        <button @click="viewReviews">查看评价</button>-->
+        <button @click="newViewReviews">新查看评价</button>
         <button @click="progressTracking">工单进度跟踪接口</button>
         <button @click="newPujiSearchCase">客诉订单二期列表接口（手机号要求esa加密）</button>
     </div>
@@ -18,7 +18,7 @@
 <script>
   import $ from "jquery";
   import {createHeader, ipUri} from "../../main";
-  import {encrypt} from './aes'
+  import {Encrypt} from './aes'
 
   export default {
     name: "PaymentList",
@@ -82,7 +82,6 @@
       },
       // 客诉详情接口
       getWorkOrder() {
-        let time = Date.now()
         let data = {
           id: this.id,
           workId: "",  // 工单id (不必填)
@@ -134,7 +133,6 @@
       },
       //  客诉处理状态历史接口
       taskHistory() {
-        let time = Date.now()
         let data = {
           id: this.id,
           workId: "",  // 工单id (不必填)
@@ -242,21 +240,21 @@
         // var iv = "tdrdadq59tbss5n7";
 
         // aes 加密
-        let pazzword = encrypt('15712852037');
+        let pazzword = Encrypt('15712852037');
         console.log(pazzword)
         let data = {
           custId: this.custId,  // 客户主数据id
           contactNumber: pazzword,  // 联系号码
-          appealNature: 1,  // 诉求性质: 1.报事报修,2:咨询建议
-          pageNo: 1,  // 诉求性质: 1.报事报修,2:咨询建议
-          pageSize: 10,  // 诉求性质: 1.报事报修,2:咨询建议
+          appealNature: 2,  // 诉求性质: 1.报事报修,2:咨询建议
+          pageNo: 1,
+          pageSize: 10,
         }
         $.ajax({
           crossDomain: true,//兼容ie8,9
           type: "get",
           headers: createHeader(),
-          // url: `/wpi/newPujiSearchCase`,
-          url: `${ipUri["/wpi"]}/newPujiSearchCase`,
+          url: `/wpi/newPujiSearchCase`,
+          // url: `${ipUri["/wpi"]}/newPujiSearchCase`,
           data: data,
           success: (res) => {
             console.log(res)
