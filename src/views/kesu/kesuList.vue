@@ -8,11 +8,11 @@
             </div>
         </div>
         <button @click="newWorkOrder">同步客诉单</button>
-        <button @click="submitScore">提交评价</button>
+        <button @click="submitScore">提交评价(返回 400)</button>
         <button @click="viewReviews">查看评价</button>
         <button @click="newViewReviews">新查看评价</button>
         <button @click="progressTracking">工单进度跟踪接口</button>
-        <button @click="newPujiSearchCase">客诉订单二期列表接口</button>
+        <button @click="newPujiSearchCase">客诉订单二期列表接口（手机号要求esa加密）</button>
     </div>
 </template>
 
