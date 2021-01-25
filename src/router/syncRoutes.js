@@ -7,6 +7,7 @@ import OrderDetail from "@/views/order/OrderDetail.vue";
 import Prepayment from "@/views/prepay/Prepayment.vue";
 import ConfirmPrepay from "@/views/prepay/ConfirmPrepay.vue";
 import PaymentRecords from "@/views/PaymentRecords.vue";
+import kesu from "@/views/kesu/kesuList.vue";
 //	同步路由
 export const syncRoutesList = [
   {
@@ -63,6 +64,11 @@ export const syncRoutesList = [
     path: '/wechat-pay/PaymentRecords',
     name: 'PaymentRecords',
     component: PaymentRecords,
+  },
+  {
+    path: '/wechat-pay/kesu',
+    name: 'kesu',
+    component: kesu,
   },
 ];
 

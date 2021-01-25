@@ -10,6 +10,10 @@
         <div class="payment right-button paymentRecords">
             <div @click="goPage('/wechat-pay/PaymentRecords')">缴费记录</div>
         </div>
+        <div class="payment right-button paymentRecords">
+            <div @click="goPage('/wechat-pay/kesu')">客诉</div>
+        </div>
+
     </div>
 </template>
 <script>
