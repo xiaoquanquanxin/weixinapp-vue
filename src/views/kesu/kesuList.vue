@@ -11,7 +11,8 @@
         <button @click="submitScore">提交评价</button>
         <button @click="viewReviews">查看评价</button>
         <button @click="newViewReviews">新查看评价</button>
-        <button @click="newPujiSearchCase">工单进度跟踪接口</button>
+        <button @click="progressTracking">工单进度跟踪接口</button>
+        <button @click="newPujiSearchCase">客诉订单二期列表接口</button>
     </div>
 </template>
 
@@ -241,6 +242,22 @@
         })
       },
       // 	工单进度跟踪接口
+      progressTracking() {
+        let data = {
+          id: this.id  // 客诉id
+        }
+        $.ajax({
+          crossDomain: true,//兼容ie8,9
+          type: "get",
+          headers: createHeader(),
+          url: `/wpi/progressTracking`,
+          data: data,
+          success: (res) => {
+            console.log(res)
+          }
+        })
+      },
+      //	客诉订单二期列表接口
       newPujiSearchCase() {
         // var key = "HaChiSmart++++++";
         // var iv = "tdrdadq59tbss5n7";
