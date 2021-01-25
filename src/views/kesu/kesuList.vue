@@ -263,7 +263,7 @@
         // var iv = "tdrdadq59tbss5n7";
 
         // aes 加密
-        let pazzword = encrypt('15712852037HaChiSmart++++++');
+        let pazzword = encrypt('15712852037');
         console.log(pazzword)
         let data = {
           custId: this.custId,  // 客户主数据id
