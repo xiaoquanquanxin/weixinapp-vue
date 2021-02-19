@@ -61,7 +61,8 @@
         </div>
         <!--        已缴账单-->
         <div class="content" v-else>
-            <payment class="paid-box" :paidData="paidInList" v-if="!noList"></payment>
+            <payment class="paid-box" :paidData="paidInList" v-if="!noList" :roomId="roomId"
+                     userId="81bd49dbe22e4a3ca5b3189b4d0faeeb" :active="active" ></payment>
             <div v-else class="no-message">
                 <img src="~@/assets/images/noMessage.png">
                 <p>暂无已缴账单</p>
@@ -150,7 +151,7 @@
       getPaidInList() {
         let data = {
           roomIDs: this.roomId,
-          userID: '575cd6b8b1c54389936cf47fe8347a40',
+          userID: '81bd49dbe22e4a3ca5b3189b4d0faeeb',
           startDate: '2012-02-05',
           endDate: '2020-02-05'
         };

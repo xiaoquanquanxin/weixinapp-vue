@@ -29,6 +29,7 @@
     methods: {
       getBillDetail() {
         let sType = this.$route.query.active ? 0 : 1;
+        console.log(sType)
         let data = {
           roomIds: this.$route.query.roomId,
           userID: this.$route.query.userId,
