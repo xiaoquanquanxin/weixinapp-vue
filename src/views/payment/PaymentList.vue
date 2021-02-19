@@ -27,10 +27,13 @@
                     <div class="box">
                         <payment class="context" :paidData="paidOutListFilter" :isFrozen="isFrozen"
                                  :paidName="'paidOut'"
+                                 :roomId="roomId"
+                                 userId="81bd49dbe22e4a3ca5b3189b4d0faeeb"
+                                 :active="active"
                                  @billdsCheck="billdsCheck"></payment>
                     </div>
                     <div class="freeze" v-if="isFrozen">
-                        <router-link to="/wechat-pay/PaymentRecords">您有账单被冻结，请支付或取消后再缴费>></router-link>
+                        <router-link to="/wechat-pay/PaymentRecords">您有账单未支付，点击这里去支付或取消订单>></router-link>
                     </div>
                     <div :class="['box-footer',{'box-shadow':!isFrozen}]">
                         <!--                <input type="checkbox" :checked="allChecked" id="allChecked">-->
@@ -102,7 +105,7 @@
     },
 
     created() {
-      document.title="欠缴账单列表"
+      document.title = "欠缴账单列表"
       //  获取房间列表
       this.getRoomList();
     },
@@ -114,7 +117,7 @@
           url: `${ipUri["/bpi"]}/getPmdRooms.do`,
           contentType: "application/x-www-form-urlencoded",
           data: {
-            wxUserID: "5"
+            wxUserID: 70
           },
           success: (result) => {
             let roomList = [];
@@ -146,7 +149,7 @@
       // 获取已缴账单列表
       getPaidInList() {
         let data = {
-          roomIDs: '4a7477c8-7a28-46ce-bfc9-678e6dd71aaa',
+          roomIDs: this.roomId,
           userID: '575cd6b8b1c54389936cf47fe8347a40',
           startDate: '2012-02-05',
           endDate: '2020-02-05'
@@ -191,8 +194,10 @@
       // 获取未缴账单列表
       getPaymentList() {
         let data = {
-          roomIDs: this.roomId,
-          userID: '575cd6b8b1c54389936cf47fe8347a40' // 物管用户id
+          // roomIDs: this.roomId,
+          "roomIDs": "83a7999d-5177-4d0a-9d58-754aaad5db15",
+          "userID": "81bd49dbe22e4a3ca5b3189b4d0faeeb"
+          // userID: '575cd6b8b1c54389936cf47fe8347a40' // 物管用户id
           // roomIDs: '4a7477c8-7a28-46ce-bfc9-678e6dd71aaa',
           // userID: '575cd6b8b1c54389936cf47fe8347a40',
         };
@@ -204,14 +209,14 @@
           contentType: "application/x-www-form-urlencoded",
           data: {'json': JSON.stringify(data)},
           success: (res) => {
-            this.totleMoney = 0; // 总价格
+            let sum = 0; // 总价格
             this.billIDsList = []; // 选中账单id
             if (res.data.content) {
               this.noList = false;
               this.paidOutList = res.data.content //  所有未缴账单列表
               this.paidOutListFilter = res.data.content // 根据费项
               this.totalMoney = res.data.totalMoney
-              let costItem = []; // 费项列表
+              let costItem = ['全部费项']; // 费项列表
               this.paidOutListFilter.forEach((item) => {
                 item.billDetails.forEach((_item) => {
                   //  拿到项目名称 添加到costItem数组中 去重
@@ -225,11 +230,13 @@
                     // 默认选中所有费项
                     this.$set(_item, 'checked', true)
                     // 默认选中所有费项
-                    this.totleMoney += _item.paidTotal
+                    sum += _item.paidTotal
                   }
                 })
 
               })
+              this.totleMoney = sum.toFixed(2)
+              console.log(this.paidOutListFilter)
               costItem.forEach((item) => { // 把处理好的费项赋值给this.costItem
                 this.costItem.push({
                   id: "",
@@ -273,16 +280,22 @@
       // 选择费项
       setCharges(value) {
         this.billName = value.value
-        //  筛选 包含 所选费项的 账单
-        this.paidOutListFilter = this.paidOutList.filter((item) => {
-          item.billDetails.forEach((_item) => {
-            if (_item.paidName == value.value) {
-              return item
-            }
+        if (value.value === '全部费项') {
+          this.paidOutListFilter = this.paidOutList
+        } else {
+          //  筛选 包含 所选费项的 账单
+          this.paidOutListFilter = this.paidOutList.filter((item) => {
+            item.billDetails.forEach((_item) => {
+              if (_item.paidName == value.value) {
+                return item
+              }
+            })
           })
-        })
+        }
+
         this.billIDsList = [];
-        this.totleMoney = 0;
+
+        let sum = 0;
         this.paidOutListFilter.forEach((item) => {
           item.billDetails.forEach((_item) => {
             // 拿到选中账单id
@@ -292,10 +305,11 @@
               // 默认选中所有费项
               this.$set(_item, 'checked', true)
               // 默认选中所有费项
-              this.totleMoney += _item.paidTotal
+              sum += _item.paidTotal
             }
           })
         })
+        this.totleMoney = sum.toFixed(2);
         // this.$showToast.hide()
       },
       //  全选按钮点击事件
@@ -375,9 +389,9 @@
       isCheckedAll() {
         // 控制全选按钮
         let checkedItem = this.paidOutListFilter.every(item => {
-         return item.billDetails.some((_item) => {
-           return _item.checked
-         })
+          return item.billDetails.some((_item) => {
+            return _item.checked
+          })
         });
         this.allChecked = checkedItem
       },
@@ -633,4 +647,5 @@
         }
 
     }
+
 </style>

@@ -2,7 +2,7 @@
     <div class="form-item">
         <ul>
             <li v-for="(item,index) in paidData" :key="index" class="line">
-                <div class="year line">{{item.billMonth}}</div>
+                <div class="year line">{{item.billMonth}} <span @click.stop="goBillDetail(item.billMonth)">明细</span></div>
                 <div v-for="items in item.billDetails" :key="items.billIds"
                      :class="['paid-cont',{'isFrozen':isFrozen}]"
                      @click="choosepaid(items.billIds,index,Number(items.isFrozen))">
@@ -12,6 +12,7 @@
                             {{items.paidName}}
                             <span v-if="!Number(items.isFrozen)" class="border">冻结</span>
                         </div>
+
                     </div>
                     <div class="paid-pay">
                         ￥{{items.paidTotal}}
@@ -34,7 +35,7 @@
         // billdsList:[]
       }
     },
-    props: ['paidData', 'paidName', 'isAllChecked','isFrozen'],
+    props: ['paidData', 'paidName', 'isAllChecked', 'isFrozen', 'roomId', 'userId', "active"],
     computed: {
       allChecked() {
         return this.$store.state.paidOut.allChecked
@@ -48,14 +49,14 @@
       //   'setAllChecked',
       // ]),
       choosepaid(id, index) {
-        let prev = true ,next = true;
+        let prev = true, next = true;
         // 如果没有冻结账单 则可以操作账单列表
-        if(!this.isFrozen){
+        if (!this.isFrozen) {
           //  判断之前月份有没有没勾选
           for (let i = 0; i < index; i++) {
             if (this.paidData[i]) {
               this.paidData[i].billDetails.forEach((_item) => {
-                if(!_item.checked){
+                if (!_item.checked) {
                   this.$showToast.show('不能跳月缴费，请把之前的月份账单结清。', 2000)
                   prev = false
                 }
@@ -65,8 +66,8 @@
           //  判断之后月份有没有勾选
           for (let i = index, len = this.paidData.length; i < len; i++) {
             if (this.paidData[i + 1]) {
-              this.paidData[i+1].billDetails.forEach((_item) => {
-                if(_item.checked){
+              this.paidData[i + 1].billDetails.forEach((_item) => {
+                if (_item.checked) {
                   this.$showToast.show('不能跳月缴费，请把之前的月份账单结清。', 2000)
                   next = false
                 }
@@ -75,11 +76,20 @@
             }
           }
           // 都不满足则不是跳月缴费 可以操作勾选
-          if(prev && next){
+          if (prev && next) {
             this.$emit('billdsCheck', id)
           }
 
         }
+      },
+      goBillDetail(billMonth) {
+        let query = {
+          roomId: this.roomId,
+          userId: this.userId,
+          billMonth: billMonth,
+          active: this.active
+        }
+        this.$router.push({path: '/wechat-pay/BillDetail', query})
       }
     }
   }
@@ -101,7 +111,14 @@
     }
 
     .year {
+        display: flex;
+        padding-right: 0.24rem;
+        justify-content: space-between;
         font-size: 0.14rem;
+        background-image: url("~@/assets/images/rightB.png");
+        background-size: 0.07rem 0.11rem;
+        background-repeat: no-repeat;
+        background-position: center right 0.1rem;
     }
 
     .paid-cont {
@@ -142,7 +159,8 @@
     .isFrozen {
         opacity: 0.4;
     }
-    .border{
+
+    .border {
         padding: 0.02rem 0.06rem;
         border: 1px solid #ECECEC;
         font-size: 0.11rem;

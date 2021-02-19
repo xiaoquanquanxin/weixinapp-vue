@@ -1,6 +1,7 @@
 import Login from "@/views/Login.vue";
 import PayIndex from "@/views/PayIndex.vue";
 import PaymentList from "@/views/payment/PaymentList.vue";
+import BillDetail from "@/views/payment/BillDetail.vue";
 import ConfirmPayment from "@/views/payment/ConfirmPayment.vue";
 import PaySuccess from "@/views/PaySuccess.vue";
 import OrderDetail from "@/views/order/OrderDetail.vue";
@@ -69,6 +70,11 @@ export const syncRoutesList = [
     path: '/wechat-pay/kesu',
     name: 'kesu',
     component: kesu,
+  },
+  {
+    path: '/wechat-pay/BillDetail',
+    name: 'BillDetail',
+    component: BillDetail,
   },
 ];
 

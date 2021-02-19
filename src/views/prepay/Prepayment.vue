@@ -24,7 +24,7 @@
         </div>
         <div class="content" v-if="calcTimeUint">
             <div v-if="calcTimeUint == 2" class="pay">
-                <div v-if="paymentList.length" class="pay-list">
+                <div v-if="paymentList.length > 1" class="pay-list">
                     <div v-for="(item,index) in paymentList" :key="index" :class="{'isFrozen':isFrozen}">
                         <div @click="customFunc(item)" :class="{'checked':item.checked}"
                              v-if="item.type === 1">
@@ -136,6 +136,7 @@
       return {
         rates: false, // 收费标准
         custom: false, // 自定义
+        cmdsId: 0,
         feeName: "",
         feeInfo: [], // 费项列表
         roomList: [], // 房间列表
@@ -164,7 +165,7 @@
       Confrim
     },
     created() {
-      document.title="预缴账单"
+      document.title = "预缴账单"
       // 获取房间列表
       this.getRoomList()
     },
@@ -176,7 +177,7 @@
           url: `${ipUri["/bpi"]}/getPmdRooms.do`,
           contentType: "application/x-www-form-urlencoded",
           data: {
-            wxUserID: "5"
+            wxUserID: "53"
           },
           success: (result) => {
             let roomList = [];
@@ -189,6 +190,7 @@
             this.roomList = roomList;
             this.roomName = roomList[0].value //  默认第一个房间名称
             this.roomID = roomList[0].id  // 默认第一个房间id
+            this.cmdsId = result.data[0].cmdsId  // 默认第一个房间id
             // 获取当前房间下有没有预缴订单
             this.getFeeItem()
           }
@@ -198,7 +200,7 @@
       getFeeItem() {
         let data = {
           pmdsRoomId: this.roomID,
-          cmdsId: '575cd6b8b1c54389936cf47fe8347a40'
+          cmdsId: this.cmdsId
         };
         $.ajax({
           crossDomain: true,//兼容ie8,9
@@ -222,7 +224,7 @@
       getFeeInfo() {
         let data = {
           pmdsRoomId: this.roomID, // 房间主数据id
-          cmdsId: '575cd6b8b1c54389936cf47fe8347a40'  // 用户主数据id
+          cmdsId: this.cmdsId  // 用户主数据id
         };
         $.ajax({
           crossDomain: true,//兼容ie8,9
@@ -262,7 +264,7 @@
 
         let data = {
           pmdsRoomId: this.roomID,  //房间主数据id
-          cmdsId: '575cd6b8b1c54389936cf47fe8347a40',  //用户主数据id
+          cmdsId: this.cmdsId,  //用户主数据id
           feeId: this.feeId,  // 费项id
           itemSourceName: this.itemSourceName // 数据来源：房间号、表具编号、车位号
         };
@@ -282,7 +284,7 @@
       getFeeitemDetails() {
         let data = {
           pmdsRoomId: this.roomID, //房间主数据id
-          cmdsId: '575cd6b8b1c54389936cf47fe8347a40', //  用户主数据id
+          cmdsId: this.cmdsId, //  用户主数据id
           feeId: this.feeId, // 费项id
           itemSourceName: this.itemSourceName, // 数据来源：房间号、表具编号、车位号
           customMonths: 1  //  自定义预缴月数 后台暂时未用的 但是加了判空验证
@@ -314,9 +316,9 @@
                 break;
               }
             }
+
             arr.push(this.customObj);
             this.paymentList = arr;
-
             // // 获取个人冻结订单
             // this.getUnpaidBillTran()
           }
@@ -335,6 +337,7 @@
       // 自定义
       customFunc() {
         //  如果没有价格，那么一定是第一次打开的
+        console.log(this.isFrozen)
         if (!this.isFrozen) {
           //    我要默认执行选择快捷支付的事件
           const checkedItem = this.paymentList.find(item => {
@@ -405,11 +408,7 @@
         this.roomID = value.id
         this.roomName = value.value
         // 重新拉数据
-        // 获取费项收费标准
-        this.getFeeChargeStandard()
-
-        // 获取专项预缴费项订单明细
-        this.getFeeitemDetails()
+        this.getFeeItem()
       },
       setfeeInfo(value) {
         console.log(value)
