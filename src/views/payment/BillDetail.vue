@@ -2,10 +2,13 @@
     <div class="payment-box">
         <div class="payment-list">
             <h3 class="line">{{billMonth}}</h3>
-            <div v-for="(item,index) in billDetail" :key="index">
-                <p class="paymen-name">{{item.paidName}}</p>
-                <p class="payment-money">￥{{item.paidTotal}}</p>
+            <div class="line">
+                <div v-for="(item,index) in billDetail" :key="index">
+                    <p class="paymen-name">{{item.paidName}}</p>
+                    <p class="payment-money">￥{{item.paidTotal}}</p>
+                </div>
             </div>
+
         </div>
     </div>
 </template>
@@ -54,20 +57,23 @@
 <style scoped lang="less">
     @import "~@/assets/css/common.less";
     .payment-box {
-        margin-top: 0.1rem;
-        background: #ffffff;
+        margin-bottom: 0.27rem;
         font-size: 0.16rem;
+        padding: 0.2rem 0.15rem;
+        height: 100%;
+        box-sizing: border-box;
         h3{
             text-align: center;
             line-height: 0.4rem;
+
         }
         .payment-list {
-            padding: 0.13rem;
+            padding: 0.1rem;
+            height: 100%;
             box-sizing: border-box;
             background: #ffffff;
-            border-bottom: 0.01rem solid #ECECEC;
 
-            div {
+            >div>div {
                 display: flex;
                 justify-content: space-between;
                 font-size: 0.13rem;
