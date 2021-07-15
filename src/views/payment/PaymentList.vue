@@ -62,7 +62,7 @@
         <!--        已缴账单-->
         <div class="content" v-else>
             <payment class="paid-box" :paidData="paidInList" v-if="!noList" :roomId="roomId"
-                     userId="81bd49dbe22e4a3ca5b3189b4d0faeeb" :active="active" ></payment>
+                     userId="81bd49dbe22e4a3ca5b3189b4d0faeeb" :active="active"></payment>
             <div v-else class="no-message">
                 <img src="~@/assets/images/noMessage.png">
                 <p>暂无已缴账单</p>
@@ -118,7 +118,7 @@
           url: `${ipUri["/bpi"]}/getPmdRooms.do`,
           contentType: "application/x-www-form-urlencoded",
           data: {
-            wxUserID: 70
+            wxUserID: 80
           },
           success: (result) => {
             let roomList = [];
@@ -151,7 +151,7 @@
       getPaidInList() {
         let data = {
           roomIDs: this.roomId,
-          userID: '81bd49dbe22e4a3ca5b3189b4d0faeeb',
+          userID: '575cd6b8b1c54389936cf47fe8347a40',
           startDate: '2012-02-05',
           endDate: '2020-02-05'
         };
@@ -196,9 +196,9 @@
       getPaymentList() {
         let data = {
           // roomIDs: this.roomId,
-          "roomIDs": "83a7999d-5177-4d0a-9d58-754aaad5db15",
-          "userID": "81bd49dbe22e4a3ca5b3189b4d0faeeb"
-          // userID: '575cd6b8b1c54389936cf47fe8347a40' // 物管用户id
+          "roomIDs": "0b000add-bb9b-4f30-9392-aa543b5be332",
+          // "userID": "81bd49dbe22e4a3ca5b3189b4d0faeeb"
+          userID: '575cd6b8b1c54389936cf47fe8347a40' // 物管用户id
           // roomIDs: '4a7477c8-7a28-46ce-bfc9-678e6dd71aaa',
           // userID: '575cd6b8b1c54389936cf47fe8347a40',
         };
@@ -237,7 +237,6 @@
 
               })
               this.totleMoney = sum.toFixed(2)
-              console.log(this.paidOutListFilter)
               costItem.forEach((item) => { // 把处理好的费项赋值给this.costItem
                 this.costItem.push({
                   id: "",
@@ -343,8 +342,29 @@
           billIDsList: this.billIDsList
 
         }
-        console.log(query)
-        // this.$router.push({path: '/ConfirmPayment', query})
+
+        let isTrue = true;
+        // 遍历账单列表 获取每一账单的delayIsMustPay值
+        this.paidOutListFilter.map((item) => {
+          item.billDetails.forEach((_item) => {
+            // 找到选中账单delayIsMustPay为1的违约金id ：delayChargeItemDetailID
+            if (_item.checked && _item.delayIsMustPay === '1') {
+              item.billDetails.forEach((filter_items) => {
+                // 获取到delayChargeItemDetailID之后遍历所属的billDetails 找到billIds为delayChargeItemDetailID一项查看是否选中
+                if (filter_items.billIds.includes(_item.delayChargeItemDetailID)) {
+                  isTrue = filter_items.checked;
+                }
+              })
+            }
+          })
+        })
+        if(!isTrue){
+          console.log('请缴纳违约金账单')
+          return;
+        }
+
+
+        this.$router.push({path: '/ConfirmPayment', query})
         this.$router.push({path: '/wechat-pay/ConfirmPayment', query})
       },
       // 费项点击事件
