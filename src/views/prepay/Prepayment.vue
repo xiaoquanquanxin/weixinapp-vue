@@ -177,7 +177,7 @@
           url: `${ipUri["/bpi"]}/getPmdRooms.do`,
           contentType: "application/x-www-form-urlencoded",
           data: {
-            wxUserID: "53"
+            wxUserID: "80"
           },
           success: (result) => {
             let roomList = [];
@@ -237,7 +237,32 @@
             if (res.code == 2000) {
               this.feeName = `${res.data[0].feeName}(${res.data[0].itemSourceName})`
               let arr = [];
-              res.data.map((item) => {
+              const objData = [{
+                "feeName": "预收住宅物业管理费",
+                "feeId": "29401",
+                "calcTimeUint": "2",
+                "itemSourceName": "132",
+                "balanceAmount": "0"
+              }, {
+                "feeName": "预缴月保车位费",
+                "feeId": "35204",
+                "calcTimeUint": "2",
+                "itemSourceName": "132",
+                "balanceAmount": "0"
+              }, {
+                "feeName": "预收车位费",
+                "feeId": "35206",
+                "calcTimeUint": "2",
+                "itemSourceName": "A001",
+                "balanceAmount": "0"
+              }, {
+                "feeName": "预收车位租金",
+                "feeId": "35207",
+                "calcTimeUint": "2",
+                "itemSourceName": "A001",
+                "balanceAmount": "0"
+              }]
+              objData.map((item) => {
                 arr.push({
                   'id': item.feeId,
                   'value': `${item.feeName}(${item.itemSourceName})`,

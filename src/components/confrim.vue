@@ -54,8 +54,8 @@
         // this.type = 'confirm'
         this.outerData = null
       },
-      clickFun (type) {
-        this.$emit('userBehavior', type, this.outerData)
+      clickFun () {
+        // this.$emit('userBehavior', type, this.outerData)
         this.hidden()
       }
     }

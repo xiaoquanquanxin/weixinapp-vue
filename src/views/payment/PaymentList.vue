@@ -364,7 +364,8 @@
         }
 
 
-        this.$router.push({path: '/ConfirmPayment', query})
+
+        // this.$router.push({path: '/ConfirmPayment', query})
         this.$router.push({path: '/wechat-pay/ConfirmPayment', query})
       },
       // 费项点击事件

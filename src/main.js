@@ -1,7 +1,9 @@
 export const ipUri = {
-  '/mpi': 'https://hachiseedland-dev.hachi-tech.com',
+  // '/mpi': 'https://hachiseedland-dev.hachi-tech.com',
+  '/mpi': 'http://192.168.100.28:5080/wechat-mobile/',
   // '/bpi':'https://hachiseedland-dev.hachi-tech.com/v3/api/',
-  '/bpi': 'http://192.168.100.208:3080', //  容丽姐 端口
+  // '/bpi': 'http://192.168.100.87:8080', //  少杰 端口 物业缴费
+  '/bpi': 'http://192.168.100.28:3080', //  容丽姐 端口
   '/wpi': 'http://asm-test.seedland.cc:8084/life-web/sso/api/workorder', //  客诉端口
   '/opi': 'http://hachi-pay.mynatapp.cc/api/'  //  少杰 端口
 }
